@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXIA · Inteligencia Operativa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config={darkMode:'class',theme:{extend:{
+    fontFamily:{serif:['Fraunces','serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']},
+    colors:{
+      brand:{DEFAULT:'#3b82f6',dark:'#3b82f6'},
+      ok:{DEFAULT:'#10b981',dark:'#22c55e'},
+      warn:{DEFAULT:'#eab308',dark:'#fbbf24'},
+      crit:{DEFAULT:'#ef4444',dark:'#ef4444'},
+    }
+  }}};
+</script>
+<style>
+  body{font-family:'Inter',sans-serif;}
+  .serif{font-family:'Fraunces','serif';} .mono{font-family:'JetBrains Mono','monospace';}
+  @keyframes ping-soft{0%{transform:scale(1);opacity:.5;}75%,100%{transform:scale(2.2);opacity:0;}}
+  .ping-soft{animation:ping-soft 1.6s cubic-bezier(0,0,.2,1) infinite;}
+  .view{display:none;} .view.active{display:block;animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .stripe{background:repeating-linear-gradient(45deg,#fef3c7,#fef3c7 10px,#fde68a 10px,#fde68a 20px);}
+  .dark .stripe{background:repeating-linear-gradient(45deg,#422006,#422006 10px,#52320a 10px,#52320a 20px);color:#fcd34d;}
+  @keyframes slide-in{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:none;}}
+  .slide-in{animation:slide-in .4s ease;}
+  .ico{display:inline-block;vertical-align:-2px;}
+</style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
+
+<!-- Iconos SVG reutilizables (símbolos, estilo línea fina) -->
+<svg width="0" height="0" class="hidden">
+  <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l3-3M3.6 9a9 9 0 1 0 16.8 0M12 21a9 9 0 0 1-9-9M21 12a9 9 0 0 0-9-9"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2M3.05 11a9 9 0 1 1 .5 4M3 4v4h4"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4.5a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 6 9.4a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 11 4.6V4.5a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M6 8h12v3a6 6 0 0 1-12 0zM12 17v5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l14 8-14 8z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+</svg>
+
+<div class="stripe px-4 py-1.5 text-center text-[11px] font-medium uppercase tracking-wider text-amber-900">
+  Modo demostración · datos simulados · listo para conectar a sensores reales
+</div>
+
+<!-- NAV -->
+<nav class="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 sm:px-8">
+    <div class="flex items-center gap-2.5">
+      <span class="relative flex h-2.5 w-2.5"><span class="ping-soft absolute inline-flex h-full w-full rounded-full" style="background:#10b981"></span><span class="relative inline-flex h-2.5 w-2.5 rounded-full" style="background:#10b981"></span></span>
+      <span class="serif text-lg tracking-tight">NEXIA</span>
+    </div>
+    <div class="flex items-center gap-0.5 text-sm">
+      <button onclick="show('command')" data-nav="command" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-gauge"/></svg><span class="hidden sm:inline">Mando</span></button>
+      <button onclick="show('oee')" data-nav="oee" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-chart"/></svg><span class="hidden sm:inline">Producción</span></button>
+      <button onclick="show('audit')" data-nav="audit" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-clipboard"/></svg><span class="hidden sm:inline">Auditoría</span></button>
+      <button onclick="show('history')" data-nav="history" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-history"/></svg><span class="hidden sm:inline">Historial</span></button>
+      <button onclick="show('asistente')" data-nav="asistente" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-spark"/></svg><span class="hidden sm:inline">Asistente</span></button>
+      <button onclick="show('connect')" data-nav="connect" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-plug"/></svg><span class="hidden sm:inline">Conectar</span></button>
+      <button onclick="show('settings')" data-nav="settings" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-settings"/></svg><span class="hidden sm:inline">Ajustes</span></button>
+      <button onclick="show('admin')" data-nav="admin" id="nav-admin" class="nav-btn flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-neutral-500 transition-colors dark:text-neutral-400"><svg class="ico h-4 w-4"><use href="#i-shield"/></svg><span class="hidden sm:inline">Admin</span></button>
+      <div class="mx-1.5 h-5 w-px bg-neutral-200 dark:bg-neutral-700"></div>
+      <select id="role-select" onchange="cambiarRol()" class="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+        <option value="admin">Administrador</option>
+        <option value="jefe">Jefe de planta</option>
+        <option value="tecnico">Técnico de mantenimiento</option>
+        <option value="operador">Operador</option>
+        <option value="lectura">Solo lectura</option>
+      </select>
+      <button onclick="toggleDark()" aria-label="Cambiar tema" class="rounded-lg border border-neutral-200 p-1.5 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"><svg class="ico h-4 w-4" id="theme-icon"><use href="#i-moon"/></svg></button>
+    </div>
+  </div>
+</nav>
+
+<!-- COMMAND -->
+<section id="view-command" class="view active">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-7xl">
+    <header class="mb-6"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">En vivo · actualizando cada 2s</span><div class="mt-2 flex items-end justify-between"><h1 class="serif text-3xl tracking-tight">Centro de mando</h1><p id="cmd-summary" class="text-sm text-neutral-500"></p></div></header>
+    <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div class="rounded-2xl border border-neutral-200 bg-neutral-900 px-7 py-6 text-white dark:border-neutral-800 lg:col-span-2"><div class="flex flex-wrap items-center justify-between gap-6"><div><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Ahorro estimado este mes</span><div id="ahorro-mes" class="mt-1 serif text-4xl tracking-tight" style="color:#22c55e">$0</div><p class="mt-1 text-xs text-neutral-400">en paradas no planificadas evitadas</p></div><div class="flex gap-6"><div><div id="kpi-evitadas" class="serif text-2xl">0</div><span class="text-[11px] uppercase tracking-wider text-neutral-500">paradas evitadas</span></div><div><div class="serif text-2xl">6</div><span class="text-[11px] uppercase tracking-wider text-neutral-500">activos</span></div></div></div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Salud general de planta</span><div id="salud-gauge" class="mt-2 flex justify-center"></div></div>
+    </div>
+    <div id="grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </div></main>
+</section>
+
+<!-- OEE -->
+<section id="view-oee" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-7xl">
+    <header class="mb-6"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Turno actual · Línea 1</span><h1 class="mt-2 serif text-3xl tracking-tight">Producción y eficiencia</h1></header>
+    <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-6 text-center dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">OEE Global</span><div id="oee-gauge" class="mt-2 flex justify-center"></div><p id="oee-nivel" class="mt-1 text-xs text-neutral-500"></p></div>
+      <div class="grid grid-cols-1 gap-4 lg:col-span-3 sm:grid-cols-3">
+        <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Disponibilidad</span><div id="m-dispo" class="mt-2 serif text-3xl" style="color:#3b82f6">—</div><div class="mt-3 h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800"><div id="bar-dispo" class="h-1.5 rounded-full" style="width:0%;background:#3b82f6"></div></div></div>
+        <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Rendimiento</span><div id="m-rend" class="mt-2 serif text-3xl" style="color:#eab308">—</div><div class="mt-3 h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800"><div id="bar-rend" class="h-1.5 rounded-full" style="width:0%;background:#eab308"></div></div></div>
+        <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Calidad</span><div id="m-cal" class="mt-2 serif text-3xl" style="color:#10b981">—</div><div class="mt-3 h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800"><div id="bar-cal" class="h-1.5 rounded-full" style="width:0%;background:#10b981"></div></div></div>
+      </div>
+    </div>
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Piezas buenas</span><div id="c-buenas" class="mt-1 serif text-3xl" style="color:#10b981">0</div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Rechazos</span><div id="c-malas" class="mt-1 serif text-3xl" style="color:#ef4444">0</div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Objetivo turno</span><div class="mt-1 serif text-3xl text-neutral-400">4,200</div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Ritmo (pzs/min)</span><div id="c-ritmo" class="mt-1 serif text-3xl">0</div><span id="c-ritmo-meta" class="text-[11px] text-neutral-400"></span></div>
+    </div>
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900"><h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Tiempos de inactividad · por causa</h3><div id="downtime-chart" class="mt-4 flex items-center gap-6"></div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900"><h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Consumo energético · turno</h3><div id="energy" class="mt-4 space-y-4"></div></div>
+    </div>
+  </div></main>
+</section>
+
+<!-- DETAIL -->
+<section id="view-detail" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-5xl">
+    <button onclick="show('command')" class="mb-5 text-sm text-neutral-400 transition-colors hover:text-neutral-700">&larr; Volver a la flota</button>
+    <header class="mb-5"><div class="flex items-center gap-2"><span id="d-dot" class="h-1.5 w-1.5 rounded-full"></span><span id="d-state" class="text-xs uppercase tracking-[0.18em] text-neutral-400"></span></div><h1 id="d-title" class="mt-2 serif text-3xl tracking-tight"></h1><p id="d-sub" class="mt-1 mono text-sm text-neutral-400"></p></header>
+    <div id="d-prediction" class="mb-5 rounded-2xl border px-7 py-5"></div>
+    <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div class="rounded-2xl border border-neutral-200 bg-white px-5 py-5 text-center dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Temperatura</span><div id="g-temp" class="mt-1 flex justify-center"></div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-5 py-5 text-center dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Presión</span><div id="g-pres" class="mt-1 flex justify-center"></div></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-5 py-5 text-center dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">RPM</span><div id="g-rpm" class="mt-1 flex justify-center"></div></div>
+    </div>
+    <div class="mb-5 rounded-2xl border border-neutral-200 bg-white px-7 py-5 dark:border-neutral-800 dark:bg-neutral-900"><h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Estado de sensores y actuadores</h3><div id="sensores" class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4"></div></div>
+    <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
+      <div class="mb-5 flex items-baseline justify-between"><h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Vibración real vs. esperado</h3><div class="text-right"><div id="d-val" class="mono text-2xl"></div><div id="d-exp" class="mono text-xs text-neutral-400"></div></div></div>
+      <div id="d-chart"></div>
+      <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-neutral-400">
+        <span class="flex items-center gap-1.5"><span class="inline-block h-0 w-4" style="border-top:2px solid #3b82f6"></span>Real</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block h-0 w-4" style="border-top:2px dashed #9ca3af"></span>Esperado</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block h-2 w-4 rounded" style="background:#9ca3af;opacity:.2"></span>Rango normal</span>
+        <button onclick="reproducir()" class="ml-auto flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1 text-xs text-neutral-600 transition-colors hover:border-neutral-300 dark:border-neutral-700"><svg class="ico h-3 w-3"><use href="#i-play"/></svg>Ver cómo se detectó</button>
+      </div>
+    </div>
+    <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">Horas de operación</span><div id="m-horas" class="mt-1 serif text-2xl">—</div><span class="text-[11px] text-neutral-400">próx. mantenimiento en 240h</span></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">MTBF</span><div class="mt-1 serif text-2xl">182 h</div><span class="text-[11px] text-neutral-400">tiempo medio entre fallos</span></div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900"><span class="text-xs uppercase tracking-wider text-neutral-400">MTTR</span><div class="mt-1 serif text-2xl">3.2 h</div><span class="text-[11px] text-neutral-400">tiempo medio de reparación</span></div>
+    </div>
+  </div></main>
+</section>
+
+<!-- AUDIT -->
+<section id="view-audit" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-4xl">
+    <header class="mb-6"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Human-in-the-loop</span><div class="mt-2 flex items-end justify-between"><h1 class="serif text-3xl tracking-tight">Auditoría</h1><p id="audit-count" class="text-sm text-neutral-500"></p></div></header>
+    <div id="queue" class="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900"></div>
+    <div id="queue-empty" class="hidden rounded-2xl border border-neutral-200 bg-white px-8 py-16 text-center dark:border-neutral-800 dark:bg-neutral-900"><svg class="mx-auto h-8 w-8" style="color:#10b981"><use href="#i-check"/></svg><p class="mt-4 text-sm text-neutral-500">No hay alertas pendientes.</p><p class="mt-1 text-xs text-neutral-400">Todo el trabajo está al día.</p></div>
+  </div></main>
+</section>
+
+<!-- ASISTENTE IA -->
+<section id="view-asistente" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-3xl">
+    <header class="mb-6"><div class="flex items-center gap-2"><svg class="ico h-4 w-4" style="color:#3b82f6"><use href="#i-spark"/></svg><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Inteligencia aumentada</span></div><h1 class="mt-2 serif text-3xl tracking-tight">Asistente NEXIA</h1><p class="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-500">Pregunta en lenguaje natural sobre el estado de tus máquinas. El asistente responde analizando los datos en tiempo real.</p></header>
+    <div class="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div id="chat-log" class="max-h-[420px] space-y-4 overflow-y-auto px-6 py-6"></div>
+      <div class="border-t border-neutral-100 px-4 py-3 dark:border-neutral-800">
+        <div class="mb-3 flex flex-wrap gap-2" id="chat-sugerencias"></div>
+        <div class="flex items-center gap-2">
+          <input id="chat-input" onkeydown="if(event.key==='Enter')enviarChat()" placeholder="Pregunta sobre tus máquinas…" class="flex-1 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800">
+          <button onclick="enviarChat()" aria-label="Enviar" class="flex h-10 w-10 items-center justify-center rounded-xl text-white" style="background:#3b82f6"><svg class="ico h-4 w-4"><use href="#i-send"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <p class="mt-3 text-center text-[11px] text-neutral-400">El asistente analiza los datos simulados de la demo. En producción se conecta a un modelo de lenguaje con acceso a tu planta.</p>
+  </div></main>
+</section>
+
+<!-- HISTORY -->
+<section id="view-history" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-4xl">
+    <header class="mb-6"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Registro de eventos</span><div class="mt-2 flex items-end justify-between"><h1 class="serif text-3xl tracking-tight">Historial de fallos</h1><button onclick="alert('En la versión real: exporta un PDF para llevar a la reunión.')" class="flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 transition-colors hover:border-neutral-300 dark:border-neutral-700"><svg class="ico h-3.5 w-3.5"><use href="#i-download"/></svg>Exportar reporte</button></div></header>
+    <div id="history-list" class="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900"></div>
+  </div></main>
+</section>
+
+<!-- CONNECT -->
+<section id="view-connect" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-5xl">
+    <header class="mb-6"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Integración industrial</span><h1 class="mt-2 serif text-3xl tracking-tight">Conectar a</h1><p class="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-500">NEXIA se conecta a tus máquinas a través de protocolos industriales estándar. Selecciona el que usa tu PLC o controlador. Un gateway traduce la señal de tu equipo al sistema.</p></header>
+    <div id="connect-essential" class="mb-6"></div>
+    <div id="connect-vendor" class="mb-6"></div>
+    <div id="connect-special"></div>
+  </div></main>
+</section>
+
+<!-- SETTINGS -->
+<section id="view-settings" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-3xl">
+    <header class="mb-6"><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Configuración</span><h1 class="mt-2 serif text-3xl tracking-tight">Ajustes</h1></header>
+    <div class="space-y-4">
+      <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Perfil de usuario</h3>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <label class="block"><span class="text-sm text-neutral-600 dark:text-neutral-300">Nombre</span><input value="Alessia Frisoni" class="mt-1 w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800"></label>
+          <label class="block"><span class="text-sm text-neutral-600 dark:text-neutral-300">Planta</span><input value="Planta Norte · Línea 1" class="mt-1 w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800"></label>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Sistema de unidades</h3>
+        <div class="mt-4">
+          <div class="flex items-center justify-between"><div><div class="text-sm">Sistema de medida</div><div class="text-xs text-neutral-400">Cambia todas las unidades de doble sistema a la vez</div></div><div class="flex gap-1 rounded-lg border border-neutral-200 p-0.5 dark:border-neutral-700"><button onclick="setSistema('metrico')" id="sis-m" class="rounded-md px-3 py-1 text-sm font-medium" style="background:#3b82f6;color:#fff">Métrico (SI)</button><button onclick="setSistema('imperial')" id="sis-i" class="rounded-md px-3 py-1 text-sm text-neutral-500">Imperial (EE.UU.)</button></div></div>
+          <div id="unidades-tabla" class="mt-5 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3"></div>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Preferencias</h3>
+        <div class="mt-4 space-y-4">
+          <div class="flex items-center justify-between"><div><div class="text-sm">Idioma</div><div class="text-xs text-neutral-400">Idioma de la interfaz</div></div><select class="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm dark:border-neutral-700 dark:bg-neutral-800"><option>Español</option><option>English</option></select></div>
+          <div class="flex items-center justify-between"><div><div class="text-sm">Tema oscuro</div><div class="text-xs text-neutral-400">Cambia el aspecto general</div></div><button onclick="toggleDark()" class="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm dark:border-neutral-700">Alternar</button></div>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Umbrales de alerta</h3>
+        <div class="mt-4 space-y-4">
+          <label class="block"><div class="flex justify-between text-sm"><span class="text-neutral-600 dark:text-neutral-300">Sensibilidad de detección</span><span id="umbral-val" class="mono text-neutral-400">60%</span></div><input type="range" min="40" max="90" value="60" oninput="document.getElementById('umbral-val').textContent=this.value+'%'" class="mt-2 w-full" style="accent-color:#3b82f6"></label>
+          <p class="text-xs text-neutral-400">Más bajo = más sensible (más alertas). Más alto = solo casos claros.</p>
+        </div>
+      </div>
+      <div class="flex justify-end"><button onclick="toast('Ajustes guardados')" class="rounded-xl px-6 py-2.5 text-sm font-medium text-white" style="background:#3b82f6">Guardar cambios</button></div>
+    </div>
+  </div></main>
+</section>
+
+<!-- ADMIN -->
+<section id="view-admin" class="view">
+  <main class="px-6 py-8 sm:px-8"><div class="mx-auto max-w-4xl">
+    <header class="mb-6"><div class="flex items-center gap-2"><svg class="ico h-4 w-4" style="color:#3b82f6"><use href="#i-shield"/></svg><span class="text-xs uppercase tracking-[0.18em] text-neutral-400">Solo administradores</span></div><h1 class="mt-2 serif text-3xl tracking-tight">Gestión de permisos</h1><p class="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-500">Controla qué puede ver y hacer cada rol. Los cambios aplican a todos los usuarios con ese rol.</p></header>
+    <div class="mb-6 rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div class="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800"><h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Usuarios</h3></div>
+      <div id="admin-users"></div>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div class="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800"><h3 class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Matriz de permisos por rol</h3></div>
+      <div id="admin-perms" class="overflow-x-auto"></div>
+    </div>
+  </div></main>
+</section>
+
+<!-- Notif -->
+<div id="phone-alert" class="fixed right-6 top-20 z-50 hidden w-80">
+  <div class="rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800"><div class="flex items-center gap-2"><div class="flex h-8 w-8 items-center justify-center rounded-lg text-white" style="background:#ef4444"><svg class="ico h-4 w-4"><use href="#i-alert"/></svg></div><div class="flex-1"><div class="text-xs font-semibold">NEXIA</div><div class="text-[10px] text-neutral-400">ahora · SMS al responsable</div></div></div><p id="phone-msg" class="mt-2 text-sm text-neutral-700 dark:text-neutral-200"></p></div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-neutral-900/30 px-4 backdrop-blur-sm">
+  <div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900" onclick="event.stopPropagation()">
+    <div class="border-b border-neutral-100 px-8 pt-8 pb-6 dark:border-neutral-800"><span class="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Human-in-the-loop</span><h2 class="mt-3 serif text-2xl tracking-tight">Confirmar evento</h2><div class="mt-3 rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800"><span class="text-[11px] uppercase tracking-wider text-neutral-400">Causa probable (IA)</span><p id="m-cause" class="mt-0.5 text-sm text-neutral-700 dark:text-neutral-200"></p></div></div>
+    <div class="px-8 py-7"><label class="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">¿La alerta fue correcta?</label><div class="grid grid-cols-3 gap-2"><button onclick="setVerdict('real',this)" class="vbtn rounded-xl border border-neutral-200 px-3 py-3 text-sm font-medium text-neutral-500 transition-all dark:border-neutral-700">Fallo real</button><button onclick="setVerdict('falsa',this)" class="vbtn rounded-xl border border-neutral-200 px-3 py-3 text-sm font-medium text-neutral-500 transition-all dark:border-neutral-700">Falsa alarma</button><button onclick="setVerdict('nc',this)" class="vbtn rounded-xl border border-neutral-200 px-3 py-3 text-sm font-medium text-neutral-500 transition-all dark:border-neutral-700">No concluyente</button></div><div id="m-causes" class="mt-6 hidden"><label class="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Causa raíz</label><div id="m-cause-list" class="grid gap-1.5"></div><label class="mb-2 mt-5 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Acción tomada</label><div id="m-accion-list" class="grid gap-1.5"></div></div></div>
+    <div class="flex items-center justify-end gap-3 border-t border-neutral-100 px-8 py-5 dark:border-neutral-800"><button onclick="closeModal()" class="rounded-xl px-5 py-2.5 text-sm text-neutral-500 transition-colors hover:text-neutral-800">Cancelar</button><button id="m-save" onclick="saveLabel()" disabled class="rounded-xl px-6 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400 dark:disabled:bg-neutral-700" style="background:#3b82f6">Confirmar</button></div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 rounded-xl bg-neutral-900 px-5 py-3 text-sm text-white shadow-lg dark:bg-white dark:text-neutral-900"></div>
+
+<script>
+const COSTO_HORA_PARADA=1500,HORAS_PARADA_TIPICA=8;
+const C={brand:'#3b82f6',ok:'#10b981',warn:'#eab308',crit:'#ef4444',gray:'#94a3b8',cian:'#06b6d4',lima:'#84cc16',naranja:'#f97316',violeta:'#8b5cf6'};
+function dk(){return document.documentElement.classList.contains('dark');}
+function col(k){const d={brand:'#60a5fa',ok:'#34d399',warn:'#facc15',crit:'#f87171',gray:'#cbd5e1',cian:'#22d3ee',lima:'#a3e635',naranja:'#fb923c',violeta:'#a78bfa'};return dk()?(d[k]||C[k]):C[k];}
+const FLOTA=[
+  {id:"Bomba de llenado #1",sensor:"vib-eje-01",sector:"Embotelladora",base:2.1,esc:"degradando"},
+  {id:"Compresor de aire #2",sensor:"vib-01",sector:"Procesadora de alimentos",base:3.4,esc:"sano"},
+  {id:"Motor cinta transportadora",sensor:"vib-eje-02",sector:"Embotelladora",base:1.8,esc:"sano"},
+  {id:"Bomba de agua cruda",sensor:"vib-01",sector:"Tratamiento de agua",base:2.6,esc:"critico"},
+  {id:"Ventilador extractor",sensor:"vib-03",sector:"Taller mecánico",base:1.5,esc:"sano"},
+  {id:"Bomba dosificadora",sensor:"vib-02",sector:"Tratamiento de agua",base:2.0,esc:"sano"},
+];
+const ESTADOS={STABLE:"Estable",WARNING_PROBATION:"En observación",CRITICAL_ALERT:"Alerta crítica",RECOVERY_PROBATION:"Recuperación"};
+function estadoColor(e){return e==="STABLE"?col('ok'):e==="WARNING_PROBATION"?col('warn'):e==="CRITICAL_ALERT"?col('crit'):col('brand');}
+function estadoBorder(e){return e==="CRITICAL_ALERT"?'border-red-200 dark:border-red-900':'border-neutral-200 dark:border-neutral-800';}
+function estadoPulse(e){return e==="CRITICAL_ALERT"||e==="RECOVERY_PROBATION";}
+const CAUSAS={bomba:["Cavitación","Desgaste de rodamiento","Desalineación de eje","Fuga en sello"],compresor:["Desgaste de rodamiento","Válvula defectuosa","Desbalance"],motor:["Desalineación de eje","Falla de bobinado","Rodamiento dañado"],ventilador:["Desbalance de aspas","Acumulación de suciedad","Rodamiento dañado"]};
+function tipoDe(id){const l=id.toLowerCase();if(l.includes("bomba"))return"bomba";if(l.includes("compresor"))return"compresor";if(l.includes("motor"))return"motor";if(l.includes("ventilador"))return"ventilador";return"bomba";}
+const UMBRAL_CRITICO=6.5;
+const maquinas=FLOTA.map(d=>({...d,tipo:tipoDe(d.id),estado:"STABLE",cSube:0,cBaja:0,hist:[],expected:d.base,prob:0.05,tick:0,ritmoDia:d.esc==="degradando"?0.7:0,horasOp:(2000+Math.random()*3000)|0}));
+let ALERTAS=[],HISTORIAL=[],paradasEvitadas=2,ahorroMes=2*COSTO_HORA_PARADA*HORAS_PARADA_TIPICA,alertaYaNotificada={},sistema='metrico';
+
+// Sistema de unidades: cada magnitud con conversión y unidad para métrico/imperial
+const UNIDADES={
+  temp:  {nombre:"Temperatura", m:{u:'°C',f:v=>v},        i:{u:'°F',f:v=>v*9/5+32}},
+  pres:  {nombre:"Presión",     m:{u:'bar',f:v=>v},       i:{u:'psi',f:v=>v*14.5038}},
+  caudal:{nombre:"Caudal",      m:{u:'m³/h',f:v=>v},      i:{u:'GPM',f:v=>v*4.40287}},
+  pot:   {nombre:"Potencia",    m:{u:'kW',f:v=>v},        i:{u:'HP',f:v=>v*1.34102}},
+  par:   {nombre:"Par/Torque",  m:{u:'N·m',f:v=>v},       i:{u:'lb·ft',f:v=>v*0.737562}},
+  vib:   {nombre:"Vibración",   m:{u:'mm/s',f:v=>v},      i:{u:'in/s',f:v=>v*0.0393701}},
+};
+// Universales (no cambian con el sistema)
+const UNIV=[["Velocidad","RPM"],["Corriente","A"],["Voltaje","V"],["Energía","kWh"],["Frecuencia","Hz"],["Nivel","%"],["Humedad","% HR"],["Ruido","dB"]];
+function uni(mag){return UNIDADES[mag][sistema==='metrico'?'m':'i'];}
+
+// Protocolos industriales
+const PROTO_ESENCIAL=[
+  {n:"Modbus TCP",d:"El más universal · sobre red Ethernet",estado:"conectado"},
+  {n:"Modbus RTU",d:"Sobre cable serie RS-485/RS-232",estado:"disponible"},
+  {n:"OPC UA",d:"Estándar moderno de interoperabilidad",estado:"disponible"},
+  {n:"MQTT",d:"Nativo de NEXIA · ligero y en tiempo real",estado:"conectado"},
+];
+const PROTO_VENDOR=[
+  {n:"Siemens S7",d:"PLC Siemens (S7-300/400/1200/1500)",estado:"disponible"},
+  {n:"Allen-Bradley · EtherNet/IP",d:"Rockwell (ControlLogix, CompactLogix)",estado:"disponible"},
+  {n:"Omron FINS",d:"PLC Omron",estado:"configurar"},
+  {n:"Mitsubishi MELSEC · MC",d:"PLC Mitsubishi",estado:"configurar"},
+  {n:"Schneider · Modbus",d:"PLC Schneider (vía Modbus)",estado:"disponible"},
+];
+const PROTO_SPECIAL=[
+  {n:"PROFINET",d:"Bus industrial Siemens de alta velocidad",estado:"configurar"},
+  {n:"PROFIBUS",d:"Bus de campo clásico",estado:"configurar"},
+  {n:"EtherCAT",d:"Tiempo real, robótica y motion",estado:"configurar"},
+  {n:"BACnet",d:"Automatización de edificios / HVAC",estado:"configurar"},
+];
+
+function tickMaquina(m){
+  m.tick++;m.horasOp+=0.01;
+  const hora=new Date().getHours()+new Date().getMinutes()/60;
+  const ritmo=0.3*Math.sin(((hora-9)/24)*2*Math.PI);
+  m.expected=+(m.base+ritmo).toFixed(3);
+  let v;
+  if(m.esc==="sano")v=m.expected+(Math.random()-0.5)*0.4;
+  else if(m.esc==="degradando")v=m.expected+Math.min(m.tick*0.05,4.5)+(Math.random()-0.5)*0.5;
+  else v=m.expected+4+Math.random()*2;
+  v=Math.max(0,+v.toFixed(3));
+  const desv=(v-m.expected)/0.5;
+  m.prob=Math.min(0.99,Math.max(0.02,1/(1+Math.exp(-(desv-3)))));
+  const alto=m.prob>=0.6;
+  if(alto){m.cSube++;m.cBaja=0;}else{m.cBaja++;m.cSube=0;}
+  const prev=m.estado;
+  switch(m.estado){
+    case"STABLE":if(alto)m.estado="WARNING_PROBATION";break;
+    case"WARNING_PROBATION":if(m.cSube>=3)m.estado="CRITICAL_ALERT";else if(m.cBaja>=2)m.estado="STABLE";break;
+    case"CRITICAL_ALERT":if(!alto&&m.cBaja>=1)m.estado="RECOVERY_PROBATION";break;
+    case"RECOVERY_PROBATION":if(m.cBaja>=5)m.estado="STABLE";else if(alto)m.estado="CRITICAL_ALERT";break;
+  }
+  if(m.estado==="CRITICAL_ALERT"&&prev!=="CRITICAL_ALERT"){
+    const causas=CAUSAS[m.tipo]||CAUSAS.bomba;
+    const al={id:"al-"+m.id+"-"+Date.now(),maquina:m.id,sensor:m.sensor,tipo:m.tipo,causa:"Vibración fuera del rango esperado: posible "+causas[0].toLowerCase(),prob:m.prob,hora:new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})};
+    ALERTAS.unshift(al);
+    HISTORIAL.unshift({...al,fecha:new Date().toLocaleDateString("es-ES",{day:"numeric",month:"short"}),estado:"Pendiente"});
+    if(!alertaYaNotificada[m.id]){alertaYaNotificada[m.id]=true;mostrarNotifMovil(m.id,causas[0]);}
+  }
+  m.hist.push({t:Date.now(),v,exp:m.expected});
+  if(m.hist.length>40)m.hist.shift();
+}
+function diasAFallo(m){const last=m.hist[m.hist.length-1];if(!last)return Infinity;if(last.v>=UMBRAL_CRITICO)return 0;if(m.ritmoDia<=0)return Infinity;return(UMBRAL_CRITICO-last.v)/m.ritmoDia;}
+function mostrarNotifMovil(maquina,causa){document.getElementById('phone-msg').textContent=`${maquina}: vibración crítica detectada. Causa probable: ${causa.toLowerCase()}. Revisar de inmediato.`;const el=document.getElementById('phone-alert');el.classList.remove('hidden');el.classList.add('slide-in');setTimeout(()=>el.classList.add('hidden'),6000);}
+
+function toggleDark(){document.documentElement.classList.toggle('dark');document.getElementById('theme-icon').innerHTML='<use href="#i-'+(dk()?'sun':'moon')+'"/>';refrescar();}
+function setSistema(s){
+  sistema=s;
+  document.getElementById('sis-m').style.cssText=s==='metrico'?'background:#3b82f6;color:#fff':'';
+  document.getElementById('sis-i').style.cssText=s==='imperial'?'background:#3b82f6;color:#fff':'';
+  document.getElementById('sis-m').className='rounded-md px-3 py-1 text-sm font-medium'+(s==='metrico'?'':' text-neutral-500');
+  document.getElementById('sis-i').className='rounded-md px-3 py-1 text-sm font-medium'+(s==='imperial'?'':' text-neutral-500');
+  renderUnidades();
+}
+function renderUnidades(){
+  const t=document.getElementById('unidades-tabla');if(!t)return;
+  const dobles=Object.keys(UNIDADES).map(k=>`<div class="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 dark:border-neutral-800"><span class="text-xs text-neutral-500">${UNIDADES[k].nombre}</span><span class="mono text-sm" style="color:${col('brand')}">${uni(k).u}</span></div>`).join('');
+  const univ=UNIV.map(([n,u])=>`<div class="flex items-baseline justify-between border-b border-neutral-100 pb-1.5 dark:border-neutral-800"><span class="text-xs text-neutral-500">${n}</span><span class="mono text-sm text-neutral-400">${u}</span></div>`).join('');
+  t.innerHTML=dobles+univ;
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2200);}
+
+function cambiarRol(){
+  const r=document.getElementById('role-select').value;
+  const oee=document.querySelector('[data-nav="oee"]'),admin=document.getElementById('nav-admin'),conn=document.querySelector('[data-nav="connect"]');
+  // Admin solo lo ve el administrador
+  admin.style.display=r==='admin'?'':'none';
+  // Producción/OEE: no la ven operador ni solo-lectura
+  const veOEE=(r==='admin'||r==='jefe'||r==='tecnico');
+  oee.style.opacity=veOEE?'1':'0.4'; oee.title=veOEE?'':'Requiere rol con acceso a producción';
+  // Conectar: solo admin y técnico
+  const veConn=(r==='admin'||r==='tecnico');
+  conn.style.opacity=veConn?'1':'0.4'; conn.title=veConn?'':'Requiere rol Admin o Técnico';
+}
+const ROL_NOMBRE={admin:"Administrador",jefe:"Jefe de planta",tecnico:"Técnico de mantenimiento",operador:"Operador",lectura:"Solo lectura"};
+
+function gauge(valor,min,max,unidad,zonaPeligro){
+  const pct=Math.max(0,Math.min(1,(valor-min)/(max-min)));
+  const ang=Math.PI*(1-pct),cx=70,cy=70,r=54;
+  const x=cx+r*Math.cos(ang),y=cy-r*Math.sin(ang);
+  const arco=(a1,a2,color,w)=>{const x1=cx+r*Math.cos(a1),y1=cy-r*Math.sin(a1),x2=cx+r*Math.cos(a2),y2=cy-r*Math.sin(a2);const large=(a1-a2)>Math.PI?1:0;return `<path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round"/>`;};
+  const peligroAng=Math.PI*(1-zonaPeligro);
+  const colorVal=pct>=zonaPeligro?col('crit'):pct>=zonaPeligro-0.15?col('warn'):col('ok');
+  const fondoArco=dk()?'#404040':'#e5e5e5';
+  return `<svg viewBox="0 0 140 90" width="140" height="90">${arco(Math.PI,0,fondoArco,8)}${arco(peligroAng,0,col('crit'),8)}${arco(Math.PI,ang,colorVal,8)}<circle cx="${x}" cy="${y}" r="5" fill="${colorVal}"/><text x="70" y="68" text-anchor="middle" font-size="20" font-weight="600" fill="currentColor" class="mono">${valor.toFixed(valor<10?1:0)}</text><text x="70" y="83" text-anchor="middle" font-size="9" fill="#9ca3af">${unidad}</text></svg>`;
+}
+function gaugeCircular(pct,label){
+  const r=46,c=2*Math.PI*r,off=c*(1-pct/100);
+  const color=pct>=85?col('ok'):pct>=60?col('warn'):col('crit');
+  const fondo=dk()?'#404040':'#e5e5e5';
+  return `<svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="${fondo}" stroke-width="9"/><circle cx="60" cy="60" r="${r}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 60 60)"/><text x="60" y="58" text-anchor="middle" font-size="26" font-weight="600" fill="currentColor" class="serif">${Math.round(pct)}</text><text x="60" y="76" text-anchor="middle" font-size="10" fill="#9ca3af">${label}</text></svg>`;
+}
+
+function show(view){
+  const r=document.getElementById('role-select').value;
+  if(view==='oee'&&!(r==='admin'||r==='jefe'||r==='tecnico')){toast('La vista de Producción requiere otro rol');return;}
+  if(view==='connect'&&!(r==='admin'||r==='tecnico')){toast('Conexiones: requiere rol Admin o Técnico');return;}
+  if(view==='admin'&&r!=='admin'){toast('Solo los administradores acceden aquí');return;}
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('[data-nav]').forEach(b=>{const on=b.dataset.nav===view;b.style.background=on?col('brand'):'';b.style.color=on?'#fff':'';});
+  window.scrollTo(0,0);refrescar();
+}
+
+function renderGrid(){
+  const rank={CRITICAL_ALERT:0,RECOVERY_PROBATION:1,WARNING_PROBATION:2,STABLE:3};
+  const orden=[...maquinas].sort((a,b)=>rank[a.estado]-rank[b.estado]||b.prob-a.prob);
+  const atencion=maquinas.filter(m=>m.estado!=="STABLE").length;
+  const salud=Math.round(maquinas.filter(m=>m.estado==="STABLE").length/maquinas.length*100);
+  document.getElementById('cmd-summary').innerHTML=atencion===0?`<span class="mono">${maquinas.length}</span> activos · todo en orden`:`<span class="mono font-medium" style="color:${col('crit')}">${atencion}</span> ${atencion===1?'requiere':'requieren'} atención <span class="text-neutral-300">· de ${maquinas.length}</span>`;
+  document.getElementById('ahorro-mes').textContent='$'+ahorroMes.toLocaleString();
+  document.getElementById('kpi-evitadas').textContent=paradasEvitadas;
+  document.getElementById('salud-gauge').innerHTML=gaugeCircular(salud,"salud %");
+  document.getElementById('grid').innerHTML=orden.map(m=>{
+    const ec=estadoColor(m.estado),dias=diasAFallo(m);
+    let pr='';if(m.estado!=="STABLE"&&dias!==Infinity&&dias<30)pr=`<span class="text-[11px]" style="color:${col('crit')}">falla en ~${Math.max(1,Math.ceil(dias))} días</span>`;
+    return `<button onclick="openDetail('${m.id}')" class="group block text-left"><div class="rounded-2xl border bg-white px-6 py-5 transition-all duration-200 hover:border-neutral-300 dark:bg-neutral-900 ${estadoBorder(m.estado)}">
+      <div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><span class="relative flex h-2.5 w-2.5">${estadoPulse(m.estado)?`<span class="ping-soft absolute inline-flex h-full w-full rounded-full" style="background:${ec};opacity:.6"></span>`:''}<span class="relative inline-flex h-2.5 w-2.5 rounded-full" style="background:${ec}"></span></span><span class="text-xs font-medium uppercase tracking-wider text-neutral-400">${ESTADOS[m.estado]}</span></div><span class="text-[10px] uppercase tracking-wide text-neutral-300">IA activa</span></div>
+      <h3 class="mt-4 serif text-xl tracking-tight">${m.id}</h3><p class="mt-0.5 text-xs text-neutral-400">${m.sector}</p>
+      <div class="mt-5 flex items-end justify-between border-t border-neutral-100 pt-4 dark:border-neutral-800"><div><span class="mono text-lg">${Math.round(m.prob*100)}%</span><div class="text-[11px] uppercase tracking-wider text-neutral-400">prob. de fallo</div></div><div class="text-right">${pr||`<span class="mono text-xs text-neutral-400">${m.hist.length?m.hist[m.hist.length-1].v.toFixed(2):'—'}</span>`}</div></div>
+    </div></button>`;
+  }).join('');
+}
+
+let oeeState={dispo:0.875,rend:0.905,cal:0.979,buenas:3720,malas:80};
+function renderOEE(){
+  oeeState.buenas+=Math.floor(Math.random()*6);oeeState.malas+=Math.random()<0.3?1:0;
+  const oee=oeeState.dispo*oeeState.rend*oeeState.cal;
+  document.getElementById('oee-gauge').innerHTML=gaugeCircular(oee*100,"OEE %");
+  document.getElementById('oee-nivel').textContent=oee>=0.85?"World-class":oee>=0.60?"Aceptable":"Requiere mejora";
+  document.getElementById('m-dispo').textContent=(oeeState.dispo*100).toFixed(1)+'%';
+  document.getElementById('m-rend').textContent=(oeeState.rend*100).toFixed(1)+'%';
+  document.getElementById('m-cal').textContent=(oeeState.cal*100).toFixed(1)+'%';
+  document.getElementById('bar-dispo').style.width=(oeeState.dispo*100)+'%';
+  document.getElementById('bar-rend').style.width=(oeeState.rend*100)+'%';
+  document.getElementById('bar-cal').style.width=(oeeState.cal*100)+'%';
+  document.getElementById('c-buenas').textContent=oeeState.buenas.toLocaleString();
+  document.getElementById('c-malas').textContent=oeeState.malas;
+  document.getElementById('c-ritmo').textContent=(8+Math.random()*2).toFixed(1);
+  document.getElementById('c-ritmo-meta').textContent='meta 9.0';
+  const dt=[{c:"Falta de material",m:28,col:col('brand')},{c:"Fallo mecánico",m:18,col:col('crit')},{c:"Cambio de formato",m:9,col:col('naranja')},{c:"Error de operador",m:5,col:col('violeta')}];
+  const total=dt.reduce((s,d)=>s+d.m,0);let acc=0;const r=46,cc=2*Math.PI*r;
+  const segs=dt.map(d=>{const frac=d.m/total;const seg=`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${d.col}" stroke-width="14" stroke-dasharray="${cc*frac} ${cc}" stroke-dashoffset="${-cc*acc}" transform="rotate(-90 60 60)"/>`;acc+=frac;return seg;}).join('');
+  document.getElementById('downtime-chart').innerHTML=`<svg viewBox="0 0 120 120" width="120" height="120">${segs}<text x="60" y="56" text-anchor="middle" font-size="20" font-weight="600" fill="currentColor" class="serif">${total}</text><text x="60" y="72" text-anchor="middle" font-size="9" fill="#9ca3af">min</text></svg><div class="flex-1 space-y-1.5">${dt.map(d=>`<div class="flex items-center gap-2 text-xs"><span class="h-2.5 w-2.5 rounded-sm" style="background:${d.col}"></span><span class="flex-1 text-neutral-600 dark:text-neutral-300">${d.c}</span><span class="mono text-neutral-400">${d.m}m · ${Math.round(d.m/total*100)}%</span></div>`).join('')}</div>`;
+  const en=[{n:"Energía eléctrica",v:842,u:"kWh",max:1000,c:col('naranja')},{n:"Aire comprimido",v:310,u:"m³",max:500,c:col('cian')},{n:"Agua de proceso",v:128,u:"m³",max:200,c:col('lima')}];
+  document.getElementById('energy').innerHTML=en.map(e=>`<div><div class="flex justify-between text-xs"><span class="text-neutral-600 dark:text-neutral-300">${e.n}</span><span class="mono text-neutral-400">${e.v} ${e.u}</span></div><div class="mt-1.5 h-2 rounded-full bg-neutral-100 dark:bg-neutral-800"><div class="h-2 rounded-full" style="width:${e.v/e.max*100}%;background:${e.c}"></div></div></div>`).join('');
+}
+
+let activoActual=null;
+function openDetail(id){activoActual=id;show('detail');}
+function renderDetail(){
+  const m=maquinas.find(x=>x.id===activoActual);if(!m)return;
+  const ec=estadoColor(m.estado);
+  document.getElementById('d-dot').style.background=ec;
+  document.getElementById('d-state').textContent=ESTADOS[m.estado];
+  document.getElementById('d-title').textContent=m.id;
+  document.getElementById('d-sub').textContent=`${m.sensor} · ${m.sector} · IA activa`;
+  const last=m.hist[m.hist.length-1];
+  document.getElementById('d-val').textContent=last?last.v.toFixed(2):'—';
+  document.getElementById('d-exp').textContent=last?`esperado ${last.exp.toFixed(2)}`:'';
+  document.getElementById('m-horas').textContent=Math.round(m.horasOp).toLocaleString()+' h';
+  const factor=m.estado==="CRITICAL_ALERT"?1.4:m.estado==="WARNING_PROBATION"?1.15:1;
+  const tBase=58*factor+Math.random()*4;
+  const t=uni('temp'),tv=t.f(tBase);
+  document.getElementById('g-temp').innerHTML=gauge(tv,t.f(20),t.f(120),t.u,0.75);
+  const pr=uni('pres'),pBase=4.2*factor+Math.random()*0.3,pv=pr.f(pBase);
+  document.getElementById('g-pres').innerHTML=gauge(pv,pr.f(0),pr.f(10),pr.u,0.8);
+  document.getElementById('g-rpm').innerHTML=gauge(1450/factor+Math.random()*50,0,3000,"rpm",0.9);
+  const sens=[{n:"Sensor vibración",ok:true},{n:"Sensor temp.",ok:true},{n:"Válvula entrada",ok:m.estado!=="CRITICAL_ALERT"},{n:"Motor principal",ok:true},{n:"Final de carrera",ok:true},{n:"Sensor presión",ok:m.estado!=="CRITICAL_ALERT"},{n:"Bomba lubricación",ok:true},{n:"Variador",ok:true}];
+  document.getElementById('sensores').innerHTML=sens.map(s=>`<div class="flex items-center gap-2 rounded-lg border border-neutral-100 px-3 py-2 dark:border-neutral-800"><span class="h-2 w-2 rounded-full" style="background:${s.ok?col('ok'):col('crit')}"></span><span class="text-xs text-neutral-600 dark:text-neutral-300">${s.n}</span></div>`).join('');
+  const dias=diasAFallo(m),pred=document.getElementById('d-prediction');
+  const predBg=m.estado==="STABLE"?'background:'+(dk()?'#052e16':'#f0fdf4')+';border-color:'+(dk()?'#14532d':'#bbf7d0'):m.estado==="CRITICAL_ALERT"?'background:'+(dk()?'#450a0a':'#fef2f2')+';border-color:'+(dk()?'#7f1d1d':'#fecaca'):'background:'+(dk()?'#451a03':'#fffbeb')+';border-color:'+(dk()?'#78350f':'#fde68a');
+  pred.style.cssText=predBg;
+  if(m.estado==="STABLE")pred.innerHTML=`<div class="flex items-center justify-between"><div><span class="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico</span><p class="mt-1 serif text-2xl" style="color:${ec}">Operación normal</p><p class="mt-1 text-sm text-neutral-500">Sin fallos previstos.</p></div><svg class="h-8 w-8" style="color:${ec}"><use href="#i-check"/></svg></div>`;
+  else if(dias!==Infinity&&dias<30){const ah=(COSTO_HORA_PARADA*HORAS_PARADA_TIPICA).toLocaleString();pred.innerHTML=`<div><span class="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico predictivo</span><p class="mt-1 serif text-3xl" style="color:${ec}">Falla estimada en ${Math.max(1,Math.ceil(dias))} días</p><p class="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Si no se interviene. Detectarlo ahora evita una parada de <span class="font-semibold">$${ah}</span>.</p></div>`;}
+  else pred.innerHTML=`<div><span class="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico</span><p class="mt-1 serif text-2xl" style="color:${ec}">${ESTADOS[m.estado]}</p><p class="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Bajo vigilancia activa.</p></div>`;
+  if(!replayTimer)renderChart(m);
+}
+let replayIdx=0,replayTimer=null;
+function renderChart(m,override){
+  const data=override||m.hist;const W=860,H=240,pad=38;
+  if(data.length<2){document.getElementById('d-chart').innerHTML='<p class="text-sm text-neutral-400 py-12 text-center">Recopilando lecturas…</p>';return;}
+  const vals=data.map(h=>h.v),exps=data.map(h=>h.exp);
+  const maxV=Math.max(...vals,...exps.map(e=>e+1.5))*1.1,minV=0,n=data.length;
+  const x=i=>pad+(i/(n-1))*(W-pad-12),y=v=>H-pad+6-((v-minV)/(maxV-minV))*(H-pad-14);
+  const std=0.5;
+  const bandU=exps.map((e,i)=>`${x(i)},${y(e+2*std)}`).join(' ');
+  const bandL=exps.map((e,i)=>`${x(i)},${y(e-2*std)}`).reverse().join(' ');
+  function suave(pts){if(pts.length<3)return"M "+pts.map(p=>p.join(' ')).join(" L ");let d="M "+pts[0].join(' ');for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;d+=` C ${c1x} ${c1y} ${c2x} ${c2y} ${p2[0]} ${p2[1]}`;}return d;}
+  const realPts=vals.map((v,i)=>[x(i),y(v)]),expPts=exps.map((e,i)=>[x(i),y(e)]);
+  const ticks=[0,Math.round(maxV/2),Math.round(maxV)];
+  document.getElementById('d-chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="w-full" style="height:240px">${ticks.map(t=>`<line x1="${pad}" y1="${y(t)}" x2="${W-12}" y2="${y(t)}" stroke="currentColor" stroke-opacity="0.08"/><text x="${pad-6}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="#9ca3af" class="mono">${t}</text>`).join('')}<polygon points="${bandU} ${bandL}" fill="#9ca3af" fill-opacity="0.15"/><path d="${suave(expPts)}" fill="none" stroke="#9ca3af" stroke-width="1.2" stroke-dasharray="4 3"/><path d="${suave(realPts)}" fill="none" stroke="${col('brand')}" stroke-width="2.4"/>${vals[n-1]>exps[n-1]+2*std?`<circle cx="${x(n-1)}" cy="${y(vals[n-1])}" r="5" fill="${col('crit')}"/><circle cx="${x(n-1)}" cy="${y(vals[n-1])}" r="9" fill="${col('crit')}" fill-opacity="0.2"/>`:''}</svg>`;
+}
+function reproducir(){const m=maquinas.find(x=>x.id===activoActual);if(!m)return;const serie=[];for(let i=0;i<40;i++){const exp=m.base+0.2;const v=exp+Math.min(i*0.18,5)+(Math.random()-0.5)*0.3;serie.push({t:i,v:+v.toFixed(2),exp:+exp.toFixed(2)});}replayIdx=2;clearInterval(replayTimer);replayTimer=setInterval(()=>{if(replayIdx>serie.length){clearInterval(replayTimer);replayTimer=null;return;}renderChart(m,serie.slice(0,replayIdx));replayIdx++;},110);}
+
+function renderQueue(){
+  const q=document.getElementById('queue'),e=document.getElementById('queue-empty');
+  document.getElementById('audit-count').innerHTML=`<span class="mono">${ALERTAS.length}</span> ${ALERTAS.length===1?'alerta pendiente':'alertas pendientes'}`;
+  if(ALERTAS.length===0){q.classList.add('hidden');e.classList.remove('hidden');return;}
+  q.classList.remove('hidden');e.classList.add('hidden');
+  q.innerHTML=ALERTAS.map((a,i)=>`<button onclick="openModal('${a.id}')" class="flex w-full items-center gap-4 px-6 py-4 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800 ${i===ALERTAS.length-1?'':'border-b border-neutral-100 dark:border-neutral-800'}"><span class="relative flex h-2.5 w-2.5 shrink-0"><span class="ping-soft absolute inline-flex h-full w-full rounded-full" style="background:${col('crit')};opacity:.5"></span><span class="relative inline-flex h-2.5 w-2.5 rounded-full" style="background:${col('crit')}"></span></span><div class="min-w-0 flex-1"><span class="serif text-base">${a.maquina}</span><p class="mt-0.5 truncate text-sm text-neutral-500">${a.causa}</p></div><div class="hidden shrink-0 text-right sm:block"><div class="mono text-sm">${Math.round(a.prob*100)}%</div></div><div class="hidden shrink-0 text-right md:block"><div class="mono text-xs text-neutral-500">${a.hora}</div></div><span class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide" style="background:${dk()?'#451a03':'#fffbeb'};color:${col('warn')}">Pendiente</span></button>`).join('');
+}
+function renderHistory(){
+  const h=document.getElementById('history-list');
+  if(HISTORIAL.length===0){h.innerHTML='<div class="px-8 py-16 text-center text-sm text-neutral-400">Aún no hay eventos registrados. Aparecerán conforme el sistema detecte fallos.</div>';return;}
+  h.innerHTML=HISTORIAL.map((a,i)=>`<div class="flex items-center gap-4 px-6 py-4 ${i===HISTORIAL.length-1?'':'border-b border-neutral-100 dark:border-neutral-800'}"><span class="h-2 w-2 shrink-0 rounded-full" style="background:${a.estado==='Resuelto'?col('ok'):col('crit')}"></span><div class="min-w-0 flex-1"><span class="serif text-base">${a.maquina}</span><p class="mt-0.5 truncate text-sm text-neutral-500">${a.causa}</p></div><div class="hidden text-right sm:block"><div class="mono text-xs text-neutral-500">${a.fecha} · ${a.hora}</div></div><span class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide" style="background:${a.estado==='Resuelto'?(dk()?'#052e16':'#f0fdf4'):(dk()?'#451a03':'#fffbeb')};color:${a.estado==='Resuelto'?col('ok'):col('warn')}">${a.estado}</span></div>`).join('');
+}
+
+function renderConnect(){
+  const estadoPill=(e)=>{const map={conectado:[col('ok'),'Conectado'],disponible:[col('brand'),'Disponible'],configurar:[col('gray'),'Configurar']};const[c,t]=map[e];return `<span class="rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide" style="background:${c}1a;color:${c}">${t}</span>`;};
+  const card=(p)=>`<div class="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-4 transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900"><div class="flex items-center gap-3"><div class="flex h-9 w-9 items-center justify-center rounded-lg" style="background:${col('brand')}14;color:${col('brand')}"><svg class="ico h-4 w-4"><use href="#i-plug"/></svg></div><div><div class="text-sm font-medium">${p.n}</div><div class="text-xs text-neutral-400">${p.d}</div></div></div>${estadoPill(p.estado)}</div>`;
+  const grupo=(titulo,arr)=>`<h3 class="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">${titulo}</h3><div class="grid grid-cols-1 gap-2 sm:grid-cols-2">${arr.map(card).join('')}</div>`;
+  document.getElementById('connect-essential').innerHTML=grupo('Protocolos esenciales',PROTO_ESENCIAL);
+  document.getElementById('connect-vendor').innerHTML=grupo('Por fabricante de PLC',PROTO_VENDOR);
+  document.getElementById('connect-special').innerHTML=grupo('Buses industriales especializados',PROTO_SPECIAL);
+}
+
+function renderAdmin(){
+  const users=[
+    {n:"Alessia Frisoni",e:"alessia@planta.com",rol:"Administrador",c:col('brand')},
+    {n:"Carlos Méndez",e:"carlos@planta.com",rol:"Jefe de planta",c:col('warn')},
+    {n:"Roberto Salas",e:"roberto@planta.com",rol:"Técnico de mantenimiento",c:col('crit')},
+    {n:"Luis Ortega",e:"luis@planta.com",rol:"Operador",c:col('ok')},
+    {n:"Auditoría Externa",e:"audit@planta.com",rol:"Solo lectura",c:col('gray')},
+  ];
+  const roles=["Administrador","Jefe de planta","Técnico de mantenimiento","Operador","Solo lectura"];
+  document.getElementById('admin-users').innerHTML=users.map((u,i)=>`<div class="flex items-center gap-4 px-6 py-4 ${i===users.length-1?'':'border-b border-neutral-100 dark:border-neutral-800'}"><div class="flex h-9 w-9 items-center justify-center rounded-full" style="background:${u.c}1a;color:${u.c}"><svg class="ico h-4 w-4"><use href="#i-user"/></svg></div><div class="min-w-0 flex-1"><div class="text-sm font-medium">${u.n}</div><div class="text-xs text-neutral-400">${u.e}</div></div><select class="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800">${roles.map(r=>`<option ${u.rol===r?'selected':''}>${r}</option>`).join('')}</select></div>`).join('');
+  // matriz: [Admin, Jefe, Técnico, Operador, Lectura]
+  const perms=[
+    {f:"Ver centro de mando",      v:[1,1,1,1,1]},
+    {f:"Ver producción / OEE",     v:[1,1,1,0,0]},
+    {f:"Ver detalle de activos",   v:[1,1,1,1,1]},
+    {f:"Auditar y etiquetar",      v:[1,1,1,1,0]},
+    {f:"Marcar mantenimiento hecho",v:[1,1,1,0,0]},
+    {f:"Configurar conexiones",    v:[1,0,1,0,0]},
+    {f:"Gestionar usuarios",       v:[1,0,0,0,0]},
+    {f:"Cambiar ajustes de planta",v:[1,1,0,0,0]},
+    {f:"Exportar reportes",        v:[1,1,1,0,1]},
+  ];
+  const chk=(v)=>v?`<svg class="ico mx-auto h-4 w-4" style="color:${col('ok')}"><use href="#i-check"/></svg>`:`<span class="text-neutral-300 dark:text-neutral-600">—</span>`;
+  const th=["Admin","Jefe","Técnico","Operador","Lectura"];
+  document.getElementById('admin-perms').innerHTML=`<table class="w-full text-sm"><thead><tr class="border-b border-neutral-100 text-xs uppercase tracking-wider text-neutral-400 dark:border-neutral-800"><th class="px-6 py-3 text-left font-medium">Permiso</th>${th.map(t=>`<th class="px-3 py-3 text-center font-medium">${t}</th>`).join('')}</tr></thead><tbody>${perms.map((p,i)=>`<tr class="${i===perms.length-1?'':'border-b border-neutral-100 dark:border-neutral-800'}"><td class="px-6 py-3 text-neutral-600 dark:text-neutral-300">${p.f}</td>${p.v.map(x=>`<td class="px-3 py-3 text-center">${chk(x)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+let alertaActual=null,veredicto=null,causaSel=null,accionSel=null;
+function openModal(id){
+  alertaActual=ALERTAS.find(a=>a.id===id);if(!alertaActual)return;
+  veredicto=null;causaSel=null;accionSel=null;
+  document.getElementById('m-cause').textContent=alertaActual.causa;
+  document.querySelectorAll('.vbtn').forEach(b=>{b.className='vbtn rounded-xl border border-neutral-200 px-3 py-3 text-sm font-medium text-neutral-500 transition-all dark:border-neutral-700';b.style.cssText='';});
+  document.getElementById('m-causes').classList.add('hidden');
+  document.getElementById('m-save').disabled=true;
+  const causas=CAUSAS[alertaActual.tipo]||CAUSAS.bomba;
+  document.getElementById('m-cause-list').innerHTML=causas.map(c=>`<button onclick="setCause('${c}',this)" class="cbtn flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 text-left text-sm transition-colors hover:border-neutral-300 dark:border-neutral-700"><span>${c}</span></button>`).join('');
+  const acciones=["Se reemplazó la pieza","Se realineó / ajustó","Se programó intervención","Se lubricó / limpió"];
+  document.getElementById('m-accion-list').innerHTML=acciones.map(a=>`<button onclick="setAccion('${a}',this)" class="abtn flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 text-left text-sm transition-colors hover:border-neutral-300 dark:border-neutral-700"><span>${a}</span></button>`).join('');
+  document.getElementById('modal').classList.remove('hidden');document.getElementById('modal').classList.add('flex');
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('modal').classList.remove('flex');}
+function setVerdict(v,btn){
+  veredicto=v;
+  document.querySelectorAll('.vbtn').forEach(b=>{b.className='vbtn rounded-xl border border-neutral-200 px-3 py-3 text-sm font-medium text-neutral-500 transition-all dark:border-neutral-700';b.style.cssText='';});
+  const cc=v==='real'?col('crit'):v==='falsa'?col('ok'):col('gray');
+  btn.style.cssText=`border-color:${cc};background:${cc}1a;color:${cc}`;
+  document.getElementById('m-causes').classList.toggle('hidden',v!=='real');
+  causaSel=null;accionSel=null;document.querySelectorAll('.cbtn,.abtn').forEach(b=>b.style.cssText='');
+  updateSave();
+}
+function setCause(c,btn){causaSel=c;document.querySelectorAll('.cbtn').forEach(b=>b.style.cssText='');btn.style.cssText=`border-color:${col('brand')};background:${col('brand')}10`;updateSave();}
+function setAccion(a,btn){accionSel=a;document.querySelectorAll('.abtn').forEach(b=>b.style.cssText='');btn.style.cssText=`border-color:${col('brand')};background:${col('brand')}10`;updateSave();}
+function updateSave(){document.getElementById('m-save').disabled=!(veredicto&&(veredicto!=='real'||(causaSel&&accionSel)));}
+function saveLabel(){
+  if(veredicto==='real'){paradasEvitadas++;ahorroMes+=COSTO_HORA_PARADA*HORAS_PARADA_TIPICA;}
+  const hi=HISTORIAL.find(h=>h.id===alertaActual.id);if(hi)hi.estado="Resuelto";
+  ALERTAS=ALERTAS.filter(a=>a.id!==alertaActual.id);
+  closeModal();renderQueue();renderHistory();toast('Evento etiquetado · dataset actualizado');
+}
+document.getElementById('modal').addEventListener('click',closeModal);
+
+// ════ ASISTENTE IA ════
+let chatHist=[];
+function responderIA(pregunta){
+  const q=pregunta.toLowerCase();
+  const rank={CRITICAL_ALERT:0,WARNING_PROBATION:1,RECOVERY_PROBATION:2,STABLE:3};
+  const criticas=maquinas.filter(m=>m.estado==="CRITICAL_ALERT").sort((a,b)=>b.prob-a.prob);
+  const obs=maquinas.filter(m=>m.estado==="WARNING_PROBATION");
+  const nombrada=maquinas.find(m=>q.includes(m.id.toLowerCase())||q.includes(m.tipo));
+  // saludo
+  if(/^(hola|buenas|hey|qué tal|que tal)/.test(q)) return "Hola. Soy el asistente de NEXIA. Puedo decirte el estado de la planta, explicar por qué una máquina está en riesgo, o ayudarte a priorizar el mantenimiento. ¿Qué necesitas?";
+  // máquina concreta nombrada
+  if(nombrada){
+    const dias=diasAFallo(nombrada);
+    if(nombrada.estado==="STABLE") return `La ${nombrada.id} opera con normalidad. Vibración dentro del rango esperado y ${Math.round(nombrada.prob*100)}% de probabilidad de fallo, que es bajo. Sin acción requerida.`;
+    let r=`La ${nombrada.id} está en estado "${ESTADOS[nombrada.estado].toLowerCase()}" con ${Math.round(nombrada.prob*100)}% de probabilidad de fallo. `;
+    if(dias!==Infinity&&dias<30) r+=`La proyección estima una posible falla en ~${Math.max(1,Math.ceil(dias))} días si no se interviene. `;
+    r+=`El patrón es consistente con ${(CAUSAS[nombrada.tipo]||CAUSAS.bomba)[0].toLowerCase()}. Recomiendo inspección.`;
+    return r;
+  }
+  // estado general
+  if(q.includes("estado")||q.includes("resumen")||q.includes("cómo está")||q.includes("como esta")||q.includes("general")||q.includes("planta")){
+    if(criticas.length===0&&obs.length===0) return "Toda la planta opera con normalidad. Las 6 máquinas están dentro de parámetros y ninguna requiere atención.";
+    let r="";
+    if(criticas.length) r+=`${criticas.length} máquina(s) en estado crítico: ${criticas.map(m=>m.id).join(", ")}. `;
+    if(obs.length) r+=`${obs.length} en observación: ${obs.map(m=>m.id).join(", ")}. `;
+    r+="El resto opera con normalidad.";
+    return r;
+  }
+  // por qué / problema / falla
+  if(q.includes("por qué")||q.includes("por que")||q.includes("problema")||q.includes("falla")||q.includes("pasa")){
+    const m=criticas[0]||obs[0];
+    if(!m) return "En este momento ninguna máquina presenta fallos. Todo opera dentro de lo esperado.";
+    const dias=diasAFallo(m);
+    let r=`La ${m.id} muestra vibración por encima del rango esperado (${Math.round(m.prob*100)}% de probabilidad de fallo). El patrón es consistente con desgaste progresivo, típicamente ${(CAUSAS[m.tipo]||CAUSAS.bomba)[0].toLowerCase()}. `;
+    if(dias!==Infinity&&dias<30) r+=`Proyección: posible falla en ~${Math.max(1,Math.ceil(dias))} días.`;
+    return r;
+  }
+  // mantenimiento / prioridad
+  if(q.includes("mantenimiento")||q.includes("prioridad")||q.includes("primero")||q.includes("urgente")||q.includes("priori")){
+    const m=criticas[0]||obs[0];
+    if(!m) return "No hay mantenimiento urgente pendiente. Puedes seguir el plan preventivo normal.";
+    return `Prioriza la ${m.id}: es la de mayor riesgo (${Math.round(m.prob*100)}% de probabilidad de fallo). Intervenir ahora, de forma planificada, evita una parada no planificada que costaría alrededor de $${(COSTO_HORA_PARADA*HORAS_PARADA_TIPICA).toLocaleString()}.`;
+  }
+  // dinero / ahorro
+  if(q.includes("ahorro")||q.includes("dinero")||q.includes("cuánto")||q.includes("cuanto")||q.includes("costo")||q.includes("$")){
+    return `Este mes NEXIA ha evitado ${paradasEvitadas} paradas no planificadas, un ahorro estimado de $${ahorroMes.toLocaleString()}. Cada parada evitada equivale a unas ${HORAS_PARADA_TIPICA} horas de producción recuperadas.`;
+  }
+  // cuántas máquinas
+  if(q.includes("cuántas")||q.includes("cuantas")||q.includes("máquinas")||q.includes("activos")){
+    return `Hay ${maquinas.length} activos monitoreados: bombas, un compresor, un motor y un ventilador, distribuidos en embotelladora, alimentos, tratamiento de agua y taller.`;
+  }
+  return "Puedo ayudarte con: el estado general de la planta, por qué una máquina está en riesgo, qué priorizar en mantenimiento, o el ahorro acumulado. Prueba a preguntarme por una máquina concreta.";
+}
+function pintarChat(){
+  const log=document.getElementById('chat-log');
+  if(chatHist.length===0){
+    log.innerHTML=`<div class="flex gap-3"><div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style="background:${col('brand')}1a;color:${col('brand')}"><svg class="ico h-4 w-4"><use href="#i-spark"/></svg></div><div class="rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-2.5 text-sm dark:bg-neutral-800">Hola. Pregúntame sobre el estado de tus máquinas, qué priorizar, o por qué algo está en riesgo.</div></div>`;
+  } else {
+    log.innerHTML=chatHist.map(m=>m.rol==='user'
+      ?`<div class="flex justify-end"><div class="max-w-[80%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white" style="background:${col('brand')}">${m.txt}</div></div>`
+      :`<div class="flex gap-3"><div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style="background:${col('brand')}1a;color:${col('brand')}"><svg class="ico h-4 w-4"><use href="#i-spark"/></svg></div><div class="max-w-[80%] rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-2.5 text-sm dark:bg-neutral-800">${m.txt}</div></div>`
+    ).join('');
+  }
+  log.scrollTop=log.scrollHeight;
+  const sug=["¿Cuál es el estado de la planta?","¿Qué necesita mantenimiento urgente?","¿Cuánto hemos ahorrado?"];
+  document.getElementById('chat-sugerencias').innerHTML=sug.map(s=>`<button onclick="enviarChat('${s}')" class="rounded-full border border-neutral-200 px-3 py-1 text-xs text-neutral-500 transition-colors hover:border-neutral-300 dark:border-neutral-700">${s}</button>`).join('');
+}
+function enviarChat(texto){
+  const inp=document.getElementById('chat-input');
+  const q=texto||inp.value.trim();
+  if(!q)return;
+  inp.value='';
+  chatHist.push({rol:'user',txt:q});
+  pintarChat();
+  setTimeout(()=>{chatHist.push({rol:'ia',txt:responderIA(q)});pintarChat();},500);
+}
+
+
+  const v=document.querySelector('.view.active');if(!v)return;
+  if(v.id==='view-command')renderGrid();
+  if(v.id==='view-oee')renderOEE();
+  if(v.id==='view-detail')renderDetail();
+  if(v.id==='view-audit')renderQueue();
+  if(v.id==='view-history')renderHistory();
+  if(v.id==='view-connect')renderConnect();
+  if(v.id==='view-settings')renderUnidades();
+  if(v.id==='view-asistente'&&chatHist.length===0)pintarChat();
+  if(v.id==='view-admin')renderAdmin();
+}
+function loop(){maquinas.forEach(tickMaquina);refrescar();}
+for(let i=0;i<8;i++)maquinas.forEach(tickMaquina);
+cambiarRol();renderGrid();show('command');
+setInterval(loop,2000);
+</script>
+</body>
+</html>
