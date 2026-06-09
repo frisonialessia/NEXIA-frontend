@@ -1,10 +1,10 @@
 // ──────────────────────────────────────────────────────────────────────────
-// RUTA "/" · INICIO
-// El contenido se adapta al rol (centro de mando o modo operador).
+// RUTA "/produccion" · PRODUCCIÓN Y EFICIENCIA (OEE)
+// Vista protegida por rol (la propia vista verifica el acceso).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { Home } from "@/components/Home";
+import { Production } from "@/components/Production";
 
 export default function Page() {
-  return <Home />;
+  return <Production />;
 }

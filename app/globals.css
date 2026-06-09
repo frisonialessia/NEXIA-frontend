@@ -30,3 +30,52 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* ── Animaciones portadas de la demo de referencia ──────────────────────── */
+
+/* Pulso suave: aura que late en los puntos de estado crítico/recuperación */
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  75%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+.ping-soft {
+  animation: ping-soft 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Entrada lateral: la notificación móvil simulada */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.slide-in {
+  animation: slide-in 0.4s ease;
+}
+
+/* Aparición suave al cambiar de vista */
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fade-in {
+  animation: fade 0.35s ease;
+}
+

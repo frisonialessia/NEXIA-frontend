@@ -1,10 +1,15 @@
+"use client";
+
 // ──────────────────────────────────────────────────────────────────────────
-// RUTA "/" · INICIO
-// El contenido se adapta al rol (centro de mando o modo operador).
+// INICIO — elige la pantalla de arranque según el rol
+// Operador → modo simple ("qué atender ahora"). Resto → centro de mando.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { Home } from "@/components/Home";
+import { useSession } from "@/lib/state/SessionProvider";
+import { CommandCenter } from "./CommandCenter";
+import { OperatorHome } from "./OperatorHome";
 
-export default function Page() {
-  return <Home />;
+export function Home() {
+  const { modoOperador } = useSession();
+  return modoOperador ? <OperatorHome /> : <CommandCenter />;
 }
