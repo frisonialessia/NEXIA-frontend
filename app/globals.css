@@ -79,23 +79,3 @@ a {
   animation: fade 0.35s ease;
 }
 
-/* Banda diagonal del banner "modo demostración" */
-.stripe {
-  background: repeating-linear-gradient(
-    45deg,
-    #fef3c7,
-    #fef3c7 10px,
-    #fde68a 10px,
-    #fde68a 20px
-  );
-}
-.dark .stripe {
-  background: repeating-linear-gradient(
-    45deg,
-    #422006,
-    #422006 10px,
-    #52320a 10px,
-    #52320a 20px
-  );
-  color: #fcd34d;
-}

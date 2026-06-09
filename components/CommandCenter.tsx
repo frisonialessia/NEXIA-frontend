@@ -8,7 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
-import { ESTADOS, RANK_ESTADO, col, estadoColorKey } from "@/lib/constants";
+import { ESTADOS, HORAS_PARADA_TIPICA, RANK_ESTADO, col, estadoColorKey } from "@/lib/constants";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
 import { useFleet } from "@/lib/state/FleetProvider";
@@ -63,27 +63,20 @@ export function CommandCenter() {
 
         {/* Banner de ahorro + salud de planta */}
         <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-900 px-7 py-6 text-white dark:border-neutral-800 lg:col-span-2">
-            <div className="flex flex-wrap items-center justify-between gap-6">
-              <div>
-                <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">
-                  Ahorro estimado este mes
-                </span>
-                <div className="mt-1 font-serif text-4xl tracking-tight" style={{ color: "#22c55e" }}>
-                  {dinero(ahorroMes)}
-                </div>
-                <p className="mt-1 text-xs text-neutral-400">en paradas no planificadas evitadas</p>
+          <div className="flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 to-neutral-800 px-7 py-6 text-white lg:col-span-2">
+            <div>
+              <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Ahorro estimado este mes</span>
+              <div className="mt-1.5 font-serif text-5xl tracking-tight" style={{ color: "#22c55e" }}>
+                {dinero(ahorroMes)}
               </div>
-              <div className="flex gap-6">
-                <div>
-                  <div className="font-serif text-2xl">{paradasEvitadas}</div>
-                  <span className="text-[11px] uppercase tracking-wider text-neutral-500">paradas evitadas</span>
-                </div>
-                <div>
-                  <div className="font-serif text-2xl">{total || 6}</div>
-                  <span className="text-[11px] uppercase tracking-wider text-neutral-500">activos</span>
-                </div>
-              </div>
+              <p className="mt-1.5 text-xs text-neutral-400">en paradas no planificadas evitadas</p>
+            </div>
+            <div className="mt-7 flex items-center gap-7 border-t border-white/10 pt-5">
+              <Estadistica valor={String(paradasEvitadas)} label="paradas evitadas" />
+              <span className="h-8 w-px bg-white/10" />
+              <Estadistica valor={(paradasEvitadas * HORAS_PARADA_TIPICA).toLocaleString("es-ES") + " h"} label="producción recuperada" />
+              <span className="h-8 w-px bg-white/10" />
+              <Estadistica valor={String(total || 6)} label="activos" />
             </div>
           </div>
           <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900">
@@ -115,6 +108,15 @@ export function CommandCenter() {
         )}
       </div>
     </main>
+  );
+}
+
+function Estadistica({ valor, label }: { valor: string; label: string }) {
+  return (
+    <div>
+      <div className="font-serif text-2xl">{valor}</div>
+      <span className="text-[11px] uppercase tracking-wider text-neutral-500">{label}</span>
+    </div>
   );
 }
 
