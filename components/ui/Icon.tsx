@@ -23,7 +23,9 @@ export type IconName =
   | "plus"
   | "alert"
   | "spark"
-  | "send";
+  | "send"
+  | "menu"
+  | "x";
 
 /** Contenido vectorial de cada icono (paths/círculos dentro del viewBox 24×24). */
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -62,6 +64,8 @@ const PATHS: Record<IconName, React.ReactNode> = {
   alert: <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />,
   spark: <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />,
   send: <path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" />,
+  menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  x: <path d="M18 6L6 18M6 6l12 12" />,
 };
 
 /** El icono "check" usa un trazo algo más grueso, como en la demo. */
