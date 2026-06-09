@@ -1,9 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────
-// RUTA "/ajustes" · AJUSTES
-// ──────────────────────────────────────────────────────────────────────────
-
-import { Settings } from "@/components/Settings";
-
+import { redirect } from "next/navigation";
 export default function Page() {
-  return <Settings />;
+  redirect("/configuracion");
 }

@@ -1,10 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────
-// RUTA "/admin" · ADMIN (gestión de permisos)
-// Vista protegida por rol (la propia vista verifica el acceso).
-// ──────────────────────────────────────────────────────────────────────────
-
-import { Admin } from "@/components/Admin";
-
+import { redirect } from "next/navigation";
 export default function Page() {
-  return <Admin />;
+  redirect("/configuracion");
 }

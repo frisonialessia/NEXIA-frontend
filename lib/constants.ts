@@ -231,13 +231,4 @@ export const MATRIZ_PERMISOS: { f: string; v: number[] }[] = [
   { f: "Exportar reportes", v: [1, 1, 1, 0, 1] },
 ];
 
-// ──────────────────────────────────────────────────────────────────────────
-// CONTROL DE ACCESO A VISTAS POR ROL
-// Define qué roles pueden entrar a cada vista protegida.
-// ──────────────────────────────────────────────────────────────────────────
-
-export const ACCESO_VISTA = {
-  produccion: ["admin", "jefe", "tecnico"] as Rol[],
-  conectar: ["admin", "tecnico"] as Rol[],
-  admin: ["admin"] as Rol[],
-};
+// El control de acceso por rol vive en lib/permissions.ts (PERMISOS / puede()).

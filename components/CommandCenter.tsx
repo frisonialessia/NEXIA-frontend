@@ -12,13 +12,16 @@ import { ESTADOS, RANK_ESTADO, col, estadoColorKey } from "@/lib/constants";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
 import { useFleet } from "@/lib/state/FleetProvider";
+import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Maquina } from "@/lib/types";
+import { TrendCard } from "./TrendCard";
 import { GaugeCircular } from "./ui/GaugeCircular";
 
 export function CommandCenter() {
   const { maquinas, ahorroMes, paradasEvitadas } = useFleet();
   const { dark } = useTheme();
+  const { puede } = useSession();
 
   const total = maquinas.length;
   const atencion = maquinas.filter((m) => m.estado !== "STABLE").length;
@@ -90,6 +93,13 @@ export function CommandCenter() {
             </div>
           </div>
         </div>
+
+        {/* Tendencia / ROI · solo perfil gerencial */}
+        {puede("tendencia") && total > 0 && (
+          <div className="mb-6">
+            <TrendCard />
+          </div>
+        )}
 
         {/* Rejilla de máquinas */}
         {total === 0 ? (

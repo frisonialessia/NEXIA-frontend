@@ -8,7 +8,8 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ACCESO_VISTA, ROLES } from "../constants";
+import { ROLES } from "../constants";
+import { esModoOperador, esSoloLectura, puede as puedePermiso, type Permiso } from "../permissions";
 import type { Rol, SistemaUnidades } from "../types";
 
 const CLAVE_ROL = "nexia-rol";
@@ -19,8 +20,12 @@ interface SessionCtx {
   setRol: (r: Rol) => void;
   sistema: SistemaUnidades;
   setSistema: (s: SistemaUnidades) => void;
-  /** ¿El rol activo puede acceder a una vista protegida? */
-  puedeVer: (vista: keyof typeof ACCESO_VISTA) => boolean;
+  /** ¿El rol activo tiene un permiso concreto? */
+  puede: (permiso: Permiso) => boolean;
+  /** El operador entra en modo simplificado ("qué atender ahora"). */
+  modoOperador: boolean;
+  /** Solo lectura: ve todo, no ejecuta acciones. */
+  soloLectura: boolean;
 }
 
 const Ctx = createContext<SessionCtx | null>(null);
@@ -53,7 +58,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       setRol,
       sistema,
       setSistema,
-      puedeVer: (vista) => ACCESO_VISTA[vista].includes(rol),
+      puede: (permiso) => puedePermiso(rol, permiso),
+      modoOperador: esModoOperador(rol),
+      soloLectura: esSoloLectura(rol),
     }),
     [rol, sistema, setRol, setSistema]
   );

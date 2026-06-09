@@ -1,10 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────
-// RUTA "/conectar" · CONECTAR (integración industrial)
-// Vista protegida por rol (la propia vista verifica el acceso).
-// ──────────────────────────────────────────────────────────────────────────
-
-import { Connect } from "@/components/Connect";
-
+import { redirect } from "next/navigation";
 export default function Page() {
-  return <Connect />;
+  redirect("/configuracion");
 }

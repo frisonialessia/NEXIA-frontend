@@ -1,9 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────
-// RUTA "/auditoria" · AUDITORÍA
-// ──────────────────────────────────────────────────────────────────────────
-
-import { Audit } from "@/components/Audit";
-
+import { redirect } from "next/navigation";
 export default function Page() {
-  return <Audit />;
+  redirect("/alertas");
 }

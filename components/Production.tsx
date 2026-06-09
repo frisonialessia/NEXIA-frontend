@@ -24,7 +24,7 @@ interface OeeState {
 }
 
 export function Production() {
-  const { puedeVer } = useSession();
+  const { puede } = useSession();
   const { dark } = useTheme();
 
   const [oee, setOee] = useState<OeeState>({
@@ -49,7 +49,7 @@ export function Production() {
     return () => clearInterval(t);
   }, []);
 
-  if (!puedeVer("produccion")) {
+  if (!puede("produccion")) {
     return <AccessDenied mensaje="La vista de Producción requiere un rol con acceso (Administrador, Jefe de planta o Técnico)." />;
   }
 
