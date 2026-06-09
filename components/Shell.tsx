@@ -7,6 +7,7 @@
 import { DemoBanner } from "./DemoBanner";
 import { Nav } from "./Nav";
 import { PhoneAlert } from "./PhoneAlert";
+import { PwaRegister } from "./PwaRegister";
 
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <Nav />
       {children}
       <PhoneAlert />
+      <PwaRegister />
     </div>
   );
 }
