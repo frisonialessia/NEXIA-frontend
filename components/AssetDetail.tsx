@@ -19,8 +19,10 @@ import { useMaquinas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Lectura } from "@/lib/types";
+import { Card, SURFACE } from "./ui/Card";
 import { Gauge } from "./ui/Gauge";
 import { Icon } from "./ui/Icon";
+import { Label, Stat } from "./ui/Typo";
 import { VibrationChart } from "./ui/VibrationChart";
 
 export function AssetDetail({ id }: { id: string }) {
@@ -55,7 +57,7 @@ export function AssetDetail({ id }: { id: string }) {
           <Link href="/" className="text-sm text-neutral-400 transition-colors hover:text-neutral-700">
             ← Volver a la flota
           </Link>
-          <div className="mt-8 rounded-2xl border border-neutral-200 bg-white px-8 py-16 text-center dark:border-neutral-800 dark:bg-neutral-900">
+          <div className={`mt-8 ${SURFACE} px-8 py-16 text-center`}>
             <p className="text-sm text-neutral-500">No se encontró este activo.</p>
             <p className="mt-1 text-xs text-neutral-400">Puede que aún se esté cargando la flota.</p>
           </div>
@@ -159,7 +161,7 @@ export function AssetDetail({ id }: { id: string }) {
         </div>
 
         {/* Sensores y actuadores */}
-        <div className="mb-5 rounded-2xl border border-neutral-200 bg-white px-7 py-5 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className={`mb-5 ${SURFACE} px-7 py-5`}>
           <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
             Estado de sensores y actuadores
           </h3>
@@ -177,7 +179,7 @@ export function AssetDetail({ id }: { id: string }) {
         </div>
 
         {/* Gráfico de vibración */}
-        <div className="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className={`${SURFACE} px-7 py-6`}>
           <div className="mb-5 flex items-baseline justify-between">
             <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
               Vibración real vs. esperado
@@ -226,19 +228,19 @@ export function AssetDetail({ id }: { id: string }) {
 
 function GaugeCard({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white px-5 py-5 text-center dark:border-neutral-800 dark:bg-neutral-900">
-      <span className="text-xs uppercase tracking-wider text-neutral-400">{titulo}</span>
+    <Card className="px-5 py-5 text-center">
+      <Label>{titulo}</Label>
       <div className="mt-1 flex justify-center">{children}</div>
-    </div>
+    </Card>
   );
 }
 
 function InfoCard({ titulo, valor, pie }: { titulo: string; valor: string; pie: string }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900">
-      <span className="text-xs uppercase tracking-wider text-neutral-400">{titulo}</span>
-      <div className="mt-1 font-serif text-2xl">{valor}</div>
+    <Card className="px-6 py-5">
+      <Label>{titulo}</Label>
+      <Stat className="mt-1" value={valor} size="md" />
       <span className="text-[11px] text-neutral-400">{pie}</span>
-    </div>
+    </Card>
   );
 }

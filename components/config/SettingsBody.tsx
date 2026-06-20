@@ -13,6 +13,9 @@ import { uni } from "@/lib/format";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Magnitud, SistemaUnidades } from "@/lib/types";
+import { Card } from "../ui/Card";
+import { Button } from "../ui/Primitives";
+import { Label } from "../ui/Typo";
 
 export function SettingsBody() {
   const { sistema, setSistema, puede } = useSession();
@@ -90,9 +93,7 @@ export function SettingsBody() {
       )}
 
       <div className="flex justify-end">
-        <button onClick={() => toast("Ajustes guardados")} className="rounded-xl px-6 py-2.5 text-sm font-medium text-white" style={{ background: brand }}>
-          Guardar cambios
-        </button>
+        <Button onClick={() => toast("Ajustes guardados")}>Guardar cambios</Button>
       </div>
     </div>
   );
@@ -100,10 +101,10 @@ export function SettingsBody() {
 
 function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
-      <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{titulo}</h3>
+    <Card className="px-7 py-6">
+      <Label>{titulo}</Label>
       <div className="mt-4">{children}</div>
-    </div>
+    </Card>
   );
 }
 

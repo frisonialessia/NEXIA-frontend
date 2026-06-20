@@ -15,6 +15,7 @@ import type { Maquina } from "@/lib/types";
 import type { Savings } from "@/lib/state/useFleet";
 import { Icon, type IconName } from "../ui/Icon";
 import { MiniLineChart } from "../ui/MiniLineChart";
+import { Label, Stat } from "../ui/Typo";
 import { SURFACE } from "./surface";
 
 interface Delta {
@@ -107,7 +108,7 @@ function KpiTile({
           <span className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: soft(accentKey, 16), color: col(accentKey) }}>
             <Icon name={icono} className="h-4 w-4" />
           </span>
-          <span className="text-[11px] font-medium uppercase tracking-[0.12em] text-neutral-400">{titulo}</span>
+          <Label>{titulo}</Label>
         </div>
         {delta && (
           <span
@@ -120,7 +121,7 @@ function KpiTile({
         )}
       </div>
 
-      <div className="mt-2.5 font-serif text-3xl leading-none tracking-tight">{valor}</div>
+      <Stat className="mt-2.5" value={valor} />
       {sub && <div className="mt-1 text-xs text-neutral-400">{sub}</div>}
 
       <div className="mt-2 h-9 overflow-hidden">{spark ? <MiniLineChart data={spark.data} color={col(spark.colorKey)} /> : extra}</div>

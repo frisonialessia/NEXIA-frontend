@@ -11,6 +11,7 @@ import Link from "next/link";
 import { ESTADOS, RANK_ESTADO, col, estadoColorKey, mix, soft } from "@/lib/constants";
 import type { ColorKey } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
+import { SURFACE } from "./ui/Card";
 import { useMaquinas } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "./ui/Icon";
@@ -74,7 +75,7 @@ export function OperatorHome() {
               <Link
                 key={m.id}
                 href={`/activo/${encodeURIComponent(m.id)}`}
-                className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white px-5 py-4 transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900"
+                className={`${SURFACE} flex items-center gap-4 px-5 py-4 transition-shadow hover:shadow-md`}
               >
                 <span className="relative flex h-3 w-3 shrink-0">
                   {atender && <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: ec, opacity: 0.6 }} />}
@@ -91,7 +92,7 @@ export function OperatorHome() {
             );
           })}
           {orden.length === 0 && (
-            <div className="rounded-2xl border border-neutral-200 bg-white px-8 py-16 text-center text-sm text-neutral-400 dark:border-neutral-800 dark:bg-neutral-900">
+            <div className={`${SURFACE} px-8 py-16 text-center text-sm text-neutral-400`}>
               Recopilando las primeras lecturas…
             </div>
           )}
