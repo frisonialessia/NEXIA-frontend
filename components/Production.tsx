@@ -1,22 +1,23 @@
 "use client";
 
 // ──────────────────────────────────────────────────────────────────────────
-// VISTA 3 · PRODUCCIÓN Y EFICIENCIA (OEE)
-// OEE global (gauge) + Disponibilidad/Rendimiento/Calidad, contadores de
-// piezas y ritmo, dona de tiempos de inactividad por causa y consumo
-// energético. Vista protegida por rol. Portado de renderOEE() de la demo.
+// VISTA · PRODUCCIÓN Y EFICIENCIA (OEE) — sistema de diseño NEXIA
+// Reconstruida con primitivos (Card, Label, Stat, ProgressBar) para consistencia.
+// Color de métricas POR VALOR (verde/ámbar/rojo). Series de datos (dona/energía)
+// son el ÚNICO lugar donde aparece la paleta de datos (cian/lima/naranja/violeta).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col } from "@/lib/constants";
+import { col, colorPorValor } from "@/lib/constants";
 import { DOWNTIME, ENERGIA, useOee } from "@/lib/data/oee";
 import { useSession } from "@/lib/state/SessionProvider";
-import { useTheme } from "@/lib/state/ThemeProvider";
 import { AccessDenied } from "./AccessDenied";
+import { Card } from "./ui/Card";
 import { GaugeCircular } from "./ui/GaugeCircular";
+import { ProgressBar } from "./ui/Primitives";
+import { Label, PageTitle, Stat } from "./ui/Typo";
 
 export function Production() {
   const { puede } = useSession();
-  const { dark } = useTheme();
   const oee = useOee();
 
   if (!puede("produccion")) {
@@ -27,64 +28,64 @@ export function Production() {
   const nivel = oeeGlobal >= 0.85 ? "World-class" : oeeGlobal >= 0.6 ? "Aceptable" : "Requiere mejora";
 
   const metricas = [
-    { label: "Disponibilidad", val: oee.dispo, color: col("brand", dark) },
-    { label: "Rendimiento", val: oee.rend, color: col("warn", dark) },
-    { label: "Calidad", val: oee.cal, color: col("ok", dark) },
+    { label: "Disponibilidad", val: oee.dispo },
+    { label: "Rendimiento", val: oee.rend },
+    { label: "Calidad", val: oee.cal },
   ];
 
-  const downtime = DOWNTIME.map((d) => ({ ...d, color: col(d.colorKey, dark) }));
+  const downtime = DOWNTIME.map((d) => ({ ...d, color: col(d.colorKey) }));
   const totalDt = downtime.reduce((s, d) => s + d.m, 0);
-  const energia = ENERGIA.map((e) => ({ ...e, color: col(e.colorKey, dark) }));
+  const energia = ENERGIA.map((e) => ({ ...e, color: col(e.colorKey) }));
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Turno actual · Línea 1</span>
-          <h1 className="mt-2 font-serif text-3xl tracking-tight">Producción y eficiencia</h1>
+          <Label>Turno actual · Línea 1</Label>
+          <PageTitle className="mt-2">Producción y eficiencia</PageTitle>
         </header>
 
         {/* OEE global + las 3 métricas */}
-        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
-          <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-6 text-center dark:border-neutral-800 dark:bg-neutral-900">
-            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">OEE Global</span>
+        <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
+          <Card className="px-6 py-6 text-center">
+            <Label>OEE Global</Label>
             <div className="mt-2 flex justify-center">
               <GaugeCircular pct={oeeGlobal * 100} label="OEE %" />
             </div>
             <p className="mt-1 text-xs text-neutral-500">{nivel}</p>
-          </div>
+          </Card>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:col-span-3">
-            {metricas.map((m) => (
-              <div key={m.label} className="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900">
-                <span className="text-xs uppercase tracking-wider text-neutral-400">{m.label}</span>
-                <div className="mt-2 font-serif text-3xl" style={{ color: m.color }}>
-                  {(m.val * 100).toFixed(1)}%
-                </div>
-                <div className="mt-3 h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                  <div className="h-1.5 rounded-full" style={{ width: `${m.val * 100}%`, background: m.color }} />
-                </div>
-              </div>
-            ))}
+            {metricas.map((m) => {
+              const pct = m.val * 100;
+              const ck = colorPorValor(pct);
+              return (
+                <Card key={m.label} className="px-6 py-5">
+                  <Label>{m.label}</Label>
+                  <Stat className="mt-2" value={`${pct.toFixed(1)}%`} colorKey={ck} />
+                  <div className="mt-3">
+                    <ProgressBar value={m.val} colorKey={ck} />
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
         {/* Contadores */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-          <Contador label="Piezas buenas" valor={oee.buenas.toLocaleString("es-ES")} color={col("ok", dark)} />
-          <Contador label="Rechazos" valor={String(oee.malas)} color={col("crit", dark)} />
-          <Contador label="Objetivo turno" valor="4,200" color="#a3a3a3" />
-          <Contador label="Ritmo (pzs/min)" valor={oee.ritmo.toFixed(1)} pie="meta 9.0" />
+        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <Contador label="Piezas buenas" value={oee.buenas.toLocaleString("es-ES")} colorKey="ok" />
+          <Contador label="Rechazos" value={String(oee.malas)} colorKey="crit" />
+          <Contador label="Objetivo turno" value="4,200" muted />
+          <Contador label="Ritmo (pzs/min)" value={oee.ritmo.toFixed(1)} sub="meta 9.0" />
         </div>
 
         {/* Dona de paros + energía */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
-              Tiempos de inactividad · por causa
-            </h3>
+          <Card className="px-7 py-6">
+            <Label>Tiempos de inactividad · por causa</Label>
             <div className="mt-4 flex items-center gap-6">
-              <DonutParos data={downtime} total={totalDt} dark={dark} />
+              <DonutParos data={downtime} total={totalDt} />
               <div className="flex-1 space-y-1.5">
                 {downtime.map((d) => (
                   <div key={d.c} className="flex items-center gap-2 text-xs">
@@ -97,10 +98,10 @@ export function Production() {
                 ))}
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-2xl border border-neutral-200 bg-white px-7 py-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Consumo energético · turno</h3>
+          <Card className="px-7 py-6">
+            <Label>Consumo energético · turno</Label>
             <div className="mt-4 space-y-4">
               {energia.map((e) => (
                 <div key={e.n}>
@@ -116,26 +117,24 @@ export function Production() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </main>
   );
 }
 
-function Contador({ label, valor, color, pie }: { label: string; valor: string; color?: string; pie?: string }) {
+function Contador({ label, value, colorKey, sub, muted }: { label: string; value: string; colorKey?: "ok" | "crit"; sub?: string; muted?: boolean }) {
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-5 dark:border-neutral-800 dark:bg-neutral-900">
-      <span className="text-xs uppercase tracking-wider text-neutral-400">{label}</span>
-      <div className="mt-1 font-serif text-3xl" style={color ? { color } : undefined}>
-        {valor}
-      </div>
-      {pie && <span className="text-[11px] text-neutral-400">{pie}</span>}
-    </div>
+    <Card className="px-6 py-5">
+      <Label>{label}</Label>
+      <Stat className={`mt-1 ${muted ? "text-neutral-400" : ""}`} value={value} colorKey={colorKey} />
+      {sub && <span className="text-[11px] text-neutral-400">{sub}</span>}
+    </Card>
   );
 }
 
-function DonutParos({ data, total, dark }: { data: { c: string; m: number; color: string }[]; total: number; dark: boolean }) {
+function DonutParos({ data, total }: { data: { c: string; m: number; color: string }[]; total: number }) {
   const r = 46;
   const cc = 2 * Math.PI * r;
   let acc = 0;
@@ -160,7 +159,7 @@ function DonutParos({ data, total, dark }: { data: { c: string; m: number; color
         acc += frac;
         return seg;
       })}
-      <text x={60} y={56} textAnchor="middle" fontSize={20} fontWeight={600} fill="currentColor" className="font-serif">
+      <text x={60} y={56} textAnchor="middle" fontSize={20} fontWeight={600} fill="currentColor" className="font-sans tabular-nums">
         {total}
       </text>
       <text x={60} y={72} textAnchor="middle" fontSize={9} fill="#9ca3af">
