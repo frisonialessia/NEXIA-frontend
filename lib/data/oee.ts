@@ -7,7 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useState } from "react";
-import type { ColorKey } from "../constants";
+import { VERDES } from "../constants";
 
 export interface OeeState {
   dispo: number;
@@ -37,19 +37,19 @@ export function tickOee(s: OeeState): OeeState {
   };
 }
 
-/** Tiempos de inactividad por causa (minutos). */
-export const DOWNTIME: { c: string; m: number; colorKey: ColorKey }[] = [
-  { c: "Falta de material", m: 28, colorKey: "brand" },
-  { c: "Fallo mecánico", m: 18, colorKey: "crit" },
-  { c: "Cambio de formato", m: 9, colorKey: "naranja" },
-  { c: "Error de operador", m: 5, colorKey: "violeta" },
+/** Tiempos de inactividad por causa (minutos). Verdes + rojo para el fallo. */
+export const DOWNTIME: { c: string; m: number; color: string }[] = [
+  { c: "Falta de material", m: 28, color: VERDES.medio },
+  { c: "Fallo mecánico", m: 18, color: "#ef4444" },
+  { c: "Cambio de formato", m: 9, color: VERDES.claro },
+  { c: "Error de operador", m: 5, color: VERDES.oscuro },
 ];
 
-/** Consumo energético del turno. */
-export const ENERGIA: { n: string; v: number; u: string; max: number; colorKey: ColorKey }[] = [
-  { n: "Energía eléctrica", v: 842, u: "kWh", max: 1000, colorKey: "naranja" },
-  { n: "Aire comprimido", v: 310, u: "m³", max: 500, colorKey: "cian" },
-  { n: "Agua de proceso", v: 128, u: "m³", max: 200, colorKey: "lima" },
+/** Consumo energético del turno (tonos de verde, dato neutro). */
+export const ENERGIA: { n: string; v: number; u: string; max: number; color: string }[] = [
+  { n: "Energía eléctrica", v: 842, u: "kWh", max: 1000, color: VERDES.oscuro },
+  { n: "Aire comprimido", v: 310, u: "m³", max: 500, color: VERDES.medio },
+  { n: "Agua de proceso", v: 128, u: "m³", max: 200, color: VERDES.claro },
 ];
 
 /** Hook: estado de OEE en vivo (se actualiza cada 2s). */

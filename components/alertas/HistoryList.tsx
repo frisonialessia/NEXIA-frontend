@@ -39,7 +39,7 @@ export function HistoryList() {
                 {a.fecha} · {a.hora}
               </div>
             </div>
-            <Pill colorKey={resuelto ? "ok" : "warn"}>{a.estado}</Pill>
+            <Pill colorKey={resuelto ? "ok" : "crit"}>{a.estado}</Pill>
           </div>
         );
       })}

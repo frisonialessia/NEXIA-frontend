@@ -7,7 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import type { ReactNode } from "react";
-import { AHORRO_POR_PARADA, type ColorKey, col, estadoColorKey, soft } from "@/lib/constants";
+import { AHORRO_POR_PARADA, type ColorKey, col, colorPorValor, estadoColor, soft } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
 import { AHORRO_SEMANAL, SALUD_SEMANAL } from "@/lib/data/trend";
 import { dinero } from "@/lib/format";
@@ -34,7 +34,8 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
   const saludDelta = s[s.length - 1] - s[s.length - 2];
   const paradasSemanal = AHORRO_SEMANAL.map((x) => Math.round(x / AHORRO_POR_PARADA));
 
-  const dots = ordenarFlota(maquinas).map((m) => col(estadoColorKey(m.estado)));
+  const dots = ordenarFlota(maquinas).map((m) => estadoColor(m.estado));
+  const saludKey = colorPorValor(salud, 75);
 
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
@@ -50,18 +51,18 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
       <KpiTile
         titulo="Paradas evitadas"
         icono="shield"
-        accentKey="brand"
+        accentKey="ok"
         valor={String(savings.paradasEvitadas)}
         sub="este mes"
-        spark={{ data: paradasSemanal, colorKey: "brand" }}
+        spark={{ data: paradasSemanal, colorKey: "ok" }}
       />
       <KpiTile
         titulo="Salud de planta"
         icono="gauge"
-        accentKey="brand"
+        accentKey={saludKey}
         valor={`${salud}%`}
         sub="activos estables"
-        spark={{ data: SALUD_SEMANAL, colorKey: "brand" }}
+        spark={{ data: SALUD_SEMANAL, colorKey: saludKey }}
         delta={{ texto: `${saludDelta >= 0 ? "+" : ""}${saludDelta} pts`, bueno: saludDelta >= 0 }}
       />
       <KpiTile

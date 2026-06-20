@@ -7,7 +7,7 @@
 // son el ÚNICO lugar donde aparece la paleta de datos (cian/lima/naranja/violeta).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col, colorPorValor } from "@/lib/constants";
+import { colorPorValor } from "@/lib/constants";
 import { DOWNTIME, ENERGIA, useOee } from "@/lib/data/oee";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AccessDenied } from "./AccessDenied";
@@ -33,9 +33,9 @@ export function Production() {
     { label: "Calidad", val: oee.cal },
   ];
 
-  const downtime = DOWNTIME.map((d) => ({ ...d, color: col(d.colorKey) }));
+  const downtime = DOWNTIME;
   const totalDt = downtime.reduce((s, d) => s + d.m, 0);
-  const energia = ENERGIA.map((e) => ({ ...e, color: col(e.colorKey) }));
+  const energia = ENERGIA;
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">

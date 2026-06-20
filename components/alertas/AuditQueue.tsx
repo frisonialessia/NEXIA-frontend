@@ -56,7 +56,7 @@ export function AuditQueue() {
               <div className="hidden shrink-0 text-right md:block">
                 <div className="font-mono text-xs text-neutral-500">{a.hora}</div>
               </div>
-              <Pill colorKey="warn">Pendiente</Pill>
+              <Pill colorKey="crit">Pendiente</Pill>
             </>
           );
           const borde = i === alertas.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800";

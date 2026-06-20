@@ -11,7 +11,7 @@ export function ProbabilityRing({ pct, size = 48 }: { pct: number; size?: number
   const r = size / 2 - 5;
   const c = 2 * Math.PI * r;
   const off = c * (1 - Math.max(0, Math.min(100, pct)) / 100);
-  const key = pct >= 60 ? "crit" : pct >= 30 ? "warn" : "ok";
+  const key = pct >= 60 ? "crit" : "ok";
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`${Math.round(pct)}% de probabilidad de fallo`}>

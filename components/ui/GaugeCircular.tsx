@@ -22,7 +22,7 @@ export function GaugeCircular({ pct, label }: GaugeCircularProps) {
   const { dark } = useTheme();
   const c = 2 * Math.PI * R;
   const off = c * (1 - pct / 100);
-  const color = pct >= 85 ? col("ok", dark) : pct >= 60 ? col("warn", dark) : col("crit", dark);
+  const color = pct >= 60 ? col("ok", dark) : col("crit", dark);
   const fondo = ARC;
 
   return (

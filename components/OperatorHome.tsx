@@ -8,8 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
-import { ESTADOS, RANK_ESTADO, col, estadoColorKey, mix, soft } from "@/lib/constants";
-import type { ColorKey } from "@/lib/constants";
+import { ESTADOS, RANK_ESTADO, VERDES, col, estadoColor, mix } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
 import { SURFACE } from "./ui/Card";
 import { useMaquinas } from "@/lib/state/useFleet";
@@ -27,9 +26,9 @@ export function OperatorHome() {
 
   const orden = ordenarFlota(maquinas);
 
-  // Banner principal: color y mensaje según la situación.
-  const sevKey: ColorKey = hayCriticas ? "crit" : requierenAtencion.length > 0 ? "warn" : "ok";
-  const banner = { bg: soft(sevKey, 10), border: soft(sevKey, 28), c: col(sevKey, dark) };
+  // Banner principal: color y mensaje según la situación (verde/rojo).
+  const sevC = hayCriticas ? col("crit") : requierenAtencion.length > 0 ? VERDES.oscuro : VERDES.medio;
+  const banner = { bg: mix(sevC, 10), border: mix(sevC, 28), c: sevC };
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
@@ -69,7 +68,7 @@ export function OperatorHome() {
         {/* Lista de máquinas — objetivos grandes, fáciles de tocar */}
         <div className="space-y-2.5">
           {orden.map((m) => {
-            const ec = col(estadoColorKey(m.estado), dark);
+            const ec = estadoColor(m.estado);
             const atender = m.estado !== "STABLE";
             return (
               <Link
