@@ -26,7 +26,7 @@ export function GaugeCircular({ pct, label }: GaugeCircularProps) {
   const fondo = ARC;
 
   return (
-    <svg viewBox="0 0 120 120" width={120} height={120}>
+    <svg viewBox="0 0 120 120" width={120} height={120} role="img" aria-label={`${Math.round(pct)} ${label}`}>
       <circle cx={60} cy={60} r={R} fill="none" stroke={fondo} strokeWidth={9} />
       <circle
         cx={60}

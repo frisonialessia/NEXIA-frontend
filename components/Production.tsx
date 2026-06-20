@@ -140,7 +140,7 @@ function DonutParos({ data, total, dark }: { data: { c: string; m: number; color
   const cc = 2 * Math.PI * r;
   let acc = 0;
   return (
-    <svg viewBox="0 0 120 120" width={120} height={120}>
+    <svg viewBox="0 0 120 120" width={120} height={120} aria-hidden="true">
       {data.map((d) => {
         const frac = d.m / total;
         const seg = (

@@ -55,7 +55,7 @@ export function Gauge({ valor, min, max, unidad, zonaPeligro }: GaugeProps) {
   };
 
   return (
-    <svg viewBox="0 0 140 90" width={140} height={90}>
+    <svg viewBox="0 0 140 90" width={140} height={90} role="img" aria-label={`${valor.toFixed(valor < 10 ? 1 : 0)} ${unidad}`}>
       {arco(Math.PI, 0, fondoArco, 8, "fondo")}
       {arco(peligroAng, 0, col("crit", dark), 8, "peligro")}
       {arco(Math.PI, ang, colorVal, 8, "valor")}
