@@ -14,3 +14,21 @@ export function ordenarFlota(maquinas: Maquina[]): Maquina[] {
     (a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || a.id.localeCompare(b.id, "es")
   );
 }
+
+/**
+ * Orden con preferencias del usuario (arrastre + fijar). Precedencia:
+ *  1. Críticas (siempre arriba — lo urgente nunca se esconde)
+ *  2. Fijadas (pin del usuario)
+ *  3. El resto, en el orden que el usuario armó arrastrando (`orden`)
+ */
+export function ordenarConPreferencias(maquinas: Maquina[], orden: string[], pins: string[]): Maquina[] {
+  const pinSet = new Set(pins);
+  const idx = (id: string) => {
+    const i = orden.indexOf(id);
+    return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+  };
+  const grupo = (m: Maquina) => (m.estado === "CRITICAL_ALERT" ? 0 : pinSet.has(m.id) ? 1 : 2);
+  return [...maquinas].sort(
+    (a, b) => grupo(a) - grupo(b) || idx(a.id) - idx(b.id) || a.id.localeCompare(b.id, "es")
+  );
+}

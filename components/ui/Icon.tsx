@@ -25,7 +25,9 @@ export type IconName =
   | "spark"
   | "send"
   | "menu"
-  | "x";
+  | "x"
+  | "grip"
+  | "pin";
 
 /** Contenido vectorial de cada icono (paths/círculos dentro del viewBox 24×24). */
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -66,6 +68,8 @@ const PATHS: Record<IconName, React.ReactNode> = {
   send: <path d="M22 2L11 13M22 2l-7 20-4-9-9-4z" />,
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   x: <path d="M18 6L6 18M6 6l12 12" />,
+  grip: <path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01" />,
+  pin: <path d="M15 4.5l-3.25 3.25a4 4 0 0 1-1.564 .976l-2.187 .73a1 1 0 0 0-.41 1.66l5.077 5.077a1 1 0 0 0 1.66-.41l.73-2.188a4 4 0 0 1 .976-1.563l3.25-3.25M9 15l-4.5 4.5M14.5 4l5.5 5.5" />,
 };
 
 /** El icono "check" usa un trazo algo más grueso, como en la demo. */
