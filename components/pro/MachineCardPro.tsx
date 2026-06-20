@@ -40,7 +40,7 @@ export function MachineCardPro({ m }: { m: Maquina }) {
         <h3 className="mt-3 font-serif text-lg tracking-tight">{m.id}</h3>
         <p className="text-xs text-neutral-400">{m.sector}</p>
 
-        <div className="mt-3 h-10 opacity-80">
+        <div className="mt-3 h-12 overflow-hidden rounded-lg opacity-90">
           {serie.length > 1 ? (
             <MiniLineChart data={serie} color={ec} />
           ) : (

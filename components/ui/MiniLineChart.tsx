@@ -45,7 +45,7 @@ export function MiniLineChart({ data, color }: { data: number[]; color: string }
   const id = "grad-" + uid.replace(/[^a-zA-Z0-9]/g, "");
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }} preserveAspectRatio="none" aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${H}`} className="block h-full w-full" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity={0.18} />
@@ -53,8 +53,8 @@ export function MiniLineChart({ data, color }: { data: number[]; color: string }
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#${id})`} />
-      <path d={linea} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" />
-      <circle cx={x(n - 1)} cy={y(data[n - 1])} r={3} fill={color} />
+      {/* vector-effect mantiene el trazo en 2px aunque el SVG se estire */}
+      <path d={linea} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
