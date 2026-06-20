@@ -8,7 +8,7 @@
 
 import { col } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
-import { useHistorial, useMaquinas, useSavings } from "@/lib/state/useFleet";
+import { useEventos, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { EventsFeed } from "./pro/EventsFeed";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
 import { KpiStrip } from "./pro/KpiStrip";
@@ -18,7 +18,7 @@ import { SURFACE } from "./pro/surface";
 export function CommandCenter() {
   const maquinas = useMaquinas();
   const savings = useSavings();
-  const historial = useHistorial();
+  const eventos = useEventos();
 
   const total = maquinas.length;
   const atencion = maquinas.filter((m) => m.estado !== "STABLE").length;
@@ -71,7 +71,7 @@ export function CommandCenter() {
 
               <section className="lg:sticky lg:top-24 lg:col-span-1">
                 <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Actividad</h2>
-                <EventsFeed historial={historial} />
+                <EventsFeed eventos={eventos} />
               </section>
             </div>
 
