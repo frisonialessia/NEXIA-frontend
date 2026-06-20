@@ -1,10 +1,11 @@
 // ──────────────────────────────────────────────────────────────────────────
-// RUTA "/" · INICIO
-// El contenido se adapta al rol (centro de mando o modo operador).
+// RUTA "/activo/[id]" · DETALLE DE ACTIVO
+// El id viaja codificado en la URL (las máquinas tienen espacios y símbolos);
+// aquí se decodifica y se pasa a la vista.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { Home } from "@/components/Home";
+import { AssetDetail } from "@/components/AssetDetail";
 
-export default function Page() {
-  return <Home />;
+export default function Page({ params }: { params: { id: string } }) {
+  return <AssetDetail id={decodeURIComponent(params.id)} />;
 }

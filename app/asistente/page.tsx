@@ -1,10 +1,9 @@
 // ──────────────────────────────────────────────────────────────────────────
-// RUTA "/" · INICIO
-// El contenido se adapta al rol (centro de mando o modo operador).
+// RUTA "/asistente" · ASISTENTE IA
 // ──────────────────────────────────────────────────────────────────────────
 
-import { Home } from "@/components/Home";
+import { Assistant } from "@/components/Assistant";
 
 export default function Page() {
-  return <Home />;
+  return <Assistant />;
 }

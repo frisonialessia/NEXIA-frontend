@@ -1,10 +1,9 @@
 // ──────────────────────────────────────────────────────────────────────────
-// RUTA "/" · INICIO
-// El contenido se adapta al rol (centro de mando o modo operador).
+// RUTA "/configuracion" · CONFIGURACIÓN (Ajustes + Conexiones + Equipo)
 // ──────────────────────────────────────────────────────────────────────────
 
-import { Home } from "@/components/Home";
+import { Configuracion } from "@/components/Configuracion";
 
 export default function Page() {
-  return <Home />;
+  return <Configuracion />;
 }

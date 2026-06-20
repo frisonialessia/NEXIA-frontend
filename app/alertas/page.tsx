@@ -1,10 +1,9 @@
 // ──────────────────────────────────────────────────────────────────────────
-// RUTA "/" · INICIO
-// El contenido se adapta al rol (centro de mando o modo operador).
+// RUTA "/alertas" · ALERTAS (Pendientes + Historial)
 // ──────────────────────────────────────────────────────────────────────────
 
-import { Home } from "@/components/Home";
+import { Alertas } from "@/components/Alertas";
 
 export default function Page() {
-  return <Home />;
+  return <Alertas />;
 }
