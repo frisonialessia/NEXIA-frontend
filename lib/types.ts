@@ -80,6 +80,24 @@ export interface EventoHistorial extends Alerta {
 export type Veredicto = "real" | "falsa" | "nc";
 
 // ──────────────────────────────────────────────────────────────────────────
+// Eventos (feed de actividad)
+// Modelo propio, separado del "registro de fallos" (historial). Preparado para
+// crecer: detección, resolución y, en el futuro, mantenimiento / reconocimiento.
+// ──────────────────────────────────────────────────────────────────────────
+
+export type TipoEvento = "deteccion" | "resolucion";
+
+export interface Evento {
+  id: string;
+  ts: number;
+  hora: string;
+  tipo: TipoEvento;
+  maquina: string;
+  detalle: string;
+  prob?: number;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // Roles y permisos
 // ──────────────────────────────────────────────────────────────────────────
 

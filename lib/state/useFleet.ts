@@ -9,6 +9,7 @@
 import { useSyncExternalStore } from "react";
 import {
   getAlertas,
+  getEventos,
   getHistorial,
   getMaquinas,
   getNotif,
@@ -18,6 +19,10 @@ import {
 
 export { etiquetarAlerta, cerrarNotif } from "./fleetStore";
 export type { NotifMovil, Savings } from "./fleetStore";
+
+export function useEventos() {
+  return useSyncExternalStore(subscribe, getEventos, getEventos);
+}
 
 export function useMaquinas() {
   return useSyncExternalStore(subscribe, getMaquinas, getMaquinas);

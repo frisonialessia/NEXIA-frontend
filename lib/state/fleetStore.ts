@@ -1,10 +1,10 @@
 // ──────────────────────────────────────────────────────────────────────────
 // STORE DE LA FLOTA — LA CAPA DE DATOS (el "seam" inviolable)
 // Motor simulado expuesto como un store con snapshot dividido en SLICES. Cada
-// slice (maquinas / alertas / historial / ahorro / notif) mantiene una
-// referencia estable y solo cambia cuando cambia su dato. Los componentes se
-// suscriben a su slice vía useSyncExternalStore y NO se re-renderizan cada 2s
-// si su parte no cambió.
+// slice (maquinas / alertas / historial / eventos / ahorro / notif) mantiene
+// una referencia estable y solo cambia cuando cambia su dato. Los componentes
+// se suscriben a su slice vía useSyncExternalStore y NO se re-renderizan cada
+// 2s si su parte no cambió.
 //
 // 🔌  PARA UN BACKEND REAL: reemplazar warmUp()/step() por consultas de red
 //    (TanStack Query). Las firmas de los hooks no cambian → cero cambios en las
@@ -14,7 +14,7 @@
 import { AHORRO_POR_PARADA } from "../constants";
 import { aEventoHistorial, crearFlota, tickMaquina } from "../data/simulated";
 import { causaPrincipal } from "../engine/fsm";
-import type { Alerta, EventoHistorial, Maquina, Veredicto } from "../types";
+import type { Alerta, Evento, EventoHistorial, Maquina, Veredicto } from "../types";
 
 export interface NotifMovil {
   maquina: string;
@@ -30,12 +30,14 @@ interface Snapshot {
   maquinas: Maquina[];
   alertas: Alerta[];
   historial: EventoHistorial[];
+  eventos: Evento[];
   savings: Savings;
   notif: NotifMovil | null;
 }
 
 const TICKS_CALENTAMIENTO = 8;
 const INTERVALO_MS = 2000;
+const MAX_EVENTOS = 50;
 
 let flota: Maquina[] = [];
 const notificadas: Record<string, boolean> = {};
@@ -44,6 +46,7 @@ let snapshot: Snapshot = {
   maquinas: [],
   alertas: [],
   historial: [],
+  eventos: [],
   savings: { ahorroMes: 2 * AHORRO_POR_PARADA, paradasEvitadas: 2 },
   notif: null,
 };
@@ -60,6 +63,24 @@ function emit() {
 function set(patch: Partial<Snapshot>) {
   snapshot = { ...snapshot, ...patch };
   emit();
+}
+
+function ahora(): string {
+  return new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+}
+
+function eventoDeteccion(a: Alerta): Evento {
+  return { id: "ev-" + a.id, ts: Date.now(), hora: a.hora, tipo: "deteccion", maquina: a.maquina, detalle: a.causa, prob: a.prob };
+}
+
+function eventoResolucion(a: Alerta, veredicto: Veredicto): Evento {
+  const detalle =
+    veredicto === "real"
+      ? "Confirmado como fallo real"
+      : veredicto === "falsa"
+        ? "Descartado como falsa alarma"
+        : "Marcado como no concluyente";
+  return { id: "ev-res-" + a.id + "-" + Date.now(), ts: Date.now(), hora: ahora(), tipo: "resolucion", maquina: a.maquina, detalle };
 }
 
 function calentar() {
@@ -79,10 +100,15 @@ function calentar() {
     maquinas: [...flota],
     alertas: iniciales,
     historial: iniciales.map(aEventoHistorial),
+    eventos: iniciales.map(eventoDeteccion),
   };
 }
 
 function paso() {
+  // Pausa cuando la pestaña no está visible: ahorra CPU/batería y evita
+  // movimiento "fantasma" cuando el operador no está mirando.
+  if (typeof document !== "undefined" && document.hidden) return;
+
   const nuevas: Alerta[] = [];
   flota.forEach((m) => {
     const a = tickMaquina(m);
@@ -93,6 +119,7 @@ function paso() {
   if (nuevas.length) {
     patch.alertas = [...nuevas, ...snapshot.alertas];
     patch.historial = [...nuevas.map(aEventoHistorial), ...snapshot.historial];
+    patch.eventos = [...nuevas.map(eventoDeteccion), ...snapshot.eventos].slice(0, MAX_EVENTOS);
     const aNotif = nuevas.find((a) => !notificadas[a.maquina]);
     if (aNotif) {
       notificadas[aNotif.maquina] = true;
@@ -128,6 +155,7 @@ export function subscribe(listener: () => void): () => void {
 export const getMaquinas = () => snapshot.maquinas;
 export const getAlertas = () => snapshot.alertas;
 export const getHistorial = () => snapshot.historial;
+export const getEventos = () => snapshot.eventos;
 export const getSavings = () => snapshot.savings;
 export const getNotif = () => snapshot.notif;
 
@@ -140,7 +168,8 @@ export function etiquetarAlerta(id: string, veredicto: Veredicto) {
   if (alerta && veredicto === "real") {
     savings = { ahorroMes: savings.ahorroMes + AHORRO_POR_PARADA, paradasEvitadas: savings.paradasEvitadas + 1 };
   }
-  set({ alertas, historial, savings });
+  const eventos = alerta ? [eventoResolucion(alerta, veredicto), ...snapshot.eventos].slice(0, MAX_EVENTOS) : snapshot.eventos;
+  set({ alertas, historial, savings, eventos });
 }
 
 export function cerrarNotif() {

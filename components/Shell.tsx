@@ -5,6 +5,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { DemoBanner } from "./DemoBanner";
+import { LiveAnnouncer } from "./LiveAnnouncer";
 import { Nav } from "./Nav";
 import { PhoneAlert } from "./PhoneAlert";
 import { PwaRegister } from "./PwaRegister";
@@ -16,6 +17,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <Nav />
       {children}
       <PhoneAlert />
+      <LiveAnnouncer />
       <PwaRegister />
     </div>
   );
