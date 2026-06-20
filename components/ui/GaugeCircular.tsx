@@ -7,7 +7,7 @@
 // gaugeCircular() de la demo.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col, FONDO_ARCO } from "@/lib/constants";
+import { ARC, col } from "@/lib/constants";
 import { useTheme } from "@/lib/state/ThemeProvider";
 
 interface GaugeCircularProps {
@@ -23,7 +23,7 @@ export function GaugeCircular({ pct, label }: GaugeCircularProps) {
   const c = 2 * Math.PI * R;
   const off = c * (1 - pct / 100);
   const color = pct >= 85 ? col("ok", dark) : pct >= 60 ? col("warn", dark) : col("crit", dark);
-  const fondo = dark ? FONDO_ARCO.oscuro : FONDO_ARCO.claro;
+  const fondo = ARC;
 
   return (
     <svg viewBox="0 0 120 120" width={120} height={120}>

@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { ACCIONES, CAUSAS, col } from "@/lib/constants";
+import { ACCIONES, ARC, CAUSAS, col, mix, soft } from "@/lib/constants";
 import { useFleet } from "@/lib/state/FleetProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -55,7 +55,7 @@ export function AuditQueue() {
               </div>
               <span
                 className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide"
-                style={{ background: dark ? "#451a03" : "#fffbeb", color: col("warn", dark) }}
+                style={{ background: soft("warn"), color: col("warn", dark) }}
               >
                 Pendiente
               </span>
@@ -138,7 +138,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
                     setAccionSel(null);
                   }}
                   className="rounded-xl border px-3 py-3 text-sm font-medium transition-all"
-                  style={sel ? { borderColor: cc, background: `${cc}1a`, color: cc } : { borderColor: dark ? "#404040" : "#e5e5e5", color: "#737373" }}
+                  style={sel ? { borderColor: cc, background: mix(cc), color: cc } : { borderColor: ARC, color: "#737373" }}
                 >
                   {label}
                 </button>
@@ -187,7 +187,7 @@ function OpcionBtn({ label, sel, onClick, dark }: { label: string; sel: boolean;
     <button
       onClick={onClick}
       className="flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition-colors dark:border-neutral-700"
-      style={sel ? { borderColor: col("brand", dark), background: `${col("brand", dark)}10` } : { borderColor: dark ? "#404040" : "#e5e5e5" }}
+      style={sel ? { borderColor: col("brand", dark), background: soft("brand", 6) } : { borderColor: ARC }}
     >
       <span>{label}</span>
     </button>

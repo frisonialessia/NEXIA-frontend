@@ -7,7 +7,7 @@
 // punto-aguja. Portado 1:1 de la función gauge() de la demo.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col, FONDO_ARCO } from "@/lib/constants";
+import { ARC, col } from "@/lib/constants";
 import { useTheme } from "@/lib/state/ThemeProvider";
 
 interface GaugeProps {
@@ -33,7 +33,7 @@ export function Gauge({ valor, min, max, unidad, zonaPeligro }: GaugeProps) {
 
   const colorVal =
     pct >= zonaPeligro ? col("crit", dark) : pct >= zonaPeligro - 0.15 ? col("warn", dark) : col("ok", dark);
-  const fondoArco = dark ? FONDO_ARCO.oscuro : FONDO_ARCO.claro;
+  const fondoArco = ARC;
 
   // Construye un arco SVG entre dos ángulos.
   const arco = (a1: number, a2: number, color: string, w: number, key: string) => {

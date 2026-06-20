@@ -11,7 +11,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { col } from "@/lib/constants";
+import { ARC, col, mix, soft } from "@/lib/constants";
 import { SUGERENCIAS, responderIA, type AccionIA } from "@/lib/assistant/respond";
 import { useFleet } from "@/lib/state/FleetProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -98,7 +98,7 @@ export function Assistant() {
                       <div className="mt-3 flex flex-wrap gap-2">
                         {m.acciones.map((a) =>
                           hechas.has(a.id) ? (
-                            <span key={a.id} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ background: `${col("ok", dark)}1a`, color: col("ok", dark) }}>
+                            <span key={a.id} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ background: soft("ok"), color: col("ok", dark) }}>
                               <Icon name="check" className="h-3.5 w-3.5" />
                               Hecho
                             </span>
@@ -117,7 +117,7 @@ export function Assistant() {
                               key={a.id}
                               onClick={() => (a.tipo === "reconocer" ? setConfirmando(a.id) : ejecutar(a))}
                               className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors hover:border-neutral-300 dark:border-neutral-700"
-                              style={{ borderColor: dark ? "#404040" : "#e5e5e5", color: brand }}
+                              style={{ borderColor: ARC, color: brand }}
                             >
                               <Icon name={a.tipo === "reconocer" ? "check" : a.tipo === "alertas" ? "clipboard" : "gauge"} className="h-3.5 w-3.5" />
                               {a.label}
@@ -169,7 +169,7 @@ export function Assistant() {
 function Burbuja({ children, brand }: { children: React.ReactNode; brand: string }) {
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ background: `${brand}1a`, color: brand }}>
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ background: mix(brand), color: brand }}>
         <Icon name="spark" className="h-4 w-4" />
       </div>
       <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-2.5 text-sm dark:bg-neutral-800">{children}</div>

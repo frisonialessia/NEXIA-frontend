@@ -6,7 +6,7 @@
 // controla la página de Configuración según el rol.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { PROTO_ESENCIAL, PROTO_SPECIAL, PROTO_VENDOR, col } from "@/lib/constants";
+import { PROTO_ESENCIAL, PROTO_SPECIAL, PROTO_VENDOR, col, mix } from "@/lib/constants";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { EstadoProtocolo, Protocolo } from "@/lib/types";
 import { Icon } from "../ui/Icon";
@@ -44,7 +44,7 @@ function ProtocoloCard({ p, dark }: { p: Protocolo; dark: boolean }) {
   return (
     <div className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-4 transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900">
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: `${brand}14`, color: brand }}>
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: mix(brand, 8), color: brand }}>
           <Icon name="plug" className="h-4 w-4" />
         </div>
         <div>
@@ -65,7 +65,7 @@ function EstadoPill({ estado, dark }: { estado: EstadoProtocolo; dark: boolean }
   };
   const [c, t] = map[estado];
   return (
-    <span className="rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide" style={{ background: `${c}1a`, color: c }}>
+    <span className="rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide" style={{ background: mix(c), color: c }}>
       {t}
     </span>
   );

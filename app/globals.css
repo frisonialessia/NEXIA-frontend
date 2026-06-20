@@ -5,6 +5,33 @@
 :root {
   --background: #fafafa;
   --foreground: #171717;
+
+  /* ── Tokens de color NEXIA (fuente única) ──────────────────────────────
+     Cambiar la marca = cambiar estas variables, no 130 sitios en el código.
+     El modo oscuro las re-define abajo; los componentes nunca conocen el tema. */
+  --c-brand: #3b82f6;
+  --c-ok: #10b981;
+  --c-warn: #eab308;
+  --c-crit: #ef4444;
+  --c-gray: #94a3b8;
+  --c-cian: #06b6d4;
+  --c-lima: #84cc16;
+  --c-naranja: #f97316;
+  --c-violeta: #8b5cf6;
+  --c-arc: #e5e5e5; /* pista de fondo de los gauges */
+}
+
+.dark {
+  --c-brand: #60a5fa;
+  --c-ok: #34d399;
+  --c-warn: #facc15;
+  --c-crit: #f87171;
+  --c-gray: #cbd5e1;
+  --c-cian: #22d3ee;
+  --c-lima: #a3e635;
+  --c-naranja: #fb923c;
+  --c-violeta: #a78bfa;
+  --c-arc: #404040;
 }
 
 html,

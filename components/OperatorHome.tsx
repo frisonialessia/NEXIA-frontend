@@ -8,7 +8,8 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
-import { ESTADOS, RANK_ESTADO, col, estadoColorKey } from "@/lib/constants";
+import { ESTADOS, RANK_ESTADO, col, estadoColorKey, mix, soft } from "@/lib/constants";
+import type { ColorKey } from "@/lib/constants";
 import { useFleet } from "@/lib/state/FleetProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "./ui/Icon";
@@ -25,11 +26,8 @@ export function OperatorHome() {
   const orden = [...maquinas].sort((a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || b.prob - a.prob);
 
   // Banner principal: color y mensaje según la situación.
-  const banner = hayCriticas
-    ? { bg: dark ? "#450a0a" : "#fef2f2", border: dark ? "#7f1d1d" : "#fecaca", c: col("crit", dark) }
-    : requierenAtencion.length > 0
-      ? { bg: dark ? "#451a03" : "#fffbeb", border: dark ? "#78350f" : "#fde68a", c: col("warn", dark) }
-      : { bg: dark ? "#052e16" : "#f0fdf4", border: dark ? "#14532d" : "#bbf7d0", c: col("ok", dark) };
+  const sevKey: ColorKey = hayCriticas ? "crit" : requierenAtencion.length > 0 ? "warn" : "ok";
+  const banner = { bg: soft(sevKey, 10), border: soft(sevKey, 28), c: col(sevKey, dark) };
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
@@ -85,7 +83,7 @@ export function OperatorHome() {
                   <div className="font-serif text-lg tracking-tight">{m.id}</div>
                   <div className="text-xs text-neutral-400">{m.sector}</div>
                 </div>
-                <span className="shrink-0 rounded-full px-3 py-1 text-xs font-medium" style={{ background: `${ec}1a`, color: ec }}>
+                <span className="shrink-0 rounded-full px-3 py-1 text-xs font-medium" style={{ background: mix(ec), color: ec }}>
                   {atender ? "Revisar" : ESTADOS[m.estado]}
                 </span>
               </Link>

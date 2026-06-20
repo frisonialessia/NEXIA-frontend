@@ -10,7 +10,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ESTADOS, AHORRO_POR_PARADA, col, estadoColorKey } from "@/lib/constants";
+import { ESTADOS, AHORRO_POR_PARADA, col, estadoColorKey, surf } from "@/lib/constants";
 import { serieReplay } from "@/lib/data/simulated";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero, uni } from "@/lib/format";
@@ -91,11 +91,7 @@ export function AssetDetail({ id }: { id: string }) {
 
   // Fondo y borde del recuadro de pronóstico según el estado.
   const predEstilo =
-    m.estado === "STABLE"
-      ? { background: dark ? "#052e16" : "#f0fdf4", borderColor: dark ? "#14532d" : "#bbf7d0" }
-      : m.estado === "CRITICAL_ALERT"
-        ? { background: dark ? "#450a0a" : "#fef2f2", borderColor: dark ? "#7f1d1d" : "#fecaca" }
-        : { background: dark ? "#451a03" : "#fffbeb", borderColor: dark ? "#78350f" : "#fde68a" };
+    m.estado === "STABLE" ? surf("ok") : m.estado === "CRITICAL_ALERT" ? surf("crit") : surf("warn");
 
   function reproducir() {
     if (!m) return;
