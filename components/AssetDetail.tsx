@@ -10,11 +10,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ESTADOS, AHORRO_POR_PARADA, col, estadoColorKey } from "@/lib/constants";
+import { ESTADOS, AHORRO_POR_PARADA, col, estadoColorKey, surf } from "@/lib/constants";
+import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { diasAFallo } from "@/lib/engine/fsm";
-import { dinero, uni } from "@/lib/format";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { dinero } from "@/lib/format";
+import { useMaquinas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Lectura } from "@/lib/types";
@@ -23,7 +24,7 @@ import { Icon } from "./ui/Icon";
 import { VibrationChart } from "./ui/VibrationChart";
 
 export function AssetDetail({ id }: { id: string }) {
-  const { maquinas } = useFleet();
+  const maquinas = useMaquinas();
   const { sistema } = useSession();
   const { dark } = useTheme();
 
@@ -39,24 +40,13 @@ export function AssetDetail({ id }: { id: string }) {
     };
   }, []);
 
-  const factor =
-    m?.estado === "CRITICAL_ALERT" ? 1.4 : m?.estado === "WARNING_PROBATION" ? 1.15 : 1;
-
-  // Lecturas de los velocímetros: se recalculan a cada tick de la máquina
-  // (no en cada render) para que no parpadeen durante el replay.
-  const gauges = useMemo(() => {
-    const t = uni("temp", sistema);
-    const tBase = 58 * factor + Math.random() * 4;
-    const p = uni("pres", sistema);
-    const pBase = 4.2 * factor + Math.random() * 0.3;
-    const rpm = 1450 / factor + Math.random() * 50;
-    return {
-      temp: { v: t.f(tBase), min: t.f(20), max: t.f(120), u: t.u },
-      pres: { v: p.f(pBase), min: p.f(0), max: p.f(10), u: p.u },
-      rpm: { v: rpm, min: 0, max: 3000, u: "rpm" },
-    };
+  // Lecturas de los velocímetros (de la capa de datos): se recalculan a cada
+  // tick de la máquina, no en cada render, para que no parpadeen en el replay.
+  const gauges = useMemo(
+    () => lecturasGauges(m?.estado ?? "STABLE", sistema),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [m?.tick, factor, sistema]);
+    [m?.tick, m?.estado, sistema]
+  );
 
   if (!m) {
     return (
@@ -78,24 +68,11 @@ export function AssetDetail({ id }: { id: string }) {
   const dias = diasAFallo(m);
   const last = m.hist[m.hist.length - 1];
 
-  const sensores = [
-    { n: "Sensor vibración", ok: true },
-    { n: "Sensor temp.", ok: true },
-    { n: "Válvula entrada", ok: m.estado !== "CRITICAL_ALERT" },
-    { n: "Motor principal", ok: true },
-    { n: "Final de carrera", ok: true },
-    { n: "Sensor presión", ok: m.estado !== "CRITICAL_ALERT" },
-    { n: "Bomba lubricación", ok: true },
-    { n: "Variador", ok: true },
-  ];
+  const sensores = sensoresDe(m.estado);
 
   // Fondo y borde del recuadro de pronóstico según el estado.
   const predEstilo =
-    m.estado === "STABLE"
-      ? { background: dark ? "#052e16" : "#f0fdf4", borderColor: dark ? "#14532d" : "#bbf7d0" }
-      : m.estado === "CRITICAL_ALERT"
-        ? { background: dark ? "#450a0a" : "#fef2f2", borderColor: dark ? "#7f1d1d" : "#fecaca" }
-        : { background: dark ? "#451a03" : "#fffbeb", borderColor: dark ? "#78350f" : "#fde68a" };
+    m.estado === "STABLE" ? surf("ok") : m.estado === "CRITICAL_ALERT" ? surf("crit") : surf("warn");
 
   function reproducir() {
     if (!m) return;
@@ -238,9 +215,9 @@ export function AssetDetail({ id }: { id: string }) {
 
         {/* Indicadores de fiabilidad */}
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <InfoCard titulo="Horas de operación" valor={Math.round(m.horasOp).toLocaleString("es-ES") + " h"} pie="próx. mantenimiento en 240h" />
-          <InfoCard titulo="MTBF" valor="182 h" pie="tiempo medio entre fallos" />
-          <InfoCard titulo="MTTR" valor="3.2 h" pie="tiempo medio de reparación" />
+          <InfoCard titulo="Horas de operación" valor={Math.round(m.horasOp).toLocaleString("es-ES") + " h"} pie={PROX_MANTENIMIENTO} />
+          <InfoCard titulo="MTBF" valor={MTBF} pie="tiempo medio entre fallos" />
+          <InfoCard titulo="MTTR" valor={MTTR} pie="tiempo medio de reparación" />
         </div>
       </div>
     </main>

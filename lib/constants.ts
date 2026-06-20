@@ -41,41 +41,34 @@ export type ColorKey =
   | "naranja"
   | "violeta";
 
-const PALETA_CLARO: Record<ColorKey, string> = {
-  brand: "#3b82f6",
-  ok: "#10b981",
-  warn: "#eab308",
-  crit: "#ef4444",
-  gray: "#94a3b8",
-  cian: "#06b6d4",
-  lima: "#84cc16",
-  naranja: "#f97316",
-  violeta: "#8b5cf6",
-};
-
-const PALETA_OSCURO: Record<ColorKey, string> = {
-  brand: "#60a5fa",
-  ok: "#34d399",
-  warn: "#facc15",
-  crit: "#f87171",
-  gray: "#cbd5e1",
-  cian: "#22d3ee",
-  lima: "#a3e635",
-  naranja: "#fb923c",
-  violeta: "#a78bfa",
-};
-
 /**
- * Resuelve un color de la paleta según el modo (claro/oscuro).
- * Equivalente a la función `col()` de la demo, pero sin leer el DOM:
- * recibe el flag `dark` para mantener la lógica pura y testeable.
+ * Devuelve el TOKEN de color (variable CSS), no un hex. El valor real lo
+ * resuelve el navegador según el tema (claro/oscuro), así que los componentes
+ * ya no necesitan conocer el modo. Cambiar la marca = editar globals.css.
+ *
+ * El segundo parámetro queda como compatibilidad histórica y se ignora.
  */
-export function col(key: ColorKey, dark: boolean): string {
-  return dark ? PALETA_OSCURO[key] : PALETA_CLARO[key];
+export function col(key: ColorKey, _dark?: boolean): string {
+  return `var(--c-${key})`;
 }
 
-// ── Colores de fondo neutros usados en gráficos (arco de gauge, etc.) ──────
-export const FONDO_ARCO = { claro: "#e5e5e5", oscuro: "#404040" };
+/** Mezcla cualquier color CSS con transparente (fondos suaves). */
+export function mix(color: string, pct = 12): string {
+  return `color-mix(in srgb, ${color} ${pct}%, transparent)`;
+}
+
+/** Versión translúcida de un color de la paleta (para fondos suaves). */
+export function soft(key: ColorKey, pct = 12): string {
+  return mix(`var(--c-${key})`, pct);
+}
+
+/** Superficie semántica suave: fondo y borde tenues de un color (avisos, pronóstico). */
+export function surf(key: ColorKey): { background: string; borderColor: string } {
+  return { background: soft(key, 10), borderColor: soft(key, 28) };
+}
+
+/** Pista de fondo de los gauges (token, se adapta al tema). */
+export const ARC = "var(--c-arc)";
 
 // ──────────────────────────────────────────────────────────────────────────
 // ESTADOS — etiquetas legibles en español (nunca jerga técnica en la UI)

@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { useAlertas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AuditQueue } from "./alertas/AuditQueue";
 import { HistoryList } from "./alertas/HistoryList";
@@ -16,7 +16,7 @@ import { Icon } from "./ui/Icon";
 import { Tabs } from "./ui/Tabs";
 
 export function Alertas() {
-  const { alertas } = useFleet();
+  const alertas = useAlertas();
   const { puede } = useSession();
   const [tab, setTab] = useState("pendientes");
 

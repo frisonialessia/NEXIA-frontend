@@ -10,12 +10,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { col } from "@/lib/constants";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { useAlertas } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "./ui/Icon";
 
 export function NotificationBell() {
-  const { alertas } = useFleet();
+  const alertas = useAlertas();
   const { dark } = useTheme();
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);

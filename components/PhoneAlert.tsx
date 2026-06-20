@@ -7,17 +7,18 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { useEffect } from "react";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { col } from "@/lib/constants";
+import { cerrarNotif, useNotif } from "@/lib/state/useFleet";
 import { Icon } from "./ui/Icon";
 
 export function PhoneAlert() {
-  const { notif, cerrarNotif } = useFleet();
+  const notif = useNotif();
 
   useEffect(() => {
     if (!notif) return;
     const t = setTimeout(cerrarNotif, 6000);
     return () => clearTimeout(t);
-  }, [notif, cerrarNotif]);
+  }, [notif]);
 
   if (!notif) return null;
 
@@ -25,7 +26,7 @@ export function PhoneAlert() {
     <div className="slide-in fixed right-6 top-20 z-50 w-80">
       <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{ background: "#ef4444" }}>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{ background: col("crit") }}>
             <Icon name="alert" className="h-4 w-4" />
           </div>
           <div className="flex-1">

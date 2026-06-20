@@ -8,15 +8,16 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { ACCIONES, CAUSAS, col } from "@/lib/constants";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { ACCIONES, ARC, CAUSAS, col, mix, soft } from "@/lib/constants";
+import { useModalA11y } from "@/lib/hooks/useModalA11y";
+import { etiquetarAlerta, useAlertas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Alerta, Veredicto } from "@/lib/types";
 import { Icon } from "../ui/Icon";
 
 export function AuditQueue() {
-  const { alertas } = useFleet();
+  const alertas = useAlertas();
   const { dark } = useTheme();
   const { puede } = useSession();
   const [abierta, setAbierta] = useState<Alerta | null>(null);
@@ -55,7 +56,7 @@ export function AuditQueue() {
               </div>
               <span
                 className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide"
-                style={{ background: dark ? "#451a03" : "#fffbeb", color: col("warn", dark) }}
+                style={{ background: soft("warn"), color: col("warn", dark) }}
               >
                 Pendiente
               </span>
@@ -85,12 +86,12 @@ export function AuditQueue() {
 }
 
 function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }) {
-  const { etiquetarAlerta } = useFleet();
   const { dark } = useTheme();
   const [veredicto, setVeredicto] = useState<Veredicto | null>(null);
   const [causaSel, setCausaSel] = useState<string | null>(null);
   const [accionSel, setAccionSel] = useState<string | null>(null);
 
+  const dialogRef = useModalA11y<HTMLDivElement>(onClose);
   const causas = CAUSAS[alerta.tipo] || CAUSAS.bomba;
   const puedeGuardar = !!veredicto && (veredicto !== "real" || (!!causaSel && !!accionSel));
 
@@ -107,12 +108,17 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/30 px-4 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-xl dark:border-neutral-700 dark:bg-neutral-900"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="audit-modal-title"
+        tabIndex={-1}
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-200 bg-white shadow-xl outline-none dark:border-neutral-700 dark:bg-neutral-900"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-neutral-100 px-8 pt-8 pb-6 dark:border-neutral-800">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Human-in-the-loop</span>
-          <h2 className="mt-3 font-serif text-2xl tracking-tight">Confirmar evento</h2>
+          <h2 id="audit-modal-title" className="mt-3 font-serif text-2xl tracking-tight">Confirmar evento</h2>
           <div className="mt-3 rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800">
             <span className="text-[11px] uppercase tracking-wider text-neutral-400">Causa probable (IA)</span>
             <p className="mt-0.5 text-sm text-neutral-700 dark:text-neutral-200">{alerta.causa}</p>
@@ -138,7 +144,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
                     setAccionSel(null);
                   }}
                   className="rounded-xl border px-3 py-3 text-sm font-medium transition-all"
-                  style={sel ? { borderColor: cc, background: `${cc}1a`, color: cc } : { borderColor: dark ? "#404040" : "#e5e5e5", color: "#737373" }}
+                  style={sel ? { borderColor: cc, background: mix(cc), color: cc } : { borderColor: ARC, color: "#737373" }}
                 >
                   {label}
                 </button>
@@ -187,7 +193,7 @@ function OpcionBtn({ label, sel, onClick, dark }: { label: string; sel: boolean;
     <button
       onClick={onClick}
       className="flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition-colors dark:border-neutral-700"
-      style={sel ? { borderColor: col("brand", dark), background: `${col("brand", dark)}10` } : { borderColor: dark ? "#404040" : "#e5e5e5" }}
+      style={sel ? { borderColor: col("brand", dark), background: soft("brand", 6) } : { borderColor: ARC }}
     >
       <span>{label}</span>
     </button>

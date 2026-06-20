@@ -6,7 +6,8 @@
 // página de Configuración (solo Administrador).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { MATRIZ_PERMISOS, ROL_NOMBRE, col } from "@/lib/constants";
+import { MATRIZ_PERMISOS, ROL_NOMBRE, col, mix } from "@/lib/constants";
+import { USUARIOS } from "@/lib/data/team";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "../ui/Icon";
 
@@ -15,13 +16,7 @@ const COLUMNAS = ["Admin", "Jefe", "Técnico", "Operador", "Lectura"];
 export function EquipoBody() {
   const { dark } = useTheme();
 
-  const usuarios = [
-    { n: "Alessia Frisoni", e: "alessia@planta.com", rol: ROL_NOMBRE.admin, c: col("brand", dark) },
-    { n: "Carlos Méndez", e: "carlos@planta.com", rol: ROL_NOMBRE.jefe, c: col("warn", dark) },
-    { n: "Roberto Salas", e: "roberto@planta.com", rol: ROL_NOMBRE.tecnico, c: col("crit", dark) },
-    { n: "Luis Ortega", e: "luis@planta.com", rol: ROL_NOMBRE.operador, c: col("ok", dark) },
-    { n: "Auditoría Externa", e: "audit@planta.com", rol: ROL_NOMBRE.lectura, c: col("gray", dark) },
-  ];
+  const usuarios = USUARIOS.map((u) => ({ ...u, c: col(u.colorKey, dark) }));
   const roles = Object.values(ROL_NOMBRE);
 
   return (
@@ -32,7 +27,7 @@ export function EquipoBody() {
         </div>
         {usuarios.map((u, i) => (
           <div key={u.e} className={`flex items-center gap-4 px-6 py-4 ${i === usuarios.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}`}>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: `${u.c}1a`, color: u.c }}>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: mix(u.c), color: u.c }}>
               <Icon name="user" className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">

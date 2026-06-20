@@ -63,7 +63,7 @@ export function VibrationChart({ data }: { data: Lectura[] }) {
   const fueraDeBanda = vals[n - 1] > exps[n - 1] + 2 * std;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 240 }}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 240 }} role="img" aria-label="Gráfico de vibración real frente a la esperada">
       {ticks.map((t) => (
         <g key={t}>
           <line x1={PAD} y1={y(t)} x2={W - 12} y2={y(t)} stroke="currentColor" strokeOpacity={0.08} />

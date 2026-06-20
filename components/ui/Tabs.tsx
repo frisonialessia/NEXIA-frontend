@@ -6,7 +6,7 @@
 // Equipo). Estilo limpio coherente con el resto de la interfaz.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col } from "@/lib/constants";
+import { col, soft } from "@/lib/constants";
 import { useTheme } from "@/lib/state/ThemeProvider";
 
 export interface TabDef {
@@ -34,7 +34,7 @@ export function Tabs({ tabs, activo, onChange }: { tabs: TabDef[]; activo: strin
             {typeof t.badge === "number" && t.badge > 0 && (
               <span
                 className="flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold"
-                style={on ? { background: "rgba(255,255,255,0.25)", color: "#fff" } : { background: `${col("crit", dark)}1a`, color: col("crit", dark) }}
+                style={on ? { background: "rgba(255,255,255,0.25)", color: "#fff" } : { background: soft("crit"), color: col("crit", dark) }}
               >
                 {t.badge}
               </span>

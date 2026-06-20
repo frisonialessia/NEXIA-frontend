@@ -2,21 +2,18 @@
 
 // ──────────────────────────────────────────────────────────────────────────
 // PROVEEDORES DE LA APP
-// Une los tres contextos compartidos por todas las vistas: tema, sesión
-// (rol + unidades) y flota (la capa de datos). Se monta una sola vez en el
-// layout, de modo que navegar entre rutas NO reinicia la simulación.
+// Tema y sesión (rol + unidades). La flota ya no necesita provider: vive en un
+// store singleton al que los componentes se suscriben por slice (lib/state/
+// fleetStore + useFleet).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { FleetProvider } from "./FleetProvider";
 import { SessionProvider } from "./SessionProvider";
 import { ThemeProvider } from "./ThemeProvider";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <SessionProvider>
-        <FleetProvider>{children}</FleetProvider>
-      </SessionProvider>
+      <SessionProvider>{children}</SessionProvider>
     </ThemeProvider>
   );
 }

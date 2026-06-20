@@ -6,12 +6,12 @@
 // alertas con la cola de auditoría.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col } from "@/lib/constants";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { col, soft } from "@/lib/constants";
+import { useHistorial } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 
 export function HistoryList() {
-  const { historial } = useFleet();
+  const historial = useHistorial();
   const { dark } = useTheme();
 
   if (historial.length === 0) {
@@ -28,8 +28,8 @@ export function HistoryList() {
         const resuelto = a.estado === "Resuelto";
         const color = resuelto ? col("ok", dark) : col("crit", dark);
         const pill = resuelto
-          ? { background: dark ? "#052e16" : "#f0fdf4", color: col("ok", dark) }
-          : { background: dark ? "#451a03" : "#fffbeb", color: col("warn", dark) };
+          ? { background: soft("ok"), color: col("ok", dark) }
+          : { background: soft("warn"), color: col("warn", dark) };
         return (
           <div
             key={a.id}
