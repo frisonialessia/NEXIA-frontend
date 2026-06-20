@@ -10,6 +10,7 @@
 import { type ColorKey, RANK_ESTADO, mix, soft } from "@/lib/constants";
 import { DESV_ESTANDAR } from "@/lib/engine/fsm";
 import type { Maquina } from "@/lib/types";
+import { SURFACE } from "./surface";
 
 const COLUMNAS = 24;
 
@@ -25,7 +26,7 @@ export function FleetHealthMap({ maquinas }: { maquinas: Maquina[] }) {
   const orden = [...maquinas].sort((a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || b.prob - a.prob);
 
   return (
-    <div className="rounded-2xl border border-neutral-200/70 bg-white px-6 py-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <div className={`${SURFACE} px-6 py-5`}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Mapa de salud de la flota</h3>
         <div className="flex items-center gap-3 text-[11px] text-neutral-400">
