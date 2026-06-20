@@ -95,6 +95,14 @@ export function estadoColorKey(e: Estado): ColorKey {
   }
 }
 
+/**
+ * Color por VALOR (semántico): verde si va bien, ámbar si medio, rojo si mal.
+ * Por defecto usa los umbrales de OEE (≥85 world-class, ≥60 aceptable).
+ */
+export function colorPorValor(pct: number, bueno = 85, medio = 60): ColorKey {
+  return pct >= bueno ? "ok" : pct >= medio ? "warn" : "crit";
+}
+
 /** Orden de prioridad para ordenar la flota (0 = más urgente). */
 export const RANK_ESTADO: Record<Estado, number> = {
   CRITICAL_ALERT: 0,

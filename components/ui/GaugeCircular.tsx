@@ -40,7 +40,7 @@ export function GaugeCircular({ pct, label }: GaugeCircularProps) {
         strokeDashoffset={off}
         transform="rotate(-90 60 60)"
       />
-      <text x={60} y={58} textAnchor="middle" fontSize={26} fontWeight={600} fill="currentColor" className="font-serif">
+      <text x={60} y={58} textAnchor="middle" fontSize={26} fontWeight={600} fill="currentColor" className="font-sans tabular-nums">
         {Math.round(pct)}
       </text>
       <text x={60} y={76} textAnchor="middle" fontSize={10} fill="#9ca3af">
