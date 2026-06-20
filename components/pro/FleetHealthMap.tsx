@@ -7,7 +7,8 @@
 // vistazo, como los mapas hex/heat de las referencias. Datos reales del motor.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { type ColorKey, RANK_ESTADO, col } from "@/lib/constants";
+import { type ColorKey, col } from "@/lib/constants";
+import { ordenarFlota } from "@/lib/domain/flota";
 import { DESV_ESTANDAR } from "@/lib/engine/fsm";
 import type { Maquina } from "@/lib/types";
 import { SURFACE } from "./surface";
@@ -23,7 +24,7 @@ function sevKey(v: number, exp: number): ColorKey {
 }
 
 export function FleetHealthMap({ maquinas }: { maquinas: Maquina[] }) {
-  const orden = [...maquinas].sort((a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || b.prob - a.prob);
+  const orden = ordenarFlota(maquinas);
 
   return (
     <div className={`${SURFACE} px-6 py-5`}>

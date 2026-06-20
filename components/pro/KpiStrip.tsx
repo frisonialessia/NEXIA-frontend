@@ -8,6 +8,7 @@
 
 import type { ReactNode } from "react";
 import { AHORRO_POR_PARADA, type ColorKey, col, estadoColorKey, soft } from "@/lib/constants";
+import { ordenarFlota } from "@/lib/domain/flota";
 import { AHORRO_SEMANAL, SALUD_SEMANAL } from "@/lib/data/trend";
 import { dinero } from "@/lib/format";
 import type { Maquina } from "@/lib/types";
@@ -32,9 +33,7 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
   const saludDelta = s[s.length - 1] - s[s.length - 2];
   const paradasSemanal = AHORRO_SEMANAL.map((x) => Math.round(x / AHORRO_POR_PARADA));
 
-  const dots = [...maquinas]
-    .sort((x, y) => x.prob - y.prob)
-    .map((m) => col(estadoColorKey(m.estado)));
+  const dots = ordenarFlota(maquinas).map((m) => col(estadoColorKey(m.estado)));
 
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">

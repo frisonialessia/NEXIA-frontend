@@ -10,6 +10,7 @@
 import Link from "next/link";
 import { ESTADOS, RANK_ESTADO, col, estadoColorKey, mix, soft } from "@/lib/constants";
 import type { ColorKey } from "@/lib/constants";
+import { ordenarFlota } from "@/lib/domain/flota";
 import { useMaquinas } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "./ui/Icon";
@@ -23,7 +24,7 @@ export function OperatorHome() {
     .sort((a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || b.prob - a.prob);
   const hayCriticas = requierenAtencion.some((m) => m.estado === "CRITICAL_ALERT");
 
-  const orden = [...maquinas].sort((a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || b.prob - a.prob);
+  const orden = ordenarFlota(maquinas);
 
   // Banner principal: color y mensaje según la situación.
   const sevKey: ColorKey = hayCriticas ? "crit" : requierenAtencion.length > 0 ? "warn" : "ok";
