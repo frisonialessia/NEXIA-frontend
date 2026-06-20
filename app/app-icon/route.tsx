@@ -5,7 +5,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { ImageResponse } from "next/og";
-import { sparkleDataUri } from "@/lib/brand/appIcon";
+import { brandIconDataUri } from "@/lib/brand/appIcon";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export function GET(req: Request) {
     (
       <div style={{ display: "flex", width: "100%", height: "100%" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img width={size} height={size} src={sparkleDataUri({ size, maskable })} alt="NEXIA" />
+        <img width={size} height={size} src={brandIconDataUri({ size, maskable })} alt="NEXIA" />
       </div>
     ),
     { width: size, height: size }

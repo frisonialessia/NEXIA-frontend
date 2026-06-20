@@ -1,55 +1,62 @@
 // ──────────────────────────────────────────────────────────────────────────
-// ÍCONO DE MARCA NEXIA — "chispa IA" (opción 6)
-// Degradado azul → violeta, acento cian, sobre fondo oscuro. Fuente única del
-// ícono: lo usan el favicon, el apple-touch-icon y los íconos de la PWA.
+// ÍCONO DE MARCA NEXIA — "matriz de puntos" (N) · degradado cian → lima
+// Fuente única del logo: favicon, apple-touch-icon e íconos de la PWA.
+// La "N" se forma con una cuadrícula de puntos coloreados por fila (cian arriba
+// → lima abajo) sobre fondo oscuro. Solo colores de la paleta NEXIA.
 // ──────────────────────────────────────────────────────────────────────────
 
-const BLUE = "#3b82f6";
-const VIOLET = "#8b5cf6";
-const CYAN = "#22d3ee";
+const CYAN = "#06b6d4";
+const LIME = "#84cc16";
 const DARK = "#0f172a";
-const GLOW = "#3a2f73"; // violeta tenue para el resplandor
 
-/** Path de una estrella de 4 puntas centrada en (x,y). */
-function star(x: number, y: number, outer: number, inner: number): string {
-  const p = [
-    [x, y - outer],
-    [x + inner, y - inner],
-    [x + outer, y],
-    [x + inner, y + inner],
-    [x, y + outer],
-    [x - inner, y + inner],
-    [x - outer, y],
-    [x - inner, y - inner],
-  ];
-  return "M" + p.map((q) => q.map((n) => n.toFixed(1)).join(" ")).join(" L ") + " Z";
+function hx(h: string): [number, number, number] {
+  const c = h.replace("#", "");
+  return [parseInt(c.slice(0, 2), 16), parseInt(c.slice(2, 4), 16), parseInt(c.slice(4, 6), 16)];
 }
 
-/** Genera el SVG del ícono. `maskable` usa fondo a sangre (zona segura). */
-export function sparkleSvg({ size = 512, maskable = false }: { size?: number; maskable?: boolean } = {}): string {
+/** Mezcla dos colores hex (t: 0 → a, 1 → b). */
+function blend(a: string, b: string, t: number): string {
+  const A = hx(a);
+  const B = hx(b);
+  return (
+    "#" +
+    [0, 1, 2]
+      .map((i) => Math.round(A[i] + (B[i] - A[i]) * t).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+/** Genera el SVG del ícono. `maskable` deja margen de zona segura. */
+export function brandIconSvg({ size = 512, maskable = false }: { size?: number; maskable?: boolean } = {}): string {
   const S = size;
-  const cx = S / 2;
-  const cy = S / 2;
-  const mainOuter = (maskable ? 0.24 : 0.3) * S;
-  const mainInner = mainOuter * 0.32;
-  const glowOuter = mainOuter * 1.18;
-  const accOuter = 0.1 * S;
-  const accCx = cx + S * 0.16;
-  const accCy = cy + S * 0.16;
-  const bgRadius = maskable ? 0 : S * 0.22;
+  const inset = (maskable ? 0.16 : 0.07) * S;
+  const span = S - inset * 2;
+  const map = (v: number) => inset + (v / 100) * span; // v en 0..100
+  const r = (maskable ? 0.05 : 0.058) * S;
+  const bgR = maskable ? 0 : S * 0.22;
+
+  const xs = [30, 50, 70];
+  const ys = [24, 37, 50, 63, 76];
+  const dots: string[] = [];
+  const add = (ci: number, ri: number) => {
+    const color = blend(CYAN, LIME, ri / 4);
+    dots.push(`<circle cx="${map(xs[ci]).toFixed(1)}" cy="${map(ys[ri]).toFixed(1)}" r="${r.toFixed(1)}" fill="${color}"/>`);
+  };
+  for (let ri = 0; ri < 5; ri++) {
+    add(0, ri);
+    add(2, ri);
+  }
+  add(1, 1);
+  add(1, 2);
+  add(1, 3);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="${BLUE}"/><stop offset="1" stop-color="${VIOLET}"/>
-  </linearGradient></defs>
-  <rect width="${S}" height="${S}" rx="${bgRadius}" fill="${DARK}"/>
-  <path d="${star(cx, cy, glowOuter, glowOuter * 0.32)}" fill="${GLOW}"/>
-  <path d="${star(cx, cy, mainOuter, mainInner)}" fill="url(#g)"/>
-  <path d="${star(accCx, accCy, accOuter, accOuter * 0.3)}" fill="${CYAN}"/>
+  <rect width="${S}" height="${S}" rx="${bgR}" fill="${DARK}"/>
+  ${dots.join("\n  ")}
 </svg>`;
 }
 
 /** El mismo SVG como data URI (para incrustarlo en ImageResponse). */
-export function sparkleDataUri(opts?: { size?: number; maskable?: boolean }): string {
-  return "data:image/svg+xml;base64," + Buffer.from(sparkleSvg(opts)).toString("base64");
+export function brandIconDataUri(opts?: { size?: number; maskable?: boolean }): string {
+  return "data:image/svg+xml;base64," + Buffer.from(brandIconSvg(opts)).toString("base64");
 }
