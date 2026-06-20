@@ -6,7 +6,8 @@
 // mapa de salud de la flota. Lee todo a través de los hooks de la capa de datos.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { RANK_ESTADO, col } from "@/lib/constants";
+import { col } from "@/lib/constants";
+import { ordenarFlota } from "@/lib/domain/flota";
 import { useHistorial, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { EventsFeed } from "./pro/EventsFeed";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
@@ -21,9 +22,7 @@ export function CommandCenter() {
 
   const total = maquinas.length;
   const atencion = maquinas.filter((m) => m.estado !== "STABLE").length;
-  const orden = [...maquinas].sort(
-    (a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || b.prob - a.prob
-  );
+  const orden = ordenarFlota(maquinas);
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
@@ -60,7 +59,7 @@ export function CommandCenter() {
           <div className="space-y-5">
             <KpiStrip maquinas={maquinas} savings={savings} />
 
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
               <section className="lg:col-span-2">
                 <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Flota · por criticidad</h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -70,7 +69,7 @@ export function CommandCenter() {
                 </div>
               </section>
 
-              <section className="lg:col-span-1">
+              <section className="lg:sticky lg:top-24 lg:col-span-1">
                 <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Actividad</h2>
                 <EventsFeed historial={historial} />
               </section>
