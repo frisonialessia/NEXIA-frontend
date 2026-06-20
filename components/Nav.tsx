@@ -90,8 +90,8 @@ export function Nav() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="relative flex h-2.5 w-2.5">
-            <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: "#10b981" }} />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: "#10b981" }} />
+            <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: col("ok") }} />
           </span>
           <span className="font-serif text-lg tracking-tight">NEXIA</span>
         </Link>

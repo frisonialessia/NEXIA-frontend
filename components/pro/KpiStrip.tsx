@@ -38,7 +38,7 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
         sub="paradas evitadas"
         spark={{ data: AHORRO_SEMANAL, colorKey: "ok" }}
         delta={{ texto: `+${ahorroPct}%`, bueno: true }}
-        gradiente
+        accentKey="ok"
       />
       <KpiTile
         titulo="Paradas evitadas"
@@ -70,7 +70,6 @@ function KpiTile({
   spark,
   delta,
   accentKey,
-  gradiente,
 }: {
   titulo: string;
   valor: string;
@@ -78,14 +77,9 @@ function KpiTile({
   spark?: { data: number[]; colorKey: ColorKey };
   delta?: Delta;
   accentKey?: ColorKey;
-  gradiente?: boolean;
 }) {
-  const fondo = gradiente
-    ? "rounded-2xl border border-neutral-200/70 bg-gradient-to-br from-blue-50/70 to-violet-50/70 shadow-sm dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-900"
-    : CARD;
-
   return (
-    <div className={`${fondo} relative overflow-hidden px-5 py-4`}>
+    <div className={`${CARD} relative overflow-hidden px-5 py-4`}>
       {accentKey && <span className="absolute inset-y-0 left-0 w-1" style={{ background: col(accentKey) }} />}
       <div className="flex items-start justify-between gap-2">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-neutral-400">{titulo}</span>
