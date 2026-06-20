@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ARC, col, mix, soft } from "@/lib/constants";
 import { SUGERENCIAS, responderIA, type AccionIA } from "@/lib/assistant/respond";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { etiquetarAlerta, useAlertas, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "./ui/Icon";
 
@@ -24,7 +24,9 @@ interface Mensaje {
 }
 
 export function Assistant() {
-  const { maquinas, alertas, paradasEvitadas, ahorroMes, etiquetarAlerta } = useFleet();
+  const maquinas = useMaquinas();
+  const alertas = useAlertas();
+  const { ahorroMes, paradasEvitadas } = useSavings();
   const { dark } = useTheme();
   const router = useRouter();
   const brand = col("brand", dark);

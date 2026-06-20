@@ -9,14 +9,14 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ACCIONES, ARC, CAUSAS, col, mix, soft } from "@/lib/constants";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { etiquetarAlerta, useAlertas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Alerta, Veredicto } from "@/lib/types";
 import { Icon } from "../ui/Icon";
 
 export function AuditQueue() {
-  const { alertas } = useFleet();
+  const alertas = useAlertas();
   const { dark } = useTheme();
   const { puede } = useSession();
   const [abierta, setAbierta] = useState<Alerta | null>(null);
@@ -85,7 +85,6 @@ export function AuditQueue() {
 }
 
 function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }) {
-  const { etiquetarAlerta } = useFleet();
   const { dark } = useTheme();
   const [veredicto, setVeredicto] = useState<Veredicto | null>(null);
   const [causaSel, setCausaSel] = useState<string | null>(null);

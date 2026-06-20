@@ -1,0 +1,36 @@
+"use client";
+
+// ──────────────────────────────────────────────────────────────────────────
+// HOOKS DE LA FLOTA (el "seam" que consumen las vistas)
+// Cada hook se suscribe a UN slice del store. Un componente que solo lee el
+// ahorro no se re-renderiza cuando cambian las máquinas, y viceversa.
+// ──────────────────────────────────────────────────────────────────────────
+
+import { useSyncExternalStore } from "react";
+import {
+  getAlertas,
+  getHistorial,
+  getMaquinas,
+  getNotif,
+  getSavings,
+  subscribe,
+} from "./fleetStore";
+
+export { etiquetarAlerta, cerrarNotif } from "./fleetStore";
+export type { NotifMovil, Savings } from "./fleetStore";
+
+export function useMaquinas() {
+  return useSyncExternalStore(subscribe, getMaquinas, getMaquinas);
+}
+export function useAlertas() {
+  return useSyncExternalStore(subscribe, getAlertas, getAlertas);
+}
+export function useHistorial() {
+  return useSyncExternalStore(subscribe, getHistorial, getHistorial);
+}
+export function useSavings() {
+  return useSyncExternalStore(subscribe, getSavings, getSavings);
+}
+export function useNotif() {
+  return useSyncExternalStore(subscribe, getNotif, getNotif);
+}

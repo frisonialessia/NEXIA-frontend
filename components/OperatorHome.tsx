@@ -10,12 +10,12 @@
 import Link from "next/link";
 import { ESTADOS, RANK_ESTADO, col, estadoColorKey, mix, soft } from "@/lib/constants";
 import type { ColorKey } from "@/lib/constants";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { useMaquinas } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "./ui/Icon";
 
 export function OperatorHome() {
-  const { maquinas } = useFleet();
+  const maquinas = useMaquinas();
   const { dark } = useTheme();
 
   const requierenAtencion = maquinas

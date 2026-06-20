@@ -7,47 +7,17 @@
 // energético. Vista protegida por rol. Portado de renderOEE() de la demo.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { useEffect, useState } from "react";
 import { col } from "@/lib/constants";
+import { DOWNTIME, ENERGIA, useOee } from "@/lib/data/oee";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { AccessDenied } from "./AccessDenied";
 import { GaugeCircular } from "./ui/GaugeCircular";
 
-interface OeeState {
-  dispo: number;
-  rend: number;
-  cal: number;
-  buenas: number;
-  malas: number;
-  ritmo: number;
-}
-
 export function Production() {
   const { puede } = useSession();
   const { dark } = useTheme();
-
-  const [oee, setOee] = useState<OeeState>({
-    dispo: 0.875,
-    rend: 0.905,
-    cal: 0.979,
-    buenas: 3720,
-    malas: 80,
-    ritmo: 9,
-  });
-
-  // El turno avanza en vivo: piezas y ritmo se actualizan cada 2s.
-  useEffect(() => {
-    const t = setInterval(() => {
-      setOee((s) => ({
-        ...s,
-        buenas: s.buenas + Math.floor(Math.random() * 6),
-        malas: s.malas + (Math.random() < 0.3 ? 1 : 0),
-        ritmo: +(8 + Math.random() * 2).toFixed(1),
-      }));
-    }, 2000);
-    return () => clearInterval(t);
-  }, []);
+  const oee = useOee();
 
   if (!puede("produccion")) {
     return <AccessDenied mensaje="La vista de Producción requiere un rol con acceso (Administrador, Jefe de planta o Técnico)." />;
@@ -62,19 +32,9 @@ export function Production() {
     { label: "Calidad", val: oee.cal, color: col("ok", dark) },
   ];
 
-  const downtime = [
-    { c: "Falta de material", m: 28, color: col("brand", dark) },
-    { c: "Fallo mecánico", m: 18, color: col("crit", dark) },
-    { c: "Cambio de formato", m: 9, color: col("naranja", dark) },
-    { c: "Error de operador", m: 5, color: col("violeta", dark) },
-  ];
+  const downtime = DOWNTIME.map((d) => ({ ...d, color: col(d.colorKey, dark) }));
   const totalDt = downtime.reduce((s, d) => s + d.m, 0);
-
-  const energia = [
-    { n: "Energía eléctrica", v: 842, u: "kWh", max: 1000, color: col("naranja", dark) },
-    { n: "Aire comprimido", v: 310, u: "m³", max: 500, color: col("cian", dark) },
-    { n: "Agua de proceso", v: 128, u: "m³", max: 200, color: col("lima", dark) },
-  ];
+  const energia = ENERGIA.map((e) => ({ ...e, color: col(e.colorKey, dark) }));
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">

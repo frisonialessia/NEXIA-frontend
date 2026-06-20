@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ESTADOS, HORAS_PARADA_TIPICA, RANK_ESTADO, col, estadoColorKey } from "@/lib/constants";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Maquina } from "@/lib/types";
@@ -19,7 +19,8 @@ import { TrendCard } from "./TrendCard";
 import { GaugeCircular } from "./ui/GaugeCircular";
 
 export function CommandCenter() {
-  const { maquinas, ahorroMes, paradasEvitadas } = useFleet();
+  const maquinas = useMaquinas();
+  const { ahorroMes, paradasEvitadas } = useSavings();
   const { dark } = useTheme();
   const { puede } = useSession();
 

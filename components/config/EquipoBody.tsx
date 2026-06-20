@@ -7,6 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { MATRIZ_PERMISOS, ROL_NOMBRE, col, mix } from "@/lib/constants";
+import { USUARIOS } from "@/lib/data/team";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { Icon } from "../ui/Icon";
 
@@ -15,13 +16,7 @@ const COLUMNAS = ["Admin", "Jefe", "Técnico", "Operador", "Lectura"];
 export function EquipoBody() {
   const { dark } = useTheme();
 
-  const usuarios = [
-    { n: "Alessia Frisoni", e: "alessia@planta.com", rol: ROL_NOMBRE.admin, c: col("brand", dark) },
-    { n: "Carlos Méndez", e: "carlos@planta.com", rol: ROL_NOMBRE.jefe, c: col("warn", dark) },
-    { n: "Roberto Salas", e: "roberto@planta.com", rol: ROL_NOMBRE.tecnico, c: col("crit", dark) },
-    { n: "Luis Ortega", e: "luis@planta.com", rol: ROL_NOMBRE.operador, c: col("ok", dark) },
-    { n: "Auditoría Externa", e: "audit@planta.com", rol: ROL_NOMBRE.lectura, c: col("gray", dark) },
-  ];
+  const usuarios = USUARIOS.map((u) => ({ ...u, c: col(u.colorKey, dark) }));
   const roles = Object.values(ROL_NOMBRE);
 
   return (

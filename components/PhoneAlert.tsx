@@ -7,17 +7,17 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { useEffect } from "react";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { cerrarNotif, useNotif } from "@/lib/state/useFleet";
 import { Icon } from "./ui/Icon";
 
 export function PhoneAlert() {
-  const { notif, cerrarNotif } = useFleet();
+  const notif = useNotif();
 
   useEffect(() => {
     if (!notif) return;
     const t = setTimeout(cerrarNotif, 6000);
     return () => clearTimeout(t);
-  }, [notif, cerrarNotif]);
+  }, [notif]);
 
   if (!notif) return null;
 

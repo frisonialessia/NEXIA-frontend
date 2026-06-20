@@ -7,11 +7,11 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col, soft } from "@/lib/constants";
-import { useFleet } from "@/lib/state/FleetProvider";
+import { useHistorial } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 
 export function HistoryList() {
-  const { historial } = useFleet();
+  const historial = useHistorial();
   const { dark } = useTheme();
 
   if (historial.length === 0) {
