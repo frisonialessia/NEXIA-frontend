@@ -15,6 +15,7 @@ import { ARC, col, mix, soft } from "@/lib/constants";
 import { SUGERENCIAS, responderIA, type AccionIA } from "@/lib/assistant/respond";
 import { etiquetarAlerta, useAlertas, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
+import { SURFACE } from "./ui/Card";
 import { Icon } from "./ui/Icon";
 
 interface Mensaje {
@@ -81,7 +82,7 @@ export function Assistant() {
           </p>
         </header>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+        <div className={SURFACE}>
           <div ref={logRef} className="max-h-[440px] space-y-4 overflow-y-auto px-6 py-6">
             {chat.length === 0 ? (
               <Burbuja brand={brand}>Hola. Pregúntame sobre el estado de tus máquinas, qué priorizar, o por qué algo está en riesgo.</Burbuja>

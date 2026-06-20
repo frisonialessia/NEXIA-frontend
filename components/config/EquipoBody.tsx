@@ -9,7 +9,9 @@
 import { MATRIZ_PERMISOS, ROL_NOMBRE, col, mix } from "@/lib/constants";
 import { USUARIOS } from "@/lib/data/team";
 import { useTheme } from "@/lib/state/ThemeProvider";
+import { SURFACE } from "../ui/Card";
 import { Icon } from "../ui/Icon";
+import { Label } from "../ui/Typo";
 
 const COLUMNAS = ["Admin", "Jefe", "Técnico", "Operador", "Lectura"];
 
@@ -21,9 +23,9 @@ export function EquipoBody() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className={`${SURFACE} overflow-hidden`}>
         <div className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
-          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Usuarios</h3>
+          <Label>Usuarios</Label>
         </div>
         {usuarios.map((u, i) => (
           <div key={u.e} className={`flex items-center gap-4 px-6 py-4 ${i === usuarios.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}`}>
@@ -43,9 +45,9 @@ export function EquipoBody() {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className={`${SURFACE} overflow-hidden`}>
         <div className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
-          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Matriz de permisos por rol</h3>
+          <Label>Matriz de permisos por rol</Label>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

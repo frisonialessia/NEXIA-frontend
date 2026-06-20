@@ -14,7 +14,9 @@ import { etiquetarAlerta, useAlertas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Alerta, Veredicto } from "@/lib/types";
+import { SURFACE } from "../ui/Card";
 import { Icon } from "../ui/Icon";
+import { Pill } from "../ui/Primitives";
 
 export function AuditQueue() {
   const alertas = useAlertas();
@@ -26,7 +28,7 @@ export function AuditQueue() {
 
   if (alertas.length === 0) {
     return (
-      <div className="rounded-2xl border border-neutral-200 bg-white px-8 py-16 text-center dark:border-neutral-800 dark:bg-neutral-900">
+      <div className={`${SURFACE} px-8 py-16 text-center`}>
         <Icon name="check" className="mx-auto h-8 w-8" style={{ color: col("ok", dark) }} />
         <p className="mt-4 text-sm text-neutral-500">No hay alertas pendientes.</p>
         <p className="mt-1 text-xs text-neutral-400">Todo el trabajo está al día.</p>
@@ -36,7 +38,7 @@ export function AuditQueue() {
 
   return (
     <>
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className={`${SURFACE} overflow-hidden`}>
         {alertas.map((a, i) => {
           const contenido = (
             <>
@@ -54,12 +56,7 @@ export function AuditQueue() {
               <div className="hidden shrink-0 text-right md:block">
                 <div className="font-mono text-xs text-neutral-500">{a.hora}</div>
               </div>
-              <span
-                className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide"
-                style={{ background: soft("warn"), color: col("warn", dark) }}
-              >
-                Pendiente
-              </span>
+              <Pill colorKey="warn">Pendiente</Pill>
             </>
           );
           const borde = i === alertas.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800";

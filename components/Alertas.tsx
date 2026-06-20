@@ -13,7 +13,9 @@ import { useSession } from "@/lib/state/SessionProvider";
 import { AuditQueue } from "./alertas/AuditQueue";
 import { HistoryList } from "./alertas/HistoryList";
 import { Icon } from "./ui/Icon";
+import { Button } from "./ui/Primitives";
 import { Tabs } from "./ui/Tabs";
+import { Label, PageTitle } from "./ui/Typo";
 
 export function Alertas() {
   const alertas = useAlertas();
@@ -24,17 +26,18 @@ export function Alertas() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-4xl">
         <header className="mb-6">
-          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Human-in-the-loop</span>
+          <Label>Human-in-the-loop</Label>
           <div className="mt-2 flex items-end justify-between">
-            <h1 className="font-serif text-3xl tracking-tight">Alertas</h1>
+            <PageTitle>Alertas</PageTitle>
             {puede("exportar") && (
-              <button
+              <Button
+                variant="secondary"
+                className="px-3 py-1.5 text-xs"
                 onClick={() => toast("En la versión real: exporta un PDF para llevar a la reunión.")}
-                className="flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 transition-colors hover:border-neutral-300 dark:border-neutral-700"
               >
                 <Icon name="download" className="h-3.5 w-3.5" />
                 Exportar reporte
-              </button>
+              </Button>
             )}
           </div>
         </header>
