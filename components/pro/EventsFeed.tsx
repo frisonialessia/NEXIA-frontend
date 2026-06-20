@@ -9,12 +9,13 @@
 import { col } from "@/lib/constants";
 import type { EventoHistorial } from "@/lib/types";
 import { Icon } from "../ui/Icon";
+import { SURFACE } from "./surface";
 
 export function EventsFeed({ historial }: { historial: EventoHistorial[] }) {
   const eventos = historial.slice(0, 9);
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-neutral-200/70 bg-white px-6 py-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+    <div className={`${SURFACE} flex h-full flex-col px-6 py-5`}>
       <div className="mb-4 flex items-center gap-2">
         <span className="relative flex h-2 w-2">
           <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />

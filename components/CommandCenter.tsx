@@ -7,12 +7,12 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { RANK_ESTADO, col } from "@/lib/constants";
-import { useMaquinas, useSavings } from "@/lib/state/useFleet";
-import { useHistorial } from "@/lib/state/useFleet";
+import { useHistorial, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { EventsFeed } from "./pro/EventsFeed";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
 import { KpiStrip } from "./pro/KpiStrip";
 import { MachineCardPro } from "./pro/MachineCardPro";
+import { SURFACE } from "./pro/surface";
 
 export function CommandCenter() {
   const maquinas = useMaquinas();
@@ -53,11 +53,11 @@ export function CommandCenter() {
         </header>
 
         {total === 0 ? (
-          <div className="rounded-2xl border border-neutral-200/70 bg-white px-8 py-20 text-center text-sm text-neutral-400 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <div className={`${SURFACE} px-8 py-20 text-center text-sm text-neutral-400`}>
             Recopilando las primeras lecturas de la flota…
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <KpiStrip maquinas={maquinas} savings={savings} />
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

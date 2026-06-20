@@ -12,6 +12,7 @@ import { diasAFallo } from "@/lib/engine/fsm";
 import type { Maquina } from "@/lib/types";
 import { MiniLineChart } from "../ui/MiniLineChart";
 import { ProbabilityRing } from "../ui/ProbabilityRing";
+import { SURFACE } from "./surface";
 
 export function MachineCardPro({ m }: { m: Maquina }) {
   const ec = col(estadoColorKey(m.estado));
@@ -22,7 +23,7 @@ export function MachineCardPro({ m }: { m: Maquina }) {
 
   return (
     <Link href={`/activo/${encodeURIComponent(m.id)}`} className="group block">
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-200/70 bg-white px-5 py-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
+      <div className={`${SURFACE} relative overflow-hidden px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg`}>
         <span className="absolute inset-x-0 top-0 h-0.5" style={{ background: ec }} />
 
         <div className="flex items-center justify-between">

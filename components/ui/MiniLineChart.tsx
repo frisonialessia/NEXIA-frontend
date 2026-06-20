@@ -6,6 +6,8 @@
 // de un vistazo, no la lectura exacta.
 // ──────────────────────────────────────────────────────────────────────────
 
+import { useId } from "react";
+
 const W = 260;
 const H = 64;
 const PAD = 6;
@@ -28,6 +30,7 @@ function suave(pts: [number, number][]): string {
 }
 
 export function MiniLineChart({ data, color }: { data: number[]; color: string }) {
+  const uid = useId();
   const n = data.length;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -37,7 +40,9 @@ export function MiniLineChart({ data, color }: { data: number[]; color: string }
   const pts: [number, number][] = data.map((v, i) => [x(i), y(v)]);
   const linea = suave(pts);
   const area = `${linea} L ${x(n - 1)} ${H} L ${x(0)} ${H} Z`;
-  const id = `grad-${color.replace("#", "")}`;
+  // id único y saneado: el color ahora es un token CSS (var(--c-…)) y no sirve
+  // para construir el id del degradado (rompería la referencia url(#…)).
+  const id = "grad-" + uid.replace(/[^a-zA-Z0-9]/g, "");
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }} preserveAspectRatio="none" aria-hidden="true">
