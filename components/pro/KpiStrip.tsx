@@ -124,7 +124,7 @@ function KpiTile({
       <div className="mt-2.5 font-serif text-3xl leading-none tracking-tight">{valor}</div>
       {sub && <div className="mt-1 text-xs text-neutral-400">{sub}</div>}
 
-      <div className="mt-2 h-9">{spark ? <MiniLineChart data={spark.data} color={col(spark.colorKey)} /> : extra}</div>
+      <div className="mt-2 h-9 overflow-hidden">{spark ? <MiniLineChart data={spark.data} color={col(spark.colorKey)} /> : extra}</div>
     </div>
   );
 }
