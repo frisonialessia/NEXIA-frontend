@@ -10,7 +10,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ESTADOS, AHORRO_POR_PARADA, col, estadoColorKey, surf } from "@/lib/constants";
+import { ESTADOS, AHORRO_POR_PARADA, col, estadoColor, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { diasAFallo } from "@/lib/engine/fsm";
@@ -66,7 +66,7 @@ export function AssetDetail({ id }: { id: string }) {
     );
   }
 
-  const ec = col(estadoColorKey(m.estado), dark);
+  const ec = estadoColor(m.estado);
   const dias = diasAFallo(m);
   const last = m.hist[m.hist.length - 1];
 
@@ -74,7 +74,7 @@ export function AssetDetail({ id }: { id: string }) {
 
   // Fondo y borde del recuadro de pronóstico según el estado.
   const predEstilo =
-    m.estado === "STABLE" ? surf("ok") : m.estado === "CRITICAL_ALERT" ? surf("crit") : surf("warn");
+    m.estado === "STABLE" ? surf("ok") : m.estado === "CRITICAL_ALERT" ? surf("crit") : surf("ok");
 
   function reproducir() {
     if (!m) return;

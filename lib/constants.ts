@@ -96,11 +96,38 @@ export function estadoColorKey(e: Estado): ColorKey {
 }
 
 /**
- * Color por VALOR (semántico): verde si va bien, ámbar si medio, rojo si mal.
- * Por defecto usa los umbrales de OEE (≥85 world-class, ≥60 aceptable).
+ * Color por VALOR: verde si está bien, rojo si está mal (sin ámbar).
+ * Paleta NEXIA simplificada: verde = bien, rojo = mal.
  */
-export function colorPorValor(pct: number, bueno = 85, medio = 60): ColorKey {
-  return pct >= bueno ? "ok" : pct >= medio ? "warn" : "crit";
+export function colorPorValor(pct: number, bueno = 60): ColorKey {
+  return pct >= bueno ? "ok" : "crit";
+}
+
+/**
+ * Escala de VERDES (mismo tono, distinta intensidad) para gradientes de salud
+ * y series de datos. Más claro = más sano; más oscuro = más cerca de alerta.
+ */
+export const VERDES = {
+  claro: "#6ee7b7",
+  medio: "#10b981",
+  oscuro: "#059669",
+};
+
+/**
+ * Color del estado de una máquina (string listo para usar). Paleta NEXIA:
+ * verde con tonos cuando no es crítico (más oscuro = más cerca de alerta) y
+ * ROJO solo en crítico. Sin ámbar ni azul para estados.
+ */
+export function estadoColor(estado: Estado): string {
+  switch (estado) {
+    case "STABLE":
+      return VERDES.medio;
+    case "WARNING_PROBATION":
+    case "RECOVERY_PROBATION":
+      return VERDES.oscuro;
+    case "CRITICAL_ALERT":
+      return col("crit");
+  }
 }
 
 /** Orden de prioridad para ordenar la flota (0 = más urgente). */
