@@ -7,12 +7,11 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col } from "@/lib/constants";
-import { ordenarFlota } from "@/lib/domain/flota";
 import { useEventos, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { EventsFeed } from "./pro/EventsFeed";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
 import { KpiStrip } from "./pro/KpiStrip";
-import { MachineCardPro } from "./pro/MachineCardPro";
+import { SortableFleet } from "./pro/SortableFleet";
 import { SURFACE } from "./pro/surface";
 
 export function CommandCenter() {
@@ -22,7 +21,6 @@ export function CommandCenter() {
 
   const total = maquinas.length;
   const atencion = maquinas.filter((m) => m.estado !== "STABLE").length;
-  const orden = ordenarFlota(maquinas);
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
@@ -61,12 +59,10 @@ export function CommandCenter() {
 
             <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
               <section className="lg:col-span-2">
-                <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Flota · por criticidad</h2>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {orden.map((m) => (
-                    <MachineCardPro key={m.id} m={m} />
-                  ))}
-                </div>
+                <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
+                  Flota · arrastra para ordenar
+                </h2>
+                <SortableFleet maquinas={maquinas} />
               </section>
 
               <section className="lg:sticky lg:top-24 lg:col-span-1">

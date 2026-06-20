@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ordenarFlota } from "./flota";
+import { ordenarConPreferencias, ordenarFlota } from "./flota";
 import type { Maquina } from "../types";
 
 const m = (id: string, estado: Maquina["estado"], prob: number): Maquina =>
@@ -15,5 +15,25 @@ describe("orden estable de la flota", () => {
     const antes = ordenarFlota([m("A", "STABLE", 0.2), m("B", "STABLE", 0.3)]).map((x) => x.id);
     const despues = ordenarFlota([m("A", "STABLE", 0.95), m("B", "STABLE", 0.1)]).map((x) => x.id);
     expect(antes).toEqual(despues);
+  });
+});
+
+describe("orden con preferencias (arrastre + pin)", () => {
+  it("críticas arriba, luego fijadas, luego el orden del usuario", () => {
+    const flota = [
+      m("Ventilador", "STABLE", 0.1),
+      m("Bomba", "CRITICAL_ALERT", 0.99),
+      m("Motor", "STABLE", 0.2),
+      m("Compresor", "STABLE", 0.1),
+    ];
+    // El usuario arrastró: Motor antes que Ventilador; fijó "Compresor".
+    const orden = ["Motor", "Ventilador", "Compresor"];
+    const pins = ["Compresor"];
+    expect(ordenarConPreferencias(flota, orden, pins).map((x) => x.id)).toEqual([
+      "Bomba", // crítica siempre arriba
+      "Compresor", // fijada
+      "Motor", // orden del usuario
+      "Ventilador",
+    ]);
   });
 });
