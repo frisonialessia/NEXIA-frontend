@@ -11,10 +11,10 @@
 //    vistas.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { AHORRO_POR_PARADA } from "../constants";
-import { aEventoHistorial, crearFlota, tickMaquina } from "../data/simulated";
+import { AHORRO_POR_PARADA, FLOTA } from "../constants";
+import { aEventoHistorial, crearFlota, crearMaquina, tickMaquina } from "../data/simulated";
 import { causaPrincipal } from "../engine/fsm";
-import type { Alerta, Evento, EventoHistorial, Maquina, Veredicto } from "../types";
+import type { Alerta, Evento, EventoHistorial, Maquina, MaquinaSeed, Veredicto } from "../types";
 
 export interface NotifMovil {
   maquina: string;
@@ -33,13 +33,16 @@ interface Snapshot {
   eventos: Evento[];
   savings: Savings;
   notif: NotifMovil | null;
+  roster: MaquinaSeed[];
 }
 
 const TICKS_CALENTAMIENTO = 8;
 const INTERVALO_MS = 2000;
 const MAX_EVENTOS = 50;
+const K_ROSTER = "nexia-activos";
 
 let flota: Maquina[] = [];
+let rosterSeeds: MaquinaSeed[] = [];
 const notificadas: Record<string, boolean> = {};
 
 let snapshot: Snapshot = {
@@ -49,7 +52,25 @@ let snapshot: Snapshot = {
   eventos: [],
   savings: { ahorroMes: 2 * AHORRO_POR_PARADA, paradasEvitadas: 2 },
   notif: null,
+  roster: [],
 };
+
+function cargarRoster(): MaquinaSeed[] {
+  try {
+    const r = localStorage.getItem(K_ROSTER);
+    if (r) {
+      const parsed = JSON.parse(r);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch {
+    /* ignora roster corrupto */
+  }
+  return FLOTA.map((s) => ({ ...s }));
+}
+
+function persistirRoster() {
+  localStorage.setItem(K_ROSTER, JSON.stringify(rosterSeeds));
+}
 
 const listeners = new Set<() => void>();
 let intervalo: ReturnType<typeof setInterval> | null = null;
@@ -84,7 +105,8 @@ function eventoResolucion(a: Alerta, veredicto: Veredicto): Evento {
 }
 
 function calentar() {
-  flota = crearFlota();
+  rosterSeeds = cargarRoster();
+  flota = crearFlota(rosterSeeds);
   const iniciales: Alerta[] = [];
   for (let i = 0; i < TICKS_CALENTAMIENTO; i++) {
     flota.forEach((m) => {
@@ -98,6 +120,7 @@ function calentar() {
   snapshot = {
     ...snapshot,
     maquinas: [...flota],
+    roster: [...rosterSeeds],
     alertas: iniciales,
     historial: iniciales.map(aEventoHistorial),
     eventos: iniciales.map(eventoDeteccion),
@@ -158,6 +181,49 @@ export const getHistorial = () => snapshot.historial;
 export const getEventos = () => snapshot.eventos;
 export const getSavings = () => snapshot.savings;
 export const getNotif = () => snapshot.notif;
+export const getRoster = () => snapshot.roster;
+
+// ── Gestión de activos (roster editable) ───────────────────────────────────
+
+/** Agrega una máquina nueva al roster y la pone a vivir de inmediato. */
+export function agregarMaquina(seed: MaquinaSeed) {
+  if (rosterSeeds.some((s) => s.id === seed.id)) return; // nombre duplicado
+  rosterSeeds = [...rosterSeeds, seed];
+  flota.push(crearMaquina(seed));
+  persistirRoster();
+  set({ maquinas: [...flota], roster: [...rosterSeeds] });
+}
+
+/** Edita los campos configurables de una máquina (el nombre es su identidad). */
+export function editarMaquina(id: string, parcial: Partial<MaquinaSeed>) {
+  rosterSeeds = rosterSeeds.map((s) => (s.id === id ? { ...s, ...parcial, id } : s));
+  const m = flota.find((x) => x.id === id);
+  if (m) {
+    if (parcial.sector !== undefined) m.sector = parcial.sector;
+    if (parcial.sensor !== undefined) m.sensor = parcial.sensor;
+    if (parcial.base !== undefined) m.base = parcial.base;
+    if (parcial.tipo !== undefined) m.tipo = parcial.tipo;
+    if (parcial.umbral !== undefined) m.umbral = parcial.umbral;
+    if (parcial.esc !== undefined) {
+      m.esc = parcial.esc;
+      m.ritmoDia = parcial.esc === "degradando" ? 0.7 : 0;
+    }
+  }
+  persistirRoster();
+  set({ maquinas: [...flota], roster: [...rosterSeeds] });
+}
+
+/** Quita una máquina del roster (y sus alertas abiertas). */
+export function quitarMaquina(id: string) {
+  rosterSeeds = rosterSeeds.filter((s) => s.id !== id);
+  flota = flota.filter((m) => m.id !== id);
+  persistirRoster();
+  set({
+    maquinas: [...flota],
+    roster: [...rosterSeeds],
+    alertas: snapshot.alertas.filter((a) => a.maquina !== id),
+  });
+}
 
 // Acciones (estables, importables directamente)
 export function etiquetarAlerta(id: string, veredicto: Veredicto) {

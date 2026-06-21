@@ -10,18 +10,18 @@
 //    de red. Las vistas NO importan nada de aquí: hablan con useFleet().
 // ──────────────────────────────────────────────────────────────────────────
 
-import { FLOTA, tipoDe } from "../constants";
+import { FLOTA, UMBRAL_CRITICO, tipoDe } from "../constants";
 import { causaPrincipal, esAlta, probabilidadFallo, transicion } from "../engine/fsm";
-import type { Alerta, EventoHistorial, Maquina } from "../types";
+import type { Alerta, EventoHistorial, Maquina, MaquinaSeed } from "../types";
 
 /** Tamaño máximo de la ventana móvil de lecturas que guarda cada máquina. */
 const VENTANA_HIST = 40;
 
-/** Construye la flota inicial a partir de las semillas fijas. */
-export function crearFlota(): Maquina[] {
-  return FLOTA.map((d) => ({
+/** Construye una máquina viva a partir de su semilla. */
+export function crearMaquina(d: MaquinaSeed): Maquina {
+  return {
     ...d,
-    tipo: tipoDe(d.id),
+    tipo: d.tipo ?? tipoDe(d.id),
     estado: "STABLE",
     cSube: 0,
     cBaja: 0,
@@ -30,8 +30,14 @@ export function crearFlota(): Maquina[] {
     prob: 0.05,
     tick: 0,
     ritmoDia: d.esc === "degradando" ? 0.7 : 0,
-    horasOp: ((2000 + Math.random() * 3000) | 0),
-  }));
+    horasOp: (2000 + Math.random() * 3000) | 0,
+    umbral: d.umbral ?? UMBRAL_CRITICO,
+  };
+}
+
+/** Construye la flota a partir de un conjunto de semillas (por defecto, la inicial). */
+export function crearFlota(seeds: MaquinaSeed[] = FLOTA): Maquina[] {
+  return seeds.map(crearMaquina);
 }
 
 /**

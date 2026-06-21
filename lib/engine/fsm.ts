@@ -73,9 +73,10 @@ export function transicion(
 export function diasAFallo(m: Maquina): number {
   const last = m.hist[m.hist.length - 1];
   if (!last) return Infinity;
-  if (last.v >= UMBRAL_CRITICO) return 0;
+  const umbral = m.umbral ?? UMBRAL_CRITICO;
+  if (last.v >= umbral) return 0;
   if (m.ritmoDia <= 0) return Infinity;
-  return (UMBRAL_CRITICO - last.v) / m.ritmoDia;
+  return (umbral - last.v) / m.ritmoDia;
 }
 
 /** Indica si una lectura (por su probabilidad) cuenta como "alta". */

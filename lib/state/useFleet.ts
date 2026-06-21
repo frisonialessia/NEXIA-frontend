@@ -13,15 +13,20 @@ import {
   getHistorial,
   getMaquinas,
   getNotif,
+  getRoster,
   getSavings,
   subscribe,
 } from "./fleetStore";
 
-export { etiquetarAlerta, cerrarNotif, repararMaquina } from "./fleetStore";
+export { etiquetarAlerta, cerrarNotif, repararMaquina, agregarMaquina, editarMaquina, quitarMaquina } from "./fleetStore";
 export type { NotifMovil, Savings } from "./fleetStore";
 
 export function useEventos() {
   return useSyncExternalStore(subscribe, getEventos, getEventos);
+}
+
+export function useRoster() {
+  return useSyncExternalStore(subscribe, getRoster, getRoster);
 }
 
 export function useMaquinas() {

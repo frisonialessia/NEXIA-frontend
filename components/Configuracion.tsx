@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 import { useSession } from "@/lib/state/SessionProvider";
+import { AssetsBody } from "./config/AssetsBody";
 import { AuditLogBody } from "./config/AuditLogBody";
 import { ConnectBody } from "./config/ConnectBody";
 import { EquipoBody } from "./config/EquipoBody";
@@ -20,6 +21,7 @@ export function Configuracion() {
 
   const tabs: TabDef[] = [
     { id: "ajustes", label: "Ajustes" },
+    ...(puede("activos") ? [{ id: "activos", label: "Activos" }] : []),
     ...(puede("ajustesPlanta") ? [{ id: "notificaciones", label: "Notificaciones" }] : []),
     ...(puede("conexiones") ? [{ id: "conexiones", label: "Conexiones" }] : []),
     ...(puede("usuarios") ? [{ id: "equipo", label: "Equipo" }] : []),
@@ -44,6 +46,7 @@ export function Configuracion() {
         )}
 
         {activo === "ajustes" && <SettingsBody />}
+        {activo === "activos" && <AssetsBody />}
         {activo === "notificaciones" && <NotificationsBody />}
         {activo === "conexiones" && <ConnectBody />}
         {activo === "equipo" && <EquipoBody />}

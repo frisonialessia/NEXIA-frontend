@@ -35,6 +35,10 @@ export interface MaquinaSeed {
   /** baseline de vibración */
   base: number;
   esc: Escenario;
+  /** tipo de máquina (si se omite, se deduce del nombre) */
+  tipo?: TipoMaquina;
+  /** umbral crítico de vibración (si se omite, usa el global) */
+  umbral?: number;
 }
 
 /** Estado completo y vivo de una máquina (semilla + estado dinámico del motor). */
@@ -57,6 +61,8 @@ export interface Maquina extends MaquinaSeed {
   ritmoDia: number;
   /** horas de operación acumuladas */
   horasOp: number;
+  /** umbral crítico de vibración de esta máquina */
+  umbral: number;
 }
 
 /** Una alerta generada cuando una máquina entra en estado crítico. */
