@@ -8,8 +8,9 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { UNIDADES, UNIDADES_UNIVERSALES, col } from "@/lib/constants";
+import { ROL_NOMBRE, UNIDADES, UNIDADES_UNIVERSALES, col } from "@/lib/constants";
 import { uni } from "@/lib/format";
+import { useAdmin } from "@/lib/state/AdminProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Magnitud, SistemaUnidades } from "@/lib/types";
@@ -18,7 +19,8 @@ import { Button } from "../ui/Primitives";
 import { Label } from "../ui/Typo";
 
 export function SettingsBody() {
-  const { sistema, setSistema, puede } = useSession();
+  const { sistema, setSistema, puede, rol } = useSession();
+  const { registrar } = useAdmin();
   const { toggle, dark } = useTheme();
   const [umbral, setUmbral] = useState(60);
   const brand = col("brand", dark);
@@ -93,7 +95,14 @@ export function SettingsBody() {
       )}
 
       <div className="flex justify-end">
-        <Button onClick={() => toast("Ajustes guardados")}>Guardar cambios</Button>
+        <Button
+          onClick={() => {
+            registrar(ROL_NOMBRE[rol], "Guardó ajustes", `Sistema ${sistema}`);
+            toast("Ajustes guardados");
+          }}
+        >
+          Guardar cambios
+        </Button>
       </div>
     </div>
   );

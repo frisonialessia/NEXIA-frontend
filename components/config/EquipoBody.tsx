@@ -1,75 +1,184 @@
 "use client";
 
 // ──────────────────────────────────────────────────────────────────────────
-// CONFIGURACIÓN · pestaña EQUIPO (cuerpo)
-// Gestión de usuarios y matriz de permisos por rol. El acceso lo controla la
-// página de Configuración (solo Administrador).
+// CONFIGURACIÓN · pestaña EQUIPO (Administración)
+// CRUD de usuarios (invitar / cambiar rol / quitar) y MATRIZ DE PERMISOS
+// editable que gobierna de verdad el acceso. Cada acción queda en auditoría.
+// Solo accesible para el rol con permiso "usuarios".
 // ──────────────────────────────────────────────────────────────────────────
 
-import { MATRIZ_PERMISOS, ROL_NOMBRE, col, mix } from "@/lib/constants";
-import { USUARIOS } from "@/lib/data/team";
-import { useTheme } from "@/lib/state/ThemeProvider";
+import { useState } from "react";
+import { toast } from "sonner";
+import { ROLES, ROL_NOMBRE, col, mix } from "@/lib/constants";
+import { PERMISOS_ORDEN, PERMISO_LABEL } from "@/lib/permissions";
+import { useAdmin } from "@/lib/state/AdminProvider";
+import { useSession } from "@/lib/state/SessionProvider";
+import type { Rol } from "@/lib/types";
 import { SURFACE } from "../ui/Card";
 import { Icon } from "../ui/Icon";
+import { Button } from "../ui/Primitives";
 import { Label } from "../ui/Typo";
 
-const COLUMNAS = ["Admin", "Jefe", "Técnico", "Operador", "Lectura"];
+const COLS: { rol: Rol; corto: string }[] = [
+  { rol: "admin", corto: "Admin" },
+  { rol: "jefe", corto: "Jefe" },
+  { rol: "tecnico", corto: "Técnico" },
+  { rol: "operador", corto: "Operador" },
+  { rol: "lectura", corto: "Lectura" },
+];
 
 export function EquipoBody() {
-  const { dark } = useTheme();
+  const { usuarios, invitar, cambiarRol, quitar, registrar } = useAdmin();
+  const { rol, matriz, togglePermiso, resetPermisos } = useSession();
+  const actor = ROL_NOMBRE[rol];
 
-  const usuarios = USUARIOS;
-  const roles = Object.values(ROL_NOMBRE);
+  const [email, setEmail] = useState("");
+  const [nuevoRol, setNuevoRol] = useState<Rol>("operador");
+
+  function enviarInvitacion() {
+    const e = email.trim();
+    if (!e || !e.includes("@")) {
+      toast.error("Escribe un correo válido");
+      return;
+    }
+    invitar("", e, nuevoRol);
+    registrar(actor, "Invitó a un usuario", `${e} como ${ROL_NOMBRE[nuevoRol]}`);
+    toast("Invitación enviada a " + e);
+    setEmail("");
+  }
 
   return (
     <div className="space-y-6">
+      {/* Invitar */}
+      <div className={`${SURFACE} px-6 py-5`}>
+        <Label>Invitar a un miembro</Label>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && enviarInvitacion()}
+            placeholder="correo@planta.com"
+            className="flex-1 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800"
+          />
+          <select
+            value={nuevoRol}
+            onChange={(e) => setNuevoRol(e.target.value as Rol)}
+            className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800"
+          >
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {ROL_NOMBRE[r]}
+              </option>
+            ))}
+          </select>
+          <Button onClick={enviarInvitacion} className="px-4 py-2">
+            <Icon name="plus" className="h-4 w-4" />
+            Invitar
+          </Button>
+        </div>
+      </div>
+
+      {/* Usuarios */}
       <div className={`${SURFACE} overflow-hidden`}>
         <div className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
-          <Label>Usuarios</Label>
+          <Label>Usuarios · {usuarios.length}</Label>
         </div>
         {usuarios.map((u, i) => (
-          <div key={u.e} className={`flex items-center gap-4 px-6 py-4 ${i === usuarios.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}`}>
+          <div key={u.id} className={`flex items-center gap-4 px-6 py-4 ${i === usuarios.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}`}>
             <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: mix(u.color), color: u.color }}>
               <Icon name="user" className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-medium">{u.n}</div>
-              <div className="text-xs text-neutral-400">{u.e}</div>
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-medium">{u.n}</span>
+                {u.estado === "invitado" && (
+                  <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-neutral-500 dark:bg-neutral-800">
+                    Invitado
+                  </span>
+                )}
+              </div>
+              <div className="truncate text-xs text-neutral-400">{u.e}</div>
             </div>
-            <select defaultValue={u.rol} className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800">
-              {roles.map((r) => (
-                <option key={r}>{r}</option>
+            <select
+              value={u.rolKey}
+              onChange={(e) => {
+                cambiarRol(u.id, e.target.value as Rol);
+                registrar(actor, "Cambió un rol", `${u.e} → ${ROL_NOMBRE[e.target.value as Rol]}`);
+              }}
+              className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs dark:border-neutral-700 dark:bg-neutral-800"
+            >
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {ROL_NOMBRE[r]}
+                </option>
               ))}
             </select>
+            <button
+              onClick={() => {
+                quitar(u.id);
+                registrar(actor, "Quitó a un usuario", u.e);
+                toast("Usuario eliminado");
+              }}
+              aria-label="Quitar usuario"
+              className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200"
+            >
+              <Icon name="x" className="h-4 w-4" />
+            </button>
           </div>
         ))}
       </div>
 
+      {/* Matriz de permisos editable */}
       <div className={`${SURFACE} overflow-hidden`}>
-        <div className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
-          <Label>Matriz de permisos por rol</Label>
+        <div className="flex items-center justify-between border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
+          <Label>Matriz de permisos · clic para cambiar</Label>
+          <button
+            onClick={() => {
+              resetPermisos();
+              registrar(actor, "Restauró permisos", "valores por defecto");
+              toast("Permisos restaurados");
+            }}
+            className="text-xs text-neutral-500 transition-colors hover:text-neutral-800 dark:hover:text-neutral-200"
+          >
+            Restaurar
+          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-neutral-100 text-xs uppercase tracking-wider text-neutral-400 dark:border-neutral-800">
                 <th className="px-6 py-3 text-left font-medium">Permiso</th>
-                {COLUMNAS.map((t) => (
-                  <th key={t} className="px-3 py-3 text-center font-medium">
-                    {t}
+                {COLS.map((c) => (
+                  <th key={c.rol} className="px-3 py-3 text-center font-medium">
+                    {c.corto}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {MATRIZ_PERMISOS.map((p, i) => (
-                <tr key={p.f} className={i === MATRIZ_PERMISOS.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}>
-                  <td className="px-6 py-3 text-neutral-600 dark:text-neutral-300">{p.f}</td>
-                  {p.v.map((x, j) => (
-                    <td key={j} className="px-3 py-3 text-center">
-                      {x ? <Icon name="check" className="mx-auto h-4 w-4" style={{ color: col("ok", dark) }} /> : <span className="text-neutral-300 dark:text-neutral-600">—</span>}
-                    </td>
-                  ))}
+              {PERMISOS_ORDEN.map((permiso, i) => (
+                <tr key={permiso} className={i === PERMISOS_ORDEN.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}>
+                  <td className="px-6 py-3 text-neutral-600 dark:text-neutral-300">{PERMISO_LABEL[permiso]}</td>
+                  {COLS.map((c) => {
+                    const activo = matriz[permiso].includes(c.rol);
+                    return (
+                      <td key={c.rol} className="px-3 py-3 text-center">
+                        <button
+                          onClick={() => {
+                            togglePermiso(permiso, c.rol);
+                            registrar(actor, activo ? "Quitó un permiso" : "Otorgó un permiso", `${PERMISO_LABEL[permiso]} · ${ROL_NOMBRE[c.rol]}`);
+                          }}
+                          aria-label={`${activo ? "Quitar" : "Otorgar"} ${PERMISO_LABEL[permiso]} a ${ROL_NOMBRE[c.rol]}`}
+                          aria-pressed={activo}
+                          className="mx-auto flex h-6 w-6 items-center justify-center rounded-md transition-colors"
+                          style={activo ? { background: mix(col("ok"), 16), color: col("ok") } : undefined}
+                        >
+                          {activo ? <Icon name="check" className="h-4 w-4" /> : <span className="text-neutral-300 dark:text-neutral-600">—</span>}
+                        </button>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

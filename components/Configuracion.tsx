@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 import { useSession } from "@/lib/state/SessionProvider";
+import { AuditLogBody } from "./config/AuditLogBody";
 import { ConnectBody } from "./config/ConnectBody";
 import { EquipoBody } from "./config/EquipoBody";
 import { SettingsBody } from "./config/SettingsBody";
@@ -20,6 +21,7 @@ export function Configuracion() {
     { id: "ajustes", label: "Ajustes" },
     ...(puede("conexiones") ? [{ id: "conexiones", label: "Conexiones" }] : []),
     ...(puede("usuarios") ? [{ id: "equipo", label: "Equipo" }] : []),
+    ...(puede("usuarios") ? [{ id: "registro", label: "Registro" }] : []),
   ];
 
   const [tab, setTab] = useState("ajustes");
@@ -42,6 +44,7 @@ export function Configuracion() {
         {activo === "ajustes" && <SettingsBody />}
         {activo === "conexiones" && <ConnectBody />}
         {activo === "equipo" && <EquipoBody />}
+        {activo === "registro" && <AuditLogBody />}
       </div>
     </main>
   );

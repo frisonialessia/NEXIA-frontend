@@ -8,9 +8,10 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { ACCIONES, ARC, CAUSAS, col, mix, soft } from "@/lib/constants";
+import { ACCIONES, ARC, CAUSAS, ROL_NOMBRE, col, mix, soft } from "@/lib/constants";
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
 import { etiquetarAlerta, useAlertas } from "@/lib/state/useFleet";
+import { useAdmin } from "@/lib/state/AdminProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Alerta, Veredicto } from "@/lib/types";
@@ -84,6 +85,8 @@ export function AuditQueue() {
 
 function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }) {
   const { dark } = useTheme();
+  const { rol } = useSession();
+  const { registrar } = useAdmin();
   const [veredicto, setVeredicto] = useState<Veredicto | null>(null);
   const [causaSel, setCausaSel] = useState<string | null>(null);
   const [accionSel, setAccionSel] = useState<string | null>(null);
@@ -97,7 +100,9 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
   }
 
   function guardar() {
+    const etiqueta = veredicto === "real" ? "fallo real" : veredicto === "falsa" ? "falsa alarma" : "no concluyente";
     etiquetarAlerta(alerta.id, veredicto!);
+    registrar(ROL_NOMBRE[rol], "Etiquetó una alerta", `${alerta.maquina} · ${etiqueta}`);
     onClose();
     toast("Evento etiquetado · dataset actualizado");
   }
