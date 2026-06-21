@@ -94,28 +94,28 @@ export function Nav() {
 
   return (
     <nav className="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
-      {/* Rejilla 1fr · auto · 1fr: la navegación queda centrada y estática,
-          independiente del ancho de la marca o de los controles. */}
-      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 py-3 sm:px-8">
-        {/* Izquierda: marca + planta activa */}
-        <div className="flex min-w-0 items-center gap-1">
+      {/* Marca y controles no se encogen (shrink-0); la navegación ocupa el
+          centro y se desplaza si hace falta, así nunca se solapa con la marca. */}
+      <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-3 sm:px-8">
+        {/* Izquierda: marca + planta activa (la planta solo en pantallas anchas) */}
+        <div className="flex shrink-0 items-center gap-1">
           <Link href="/" className="flex shrink-0 items-center gap-2">
             <BrandMark size={26} bg="#ffffff" className="ring-1 ring-neutral-200 dark:ring-neutral-700" />
             <span className="font-display text-lg tracking-tight">NEXIA</span>
           </Link>
-          <span className="ml-1 hidden text-neutral-300 md:inline dark:text-neutral-700">/</span>
-          <div className="hidden min-w-0 md:block">
+          <span className="ml-1 hidden text-neutral-300 xl:inline dark:text-neutral-700">/</span>
+          <div className="hidden xl:block">
             <OrgSwitcher />
           </div>
         </div>
 
-        {/* Centro: navegación (centrada y estática) */}
-        <div className="no-scrollbar hidden min-w-0 items-center gap-1 overflow-x-auto md:flex">
+        {/* Centro: navegación (ocupa el espacio; se desplaza si no cabe) */}
+        <div className="no-scrollbar hidden min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto md:flex">
           {visibles.map((item) => renderItem(item, true))}
         </div>
 
         {/* Derecha: controles */}
-        <div className="flex items-center justify-end gap-2">
+        <div className="ml-auto flex shrink-0 items-center justify-end gap-2">
           <div className="hidden items-center gap-2 md:flex">
             <NotificationBell />
             {botonTema}

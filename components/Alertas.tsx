@@ -39,7 +39,7 @@ export function Alertas() {
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6">
           <Label>Human-in-the-loop</Label>
           <div className="mt-2 flex items-end justify-between">

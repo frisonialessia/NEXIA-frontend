@@ -8,7 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
-import { ESTADOS, RANK_ESTADO, VERDES, col, estadoColor, mix } from "@/lib/constants";
+import { ESTADOS, RANK_ESTADO, VERDES, col, colorSalud, mix } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
 import { SURFACE } from "./ui/Card";
 import { useMaquinas } from "@/lib/state/useFleet";
@@ -32,7 +32,7 @@ export function OperatorHome() {
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Tu turno · en vivo</span>
           <h1 className="mt-2 font-display text-3xl tracking-tight">¿Qué atender ahora?</h1>
@@ -68,7 +68,7 @@ export function OperatorHome() {
         {/* Lista de máquinas — objetivos grandes, fáciles de tocar */}
         <div className="space-y-2.5">
           {orden.map((m) => {
-            const ec = estadoColor(m.estado);
+            const ec = colorSalud(m.estado, m.prob);
             const atender = m.estado !== "STABLE";
             return (
               <Link

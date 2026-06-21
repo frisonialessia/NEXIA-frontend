@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ESTADOS, AHORRO_POR_PARADA, ROL_NOMBRE, col, estadoColor, surf } from "@/lib/constants";
+import { ESTADOS, AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { diasAFallo } from "@/lib/engine/fsm";
@@ -61,7 +61,7 @@ export function AssetDetail({ id }: { id: string }) {
   if (!m) {
     return (
       <main className="px-6 py-8 sm:px-8">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-7xl">
           <Link href="/" className="text-sm text-neutral-400 transition-colors hover:text-neutral-700">
             ← Volver a la flota
           </Link>
@@ -74,7 +74,7 @@ export function AssetDetail({ id }: { id: string }) {
     );
   }
 
-  const ec = estadoColor(m.estado);
+  const ec = colorSalud(m.estado, m.prob);
   const dias = diasAFallo(m);
   const last = m.hist[m.hist.length - 1];
 
@@ -114,7 +114,7 @@ export function AssetDetail({ id }: { id: string }) {
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-7xl">
         <Link href="/" className="mb-5 inline-block text-sm text-neutral-400 transition-colors hover:text-neutral-700">
           ← Volver a la flota
         </Link>
