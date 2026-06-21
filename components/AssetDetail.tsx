@@ -12,11 +12,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ESTADOS, AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
+import { AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useMantenimiento } from "@/lib/state/MaintenanceProvider";
 import { useMaquinas } from "@/lib/state/useFleet";
@@ -37,6 +38,7 @@ export function AssetDetail({ id }: { id: string }) {
   const { crear } = useMantenimiento();
   const { registrar, usuarios } = useAdmin();
   const router = useRouter();
+  const t = useT();
 
   const m = maquinas.find((x) => x.id === id);
 
@@ -63,11 +65,11 @@ export function AssetDetail({ id }: { id: string }) {
       <main className="px-6 py-8 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <Link href="/" className="text-sm text-neutral-400 transition-colors hover:text-neutral-700">
-            ← Volver a la flota
+            {t("detail.back")}
           </Link>
           <div className={`mt-8 ${SURFACE} px-8 py-16 text-center`}>
-            <p className="text-sm text-neutral-500">No se encontró este activo.</p>
-            <p className="mt-1 text-xs text-neutral-400">Puede que aún se esté cargando la flota.</p>
+            <p className="text-sm text-neutral-500">{t("detail.notFound")}</p>
+            <p className="mt-1 text-xs text-neutral-400">{t("detail.maybeLoading")}</p>
           </div>
         </div>
       </main>
@@ -108,7 +110,7 @@ export function AssetDetail({ id }: { id: string }) {
     const prioridad = m.estado === "CRITICAL_ALERT" ? "alta" : m.estado === "STABLE" ? "baja" : "media";
     crear({ maquinaId: m.id, maquina: m.id, tipo, prioridad, programadaPara: "", responsable: usuarios[0]?.n ?? "", notas: "" });
     registrar(ROL_NOMBRE[rol], "Creó orden de mantenimiento", `${m.id} · ${tipo}`);
-    toast("Orden creada · te llevo a Mantenimiento");
+    toast(t("detail.orderToast"));
     router.push("/mantenimiento");
   }
 
@@ -116,17 +118,17 @@ export function AssetDetail({ id }: { id: string }) {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <Link href="/" className="mb-5 inline-block text-sm text-neutral-400 transition-colors hover:text-neutral-700">
-          ← Volver a la flota
+          {t("detail.back")}
         </Link>
 
         <header className="mb-5">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: ec }} />
-            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{ESTADOS[m.estado]}</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t(`estados.${m.estado}`)}</span>
           </div>
           <h1 className="mt-2 font-display text-3xl tracking-tight">{m.id}</h1>
           <p className="mt-1 font-mono text-sm text-neutral-400">
-            {m.sensor} · {m.sector} · IA activa
+            {m.sensor} · {m.sector} · {t("card.aiActive")}
           </p>
         </header>
 
@@ -134,7 +136,7 @@ export function AssetDetail({ id }: { id: string }) {
           <div className="mb-5 flex justify-end">
             <Button variant="secondary" className="px-4 py-2 text-sm" onClick={programar}>
               <Icon name="tool" className="h-4 w-4" />
-              Programar mantenimiento
+              {t("detail.schedule")}
             </Button>
           </div>
         )}
@@ -144,45 +146,46 @@ export function AssetDetail({ id }: { id: string }) {
           {m.estado === "STABLE" ? (
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico</span>
+                <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">{t("detail.forecast")}</span>
                 <p className="mt-1 font-display text-2xl" style={{ color: ec }}>
-                  Operación normal
+                  {t("detail.normalOp")}
                 </p>
-                <p className="mt-1 text-sm text-neutral-500">Sin fallos previstos.</p>
+                <p className="mt-1 text-sm text-neutral-500">{t("detail.noFailures")}</p>
               </div>
               <Icon name="check" className="h-8 w-8" style={{ color: ec }} />
             </div>
           ) : dias !== Infinity && dias < 30 ? (
             <div>
-              <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico predictivo</span>
+              <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">{t("detail.predictiveForecast")}</span>
               <p className="mt-1 font-display text-3xl" style={{ color: ec }}>
-                Falla estimada en {Math.max(1, Math.ceil(dias))} días
+                {t("detail.failIn", { n: Math.max(1, Math.ceil(dias)) })}
               </p>
               <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
-                Si no se interviene. Detectarlo ahora evita una parada de{" "}
-                <span className="font-semibold">{dinero(AHORRO_POR_PARADA)}</span>.
+                {t("detail.avoidPrefix")}
+                <span className="font-semibold">{dinero(AHORRO_POR_PARADA)}</span>
+                {t("detail.avoidSuffix")}
               </p>
             </div>
           ) : (
             <div>
-              <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico</span>
+              <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">{t("detail.forecast")}</span>
               <p className="mt-1 font-display text-2xl" style={{ color: ec }}>
-                {ESTADOS[m.estado]}
+                {t(`estados.${m.estado}`)}
               </p>
-              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Bajo vigilancia activa.</p>
+              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">{t("detail.underMonitoring")}</p>
             </div>
           )}
         </div>
 
         {/* Velocímetros */}
         <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <GaugeCard titulo="Temperatura">
+          <GaugeCard titulo={t("detail.temp")}>
             <Gauge valor={gauges.temp.v} min={gauges.temp.min} max={gauges.temp.max} unidad={gauges.temp.u} zonaPeligro={0.75} />
           </GaugeCard>
-          <GaugeCard titulo="Presión">
+          <GaugeCard titulo={t("detail.pres")}>
             <Gauge valor={gauges.pres.v} min={gauges.pres.min} max={gauges.pres.max} unidad={gauges.pres.u} zonaPeligro={0.8} />
           </GaugeCard>
-          <GaugeCard titulo="RPM">
+          <GaugeCard titulo={t("detail.rpm")}>
             <Gauge valor={gauges.rpm.v} min={gauges.rpm.min} max={gauges.rpm.max} unidad={gauges.rpm.u} zonaPeligro={0.9} />
           </GaugeCard>
         </div>
@@ -190,7 +193,7 @@ export function AssetDetail({ id }: { id: string }) {
         {/* Sensores y actuadores */}
         <div className={`mb-5 ${SURFACE} px-7 py-5`}>
           <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
-            Estado de sensores y actuadores
+            {t("detail.sensorsTitle")}
           </h3>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {sensores.map((s) => (
@@ -209,11 +212,11 @@ export function AssetDetail({ id }: { id: string }) {
         <div className={`${SURFACE} px-7 py-6`}>
           <div className="mb-5 flex items-baseline justify-between">
             <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
-              Vibración real vs. esperado
+              {t("detail.vibTitle")}
             </h3>
             <div className="text-right">
               <div className="font-mono text-2xl">{last ? last.v.toFixed(2) : "—"}</div>
-              <div className="font-mono text-xs text-neutral-400">{last ? `esperado ${last.exp.toFixed(2)}` : ""}</div>
+              <div className="font-mono text-xs text-neutral-400">{last ? t("detail.expected", { n: last.exp.toFixed(2) }) : ""}</div>
             </div>
           </div>
 
@@ -222,31 +225,31 @@ export function AssetDetail({ id }: { id: string }) {
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-neutral-400">
             <span className="flex items-center gap-1.5">
               <span className="inline-block h-0 w-4" style={{ borderTop: `2px solid ${col("brand", dark)}` }} />
-              Real
+              {t("detail.legendActual")}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block h-0 w-4" style={{ borderTop: "2px dashed #9ca3af" }} />
-              Esperado
+              {t("detail.legendExpected")}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block h-2 w-4 rounded" style={{ background: "#9ca3af", opacity: 0.2 }} />
-              Rango normal
+              {t("detail.legendRange")}
             </span>
             <button
               onClick={reproducir}
               className="ml-auto flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1 text-xs text-neutral-600 transition-colors hover:border-neutral-300 dark:border-neutral-700"
             >
               <Icon name="play" className="h-3 w-3" />
-              Ver cómo se detectó
+              {t("detail.seeDetected")}
             </button>
           </div>
         </div>
 
         {/* Indicadores de fiabilidad */}
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <InfoCard titulo="Horas de operación" valor={Math.round(m.horasOp).toLocaleString("es-ES") + " h"} pie={PROX_MANTENIMIENTO} />
-          <InfoCard titulo="MTBF" valor={MTBF} pie="tiempo medio entre fallos" />
-          <InfoCard titulo="MTTR" valor={MTTR} pie="tiempo medio de reparación" />
+          <InfoCard titulo={t("detail.operatingHours")} valor={Math.round(m.horasOp).toLocaleString() + " h"} pie={PROX_MANTENIMIENTO} />
+          <InfoCard titulo="MTBF" valor={MTBF} pie={t("detail.mtbfDesc")} />
+          <InfoCard titulo="MTTR" valor={MTTR} pie={t("detail.mttrDesc")} />
         </div>
       </div>
     </main>
