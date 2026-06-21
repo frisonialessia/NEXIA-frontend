@@ -144,7 +144,7 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
         <div className="flex items-start justify-between border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
           <div>
             <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-400">Integración</span>
-            <h2 id="conx-title" className="mt-2 font-serif text-2xl tracking-tight">{protocolo.n}</h2>
+            <h2 id="conx-title" className="mt-2 font-display text-2xl tracking-tight">{protocolo.n}</h2>
             <p className="mt-1 text-sm text-neutral-500">{protocolo.d}</p>
           </div>
           <EstadoPill estado={actual.estado} />

@@ -30,7 +30,7 @@ export function CommandCenter() {
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">En vivo · {plantaActiva.nombre} · actualizando cada 2s</span>
           <div className="mt-2 flex items-end justify-between">
-            <h1 className="font-serif text-3xl tracking-tight">Centro de mando</h1>
+            <h1 className="font-display text-3xl tracking-tight">Centro de mando</h1>
             <p className="text-sm text-neutral-500">
               {total === 0 ? (
                 "Conectando con el motor…"

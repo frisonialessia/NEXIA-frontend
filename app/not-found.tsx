@@ -11,7 +11,7 @@ export default function NotFound() {
       <div className="mx-auto max-w-4xl">
         <div className="rounded-2xl border border-neutral-200 bg-white px-8 py-16 text-center dark:border-neutral-800 dark:bg-neutral-900">
           <span className="font-mono text-sm uppercase tracking-[0.18em] text-neutral-400">Error 404</span>
-          <h1 className="mt-3 font-serif text-3xl tracking-tight">Esta página no existe</h1>
+          <h1 className="mt-3 font-display text-3xl tracking-tight">Esta página no existe</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500">
             Puede que el enlace esté desactualizado o que la vista aún no esté disponible.
           </p>

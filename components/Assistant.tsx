@@ -75,7 +75,7 @@ export function Assistant() {
             <Icon name="spark" className="h-4 w-4" style={{ color: brand }} />
             <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Inteligencia aumentada</span>
           </div>
-          <h1 className="mt-2 font-serif text-3xl tracking-tight">Asistente NEXIA</h1>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">Asistente NEXIA</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-500">
             Pregunta en lenguaje natural sobre el estado de tus máquinas. El asistente analiza los datos en tiempo real y
             puede proponer acciones que tú confirmas.

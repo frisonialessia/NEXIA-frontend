@@ -31,7 +31,7 @@ export function HistoryList() {
           >
             <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: col(resuelto ? "ok" : "crit") }} />
             <div className="min-w-0 flex-1">
-              <span className="font-serif text-base">{a.maquina}</span>
+              <span className="font-display text-base">{a.maquina}</span>
               <p className="mt-0.5 truncate text-sm text-neutral-500">{a.causa}</p>
             </div>
             <div className="hidden text-right sm:block">

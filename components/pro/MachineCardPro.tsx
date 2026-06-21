@@ -37,7 +37,7 @@ export function MachineCardPro({ m }: { m: Maquina }) {
           <span className="text-[10px] uppercase tracking-wide text-neutral-300">IA activa</span>
         </div>
 
-        <h3 className="mt-3 font-serif text-lg tracking-tight">{m.id}</h3>
+        <h3 className="mt-3 font-display text-lg tracking-tight">{m.id}</h3>
         <p className="text-xs text-neutral-400">{m.sector}</p>
 
         <div className="mt-3 h-12 overflow-hidden rounded-lg opacity-90">

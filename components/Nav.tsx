@@ -101,7 +101,7 @@ export function Nav() {
               <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: col("ok") }} />
             </span>
-            <span className="font-serif text-lg tracking-tight">NEXIA</span>
+            <span className="font-display text-lg tracking-tight">NEXIA</span>
           </Link>
           <span className="ml-1 hidden text-neutral-300 md:inline dark:text-neutral-700">/</span>
           <div className="hidden md:block">

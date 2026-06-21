@@ -48,7 +48,7 @@ export function LoginScreen() {
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <BrandMark size={52} />
-          <h1 className="mt-4 font-serif text-3xl tracking-tight">NEXIA</h1>
+          <h1 className="mt-4 font-display text-3xl tracking-tight">NEXIA</h1>
           <p className="mt-1 text-sm text-neutral-500">Inteligencia Operativa</p>
         </div>
 

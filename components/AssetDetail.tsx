@@ -124,7 +124,7 @@ export function AssetDetail({ id }: { id: string }) {
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: ec }} />
             <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{ESTADOS[m.estado]}</span>
           </div>
-          <h1 className="mt-2 font-serif text-3xl tracking-tight">{m.id}</h1>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">{m.id}</h1>
           <p className="mt-1 font-mono text-sm text-neutral-400">
             {m.sensor} · {m.sector} · IA activa
           </p>
@@ -145,7 +145,7 @@ export function AssetDetail({ id }: { id: string }) {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico</span>
-                <p className="mt-1 font-serif text-2xl" style={{ color: ec }}>
+                <p className="mt-1 font-display text-2xl" style={{ color: ec }}>
                   Operación normal
                 </p>
                 <p className="mt-1 text-sm text-neutral-500">Sin fallos previstos.</p>
@@ -155,7 +155,7 @@ export function AssetDetail({ id }: { id: string }) {
           ) : dias !== Infinity && dias < 30 ? (
             <div>
               <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico predictivo</span>
-              <p className="mt-1 font-serif text-3xl" style={{ color: ec }}>
+              <p className="mt-1 font-display text-3xl" style={{ color: ec }}>
                 Falla estimada en {Math.max(1, Math.ceil(dias))} días
               </p>
               <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
@@ -166,7 +166,7 @@ export function AssetDetail({ id }: { id: string }) {
           ) : (
             <div>
               <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">Pronóstico</span>
-              <p className="mt-1 font-serif text-2xl" style={{ color: ec }}>
+              <p className="mt-1 font-display text-2xl" style={{ color: ec }}>
                 {ESTADOS[m.estado]}
               </p>
               <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Bajo vigilancia activa.</p>

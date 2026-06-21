@@ -87,7 +87,7 @@ function GlobalErrorFallback({
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
           <span className="text-xl text-neutral-400">!</span>
         </div>
-        <h1 className="mt-6 font-serif text-2xl tracking-tight text-neutral-900">
+        <h1 className="mt-6 font-display text-2xl tracking-tight text-neutral-900">
           Algo se interrumpió
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-neutral-500">

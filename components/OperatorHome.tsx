@@ -35,7 +35,7 @@ export function OperatorHome() {
       <div className="mx-auto max-w-3xl">
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Tu turno · en vivo</span>
-          <h1 className="mt-2 font-serif text-3xl tracking-tight">¿Qué atender ahora?</h1>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">¿Qué atender ahora?</h1>
         </header>
 
         {/* Banner de situación */}
@@ -44,7 +44,7 @@ export function OperatorHome() {
             <div className="flex items-center gap-4">
               <Icon name="check" className="h-8 w-8" style={{ color: banner.c }} />
               <div>
-                <p className="font-serif text-2xl tracking-tight" style={{ color: banner.c }}>
+                <p className="font-display text-2xl tracking-tight" style={{ color: banner.c }}>
                   Todo en orden
                 </p>
                 <p className="mt-0.5 text-sm text-neutral-600 dark:text-neutral-300">Ninguna máquina requiere acción. Buen turno.</p>
@@ -54,7 +54,7 @@ export function OperatorHome() {
             <div>
               <div className="flex items-center gap-2">
                 <Icon name="alert" className="h-5 w-5" style={{ color: banner.c }} />
-                <p className="font-serif text-2xl tracking-tight" style={{ color: banner.c }}>
+                <p className="font-display text-2xl tracking-tight" style={{ color: banner.c }}>
                   {requierenAtencion.length} {requierenAtencion.length === 1 ? "máquina requiere" : "máquinas requieren"} revisión
                 </p>
               </div>
@@ -81,7 +81,7 @@ export function OperatorHome() {
                   <span className="relative inline-flex h-3 w-3 rounded-full" style={{ background: ec }} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="font-serif text-lg tracking-tight">{m.id}</div>
+                  <div className="font-display text-lg tracking-tight">{m.id}</div>
                   <div className="text-xs text-neutral-400">{m.sector}</div>
                 </div>
                 <span className="shrink-0 rounded-full px-3 py-1 text-xs font-medium" style={{ background: mix(ec), color: ec }}>

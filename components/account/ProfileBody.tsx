@@ -54,7 +54,7 @@ export function ProfileBody() {
       <div className="mx-auto max-w-3xl">
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Cuenta</span>
-          <h1 className="mt-2 font-serif text-3xl tracking-tight">Mi perfil</h1>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">Mi perfil</h1>
         </header>
 
         <div className="space-y-4">
