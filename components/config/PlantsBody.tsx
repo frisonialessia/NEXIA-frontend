@@ -46,9 +46,9 @@ export function PlantsBody() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-neutral-500">{plantas.length} plantas en tu organización.</p>
-        <Button onClick={() => setNuevo(true)} className="px-4 py-2">
+        <Button onClick={() => setNuevo(true)} className="shrink-0 px-4 py-2">
           <Icon name="plus" className="h-4 w-4" />
           Agregar planta
         </Button>

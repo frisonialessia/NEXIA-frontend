@@ -38,9 +38,9 @@ export function AssetsBody() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-neutral-500">{roster.length} máquinas monitoreadas. Los cambios se aplican al motor en vivo.</p>
-        <Button onClick={() => setNuevo(true)} className="px-4 py-2">
+        <Button onClick={() => setNuevo(true)} className="shrink-0 px-4 py-2">
           <Icon name="plus" className="h-4 w-4" />
           Agregar máquina
         </Button>
@@ -153,7 +153,7 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
               </select>
             </Campo>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Campo label="Sensor">
               <input value={sensor} onChange={(e) => setSensor(e.target.value)} className={input} />
             </Campo>

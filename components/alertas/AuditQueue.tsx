@@ -129,7 +129,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
 
         <div className="px-8 py-7">
           <label className="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">¿La alerta fue correcta?</label>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {([
               ["real", "Fallo real"],
               ["falsa", "Falsa alarma"],

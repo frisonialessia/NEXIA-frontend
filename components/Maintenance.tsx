@@ -43,9 +43,9 @@ export function Maintenance() {
       <div className="mx-auto max-w-5xl">
         <header className="mb-6">
           <Label>Operaciones</Label>
-          <div className="mt-2 flex items-end justify-between">
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
             <PageTitle>Mantenimiento</PageTitle>
-            <Button onClick={() => setCrear(true)} className="px-4 py-2">
+            <Button onClick={() => setCrear(true)} className="shrink-0 px-4 py-2">
               <Icon name="plus" className="h-4 w-4" />
               Nueva orden
             </Button>
