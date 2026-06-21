@@ -114,6 +114,28 @@ export const VERDES = {
 };
 
 /**
+ * Tono de VERDE según la probabilidad de fallo (0..1). Coherente con el mapa de
+ * salud: más claro = más sano, más oscuro = menos margen (más cerca de alerta).
+ *  · < 10 %  → muy sano   (claro)
+ *  · < 35 %  → sano       (medio)
+ *  · ≥ 35 %  → vigilar    (oscuro)
+ */
+export function tonoVerde(prob: number): string {
+  if (prob < 0.1) return VERDES.claro;
+  if (prob < 0.35) return VERDES.medio;
+  return VERDES.oscuro;
+}
+
+/**
+ * Color de salud de una máquina: ROJO si es crítica; si no, un tono de verde
+ * graduado por su probabilidad de fallo (ver `tonoVerde`).
+ */
+export function colorSalud(estado: Estado, prob: number): string {
+  if (estado === "CRITICAL_ALERT") return col("crit");
+  return tonoVerde(prob);
+}
+
+/**
  * Color del estado de una máquina (string listo para usar). Paleta NEXIA:
  * verde con tonos cuando no es crítico (más oscuro = más cerca de alerta) y
  * ROJO solo en crítico. Sin ámbar ni azul para estados.

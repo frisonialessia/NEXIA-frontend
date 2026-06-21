@@ -34,6 +34,12 @@
   --c-arc: #404040;
 }
 
+html {
+  /* Reserva siempre el hueco de la barra de scroll: el contenido centrado
+     (p. ej. la navegación) no se desplaza entre páginas largas y cortas. */
+  scrollbar-gutter: stable;
+}
+
 html,
 body {
   max-width: 100vw;

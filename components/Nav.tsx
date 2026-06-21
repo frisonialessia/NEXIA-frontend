@@ -17,6 +17,7 @@ import { useOrg } from "@/lib/state/OrgProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Rol } from "@/lib/types";
+import { BrandMark } from "./account/BrandMark";
 import { NotificationBell } from "./NotificationBell";
 import { Icon, type IconName } from "./ui/Icon";
 
@@ -55,11 +56,11 @@ export function Nav() {
     const activo = esActivo(item.href);
     const estilo = activo ? { background: col("brand", dark), color: "#fff" } : undefined;
     const clases = compacto
-      ? "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 transition-colors text-neutral-500 dark:text-neutral-400"
-      : "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors text-neutral-600 dark:text-neutral-300";
+      ? "flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors text-neutral-500 dark:text-neutral-400"
+      : "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-neutral-600 dark:text-neutral-300";
     return (
       <Link key={item.href} href={item.href} className={clases} style={estilo}>
-        <Icon name={item.icon} className="h-4 w-4" />
+        <Icon name={item.icon} className="h-4 w-4 shrink-0" />
         <span className={compacto ? "hidden lg:inline" : ""}>{item.label}</span>
       </Link>
     );
@@ -93,46 +94,46 @@ export function Nav() {
 
   return (
     <nav className="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-3 sm:px-8">
+      {/* Rejilla 1fr · auto · 1fr: la navegación queda centrada y estática,
+          independiente del ancho de la marca o de los controles. */}
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-6 py-3 sm:px-8">
         {/* Izquierda: marca + planta activa */}
-        <div className="flex shrink-0 items-center gap-1">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: col("ok") }} />
-            </span>
+        <div className="flex min-w-0 items-center gap-1">
+          <Link href="/" className="flex shrink-0 items-center gap-2">
+            <BrandMark size={26} bg="#ffffff" className="ring-1 ring-neutral-200 dark:ring-neutral-700" />
             <span className="font-display text-lg tracking-tight">NEXIA</span>
           </Link>
           <span className="ml-1 hidden text-neutral-300 md:inline dark:text-neutral-700">/</span>
-          <div className="hidden md:block">
+          <div className="hidden min-w-0 md:block">
             <OrgSwitcher />
           </div>
         </div>
 
-        {/* Centro: navegación (toma el espacio disponible; se desplaza si no cabe) */}
-        <div className="no-scrollbar hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto text-sm md:flex">
+        {/* Centro: navegación (centrada y estática) */}
+        <div className="no-scrollbar hidden min-w-0 items-center gap-1 overflow-x-auto md:flex">
           {visibles.map((item) => renderItem(item, true))}
         </div>
 
         {/* Derecha: controles */}
-        <div className="hidden shrink-0 items-center gap-2 md:flex">
-          <NotificationBell />
-          {botonTema}
-          {menuCuenta}
-        </div>
-
-        {/* Móvil */}
-        <div className="ml-auto flex items-center gap-2 md:hidden">
-          <NotificationBell />
-          {botonTema}
-          <button
-            onClick={() => setMenuAbierto((v) => !v)}
-            aria-label="Abrir menú"
-            aria-expanded={menuAbierto}
-            className="rounded-lg border border-neutral-200 p-1.5 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
-          >
-            <Icon name={menuAbierto ? "x" : "menu"} className="h-4 w-4" />
-          </button>
+        <div className="flex items-center justify-end gap-2">
+          <div className="hidden items-center gap-2 md:flex">
+            <NotificationBell />
+            {botonTema}
+            {menuCuenta}
+          </div>
+          {/* Móvil */}
+          <div className="flex items-center gap-2 md:hidden">
+            <NotificationBell />
+            {botonTema}
+            <button
+              onClick={() => setMenuAbierto((v) => !v)}
+              aria-label="Abrir menú"
+              aria-expanded={menuAbierto}
+              className="rounded-lg border border-neutral-200 p-1.5 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+            >
+              <Icon name={menuAbierto ? "x" : "menu"} className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
