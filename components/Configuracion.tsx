@@ -34,11 +34,10 @@ export function Configuracion() {
 
   const [tab, setTab] = useState("ajustes");
   const activo = tabs.some((t) => t.id === tab) ? tab : "ajustes";
-  const ancho = activo === "facturacion" ? "max-w-5xl" : "max-w-3xl";
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className={`mx-auto ${ancho}`}>
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Configuración</span>
           <h1 className="mt-2 font-display text-3xl tracking-tight">Configuración</h1>

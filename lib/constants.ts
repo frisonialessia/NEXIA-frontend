@@ -104,25 +104,28 @@ export function colorPorValor(pct: number, bueno = 60): ColorKey {
 }
 
 /**
- * Escala de VERDES (mismo tono, distinta intensidad) para gradientes de salud
- * y series de datos. Más claro = más sano; más oscuro = más cerca de alerta.
+ * Escala de VERDES (mismo tono, distinta intensidad) para el ESTÁNDAR de salud.
+ * Tres pasos bien separados (emerald 300 · 500 · 700) para que se distingan:
+ *   claro  = muy sano   ·  medio = sano  ·  oscuro = vigilar (menos margen).
+ * Por encima de "vigilar" se usa ROJO (crítico).
  */
 export const VERDES = {
-  claro: "#6ee7b7",
-  medio: "#10b981",
-  oscuro: "#059669",
+  claro: "#6ee7b7", // emerald-300 · muy sano
+  medio: "#10b981", // emerald-500 · sano
+  oscuro: "#047857", // emerald-700 · vigilar
 };
 
 /**
- * Tono de VERDE según la probabilidad de fallo (0..1). Coherente con el mapa de
- * salud: más claro = más sano, más oscuro = menos margen (más cerca de alerta).
- *  · < 10 %  → muy sano   (claro)
- *  · < 35 %  → sano       (medio)
- *  · ≥ 35 %  → vigilar    (oscuro)
+ * ESTÁNDAR DE SALUD (un solo criterio para toda la app), según la probabilidad
+ * de fallo (0..1). Más claro = más sano, más oscuro = menos margen.
+ *  · < 15 %        → muy sano  (verde claro)
+ *  · 15 % – 40 %   → sano      (verde medio)
+ *  · 40 % – 60 %   → vigilar   (verde oscuro)
+ *  · ≥ 60 %        → crítico   → ROJO (ver `colorSalud`)
  */
 export function tonoVerde(prob: number): string {
-  if (prob < 0.1) return VERDES.claro;
-  if (prob < 0.35) return VERDES.medio;
+  if (prob < 0.15) return VERDES.claro;
+  if (prob < 0.4) return VERDES.medio;
   return VERDES.oscuro;
 }
 
@@ -131,7 +134,7 @@ export function tonoVerde(prob: number): string {
  * graduado por su probabilidad de fallo (ver `tonoVerde`).
  */
 export function colorSalud(estado: Estado, prob: number): string {
-  if (estado === "CRITICAL_ALERT") return col("crit");
+  if (estado === "CRITICAL_ALERT" || prob >= 0.6) return col("crit");
   return tonoVerde(prob);
 }
 

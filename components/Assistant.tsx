@@ -69,7 +69,7 @@ export function Assistant() {
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6">
           <div className="flex items-center gap-2">
             <Icon name="spark" className="h-4 w-4" style={{ color: brand }} />

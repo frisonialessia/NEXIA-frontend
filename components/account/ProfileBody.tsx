@@ -51,7 +51,7 @@ export function ProfileBody() {
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Cuenta</span>
           <h1 className="mt-2 font-display text-3xl tracking-tight">Mi perfil</h1>

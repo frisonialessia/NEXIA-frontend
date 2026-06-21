@@ -85,7 +85,7 @@ export function Analytics() {
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-7xl">
         <header className="mb-6">
           <Label>Inteligencia de negocio</Label>
           <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
