@@ -1,11 +1,9 @@
 // ──────────────────────────────────────────────────────────────────────────
-// CASCARÓN DE LA APLICACIÓN
-// Delega en AuthGate: login si no hay sesión, o la app completa (banner,
-// navegación, contenido y notificación móvil) si la sesión está iniciada.
+// RUTA "/cuenta" · PERFIL DE LA CUENTA ACTIVA
 // ──────────────────────────────────────────────────────────────────────────
 
-import { AuthGate } from "./AuthGate";
+import { ProfileBody } from "@/components/account/ProfileBody";
 
-export function Shell({ children }: { children: React.ReactNode }) {
-  return <AuthGate>{children}</AuthGate>;
+export default function Page() {
+  return <ProfileBody />;
 }

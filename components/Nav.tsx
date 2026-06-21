@@ -9,8 +9,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ROLES, ROL_NOMBRE, col } from "@/lib/constants";
+import { iniciales } from "@/lib/account";
 import type { Permiso } from "@/lib/permissions";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -38,7 +39,7 @@ const ITEMS: NavItem[] = [
 
 export function Nav() {
   const pathname = usePathname();
-  const { rol, setRol, puede } = useSession();
+  const { rol, setRol, puede, cuenta, cerrarSesion } = useSession();
   const { dark, toggle } = useTheme();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
@@ -87,6 +88,8 @@ export function Nav() {
     </button>
   );
 
+  const menuCuenta = cuenta && <AccountMenu nombre={cuenta.nombre} email={cuenta.email} color={cuenta.color} onSalir={cerrarSesion} />;
+
   return (
     <nav className="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 sm:px-8">
@@ -105,6 +108,7 @@ export function Nav() {
           <NotificationBell />
           {selectRol}
           {botonTema}
+          {menuCuenta}
         </div>
 
         {/* Móvil */}
@@ -129,8 +133,79 @@ export function Nav() {
             <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">Rol activo</label>
             {selectRol}
           </div>
+          {cuenta && (
+            <div className="mt-3 flex items-center gap-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+              <Link href="/cuenta" className="flex min-w-0 flex-1 items-center gap-2.5">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ background: cuenta.color }}>
+                  {iniciales(cuenta.nombre)}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-medium">{cuenta.nombre}</span>
+                  <span className="block truncate text-xs text-neutral-400">Mi perfil</span>
+                </span>
+              </Link>
+              <button onClick={cerrarSesion} aria-label="Cerrar sesión" className="rounded-lg border border-neutral-200 p-1.5 text-neutral-500 dark:border-neutral-700">
+                <Icon name="logout" className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>
+  );
+}
+
+/** Avatar con menú desplegable: perfil y cierre de sesión (escritorio). */
+function AccountMenu({ nombre, email, color, onSalir }: { nombre: string; email: string; color: string; onSalir: () => void }) {
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  useEffect(() => setAbierto(false), [pathname]);
+
+  useEffect(() => {
+    if (!abierto) return;
+    function fuera(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false);
+    }
+    document.addEventListener("mousedown", fuera);
+    return () => document.removeEventListener("mousedown", fuera);
+  }, [abierto]);
+
+  return (
+    <div ref={ref} className="relative ml-0.5">
+      <button
+        onClick={() => setAbierto((v) => !v)}
+        aria-label="Cuenta"
+        aria-expanded={abierto}
+        className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+        style={{ background: color }}
+      >
+        {iniciales(nombre)}
+      </button>
+
+      {abierto && (
+        <div className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="border-b border-neutral-100 px-4 py-3 dark:border-neutral-800">
+            <div className="truncate text-sm font-medium">{nombre}</div>
+            <div className="truncate text-xs text-neutral-400">{email}</div>
+          </div>
+          <Link href="/cuenta" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800">
+            <Icon name="user" className="h-4 w-4" />
+            Mi perfil
+          </Link>
+          <button
+            onClick={() => {
+              setAbierto(false);
+              onSalir();
+            }}
+            className="flex w-full items-center gap-2.5 border-t border-neutral-100 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
+          >
+            <Icon name="logout" className="h-4 w-4" />
+            Cerrar sesión
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
