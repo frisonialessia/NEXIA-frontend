@@ -28,13 +28,6 @@ export function SettingsBody() {
 
   return (
     <div className="space-y-4">
-      <Seccion titulo="Perfil de usuario">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Campo label="Nombre" defaultValue="Alessia Frisoni" />
-          <Campo label="Planta" defaultValue="Planta Norte · Línea 1" />
-        </div>
-      </Seccion>
-
       <Seccion titulo="Sistema de unidades">
         <div className="flex items-center justify-between">
           <div>
@@ -114,15 +107,6 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
       <Label>{titulo}</Label>
       <div className="mt-4">{children}</div>
     </Card>
-  );
-}
-
-function Campo({ label, defaultValue }: { label: string; defaultValue: string }) {
-  return (
-    <label className="block">
-      <span className="text-sm text-neutral-600 dark:text-neutral-300">{label}</span>
-      <input defaultValue={defaultValue} className="mt-1 w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800" />
-    </label>
   );
 }
 

@@ -29,7 +29,10 @@ export type IconName =
   | "grip"
   | "pin"
   | "tool"
-  | "report";
+  | "report"
+  | "logout"
+  | "lock"
+  | "mail";
 
 /** Contenido vectorial de cada icono (paths/círculos dentro del viewBox 24×24). */
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -74,6 +77,19 @@ const PATHS: Record<IconName, React.ReactNode> = {
   report: <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 14v3M13 11v6" />,
   grip: <path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01" />,
   pin: <path d="M15 4.5l-3.25 3.25a4 4 0 0 1-1.564 .976l-2.187 .73a1 1 0 0 0-.41 1.66l5.077 5.077a1 1 0 0 0 1.66-.41l.73-2.188a4 4 0 0 1 .976-1.563l3.25-3.25M9 15l-4.5 4.5M14.5 4l5.5 5.5" />,
+  logout: <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />,
+  lock: (
+    <>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </>
+  ),
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </>
+  ),
 };
 
 /** El icono "check" usa un trazo algo más grueso, como en la demo. */
