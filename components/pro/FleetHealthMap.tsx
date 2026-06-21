@@ -10,6 +10,7 @@
 import { VERDES, col } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
 import { DESV_ESTANDAR } from "@/lib/engine/fsm";
+import { useT } from "@/lib/state/I18nProvider";
 import type { Maquina } from "@/lib/types";
 import { SURFACE } from "./surface";
 
@@ -26,20 +27,21 @@ function sevColor(v: number, exp: number): string {
 }
 
 export function FleetHealthMap({ maquinas }: { maquinas: Maquina[] }) {
+  const t = useT();
   const orden = ordenarFlota(maquinas);
 
   return (
     <div className={`${SURFACE} px-6 py-5`}>
       <div className="mb-4 flex items-start justify-between">
         <div>
-          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Mapa de salud de la flota</h3>
-          <p className="mt-1 text-[11px] text-neutral-400">Cada celda es una lectura de vibración; el color indica cuánto se desvía de lo esperado.</p>
+          <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("map.title")}</h3>
+          <p className="mt-1 text-[11px] text-neutral-400">{t("map.desc")}</p>
         </div>
         <div className="flex items-center gap-3 text-[11px] text-neutral-400">
-          <Leyenda color={VERDES.claro} label="Muy sano" />
-          <Leyenda color={VERDES.medio} label="Normal" />
-          <Leyenda color={VERDES.oscuro} label="Vigilar" />
-          <Leyenda color={ROJO} label="Crítico" />
+          <Leyenda color={VERDES.claro} label={t("map.veryHealthy")} />
+          <Leyenda color={VERDES.medio} label={t("map.normal")} />
+          <Leyenda color={VERDES.oscuro} label={t("map.watch")} />
+          <Leyenda color={ROJO} label={t("map.critical")} />
         </div>
       </div>
 
@@ -68,7 +70,7 @@ export function FleetHealthMap({ maquinas }: { maquinas: Maquina[] }) {
             </div>
           );
         })}
-        {orden.length === 0 && <p className="py-8 text-center text-sm text-neutral-400">Recopilando lecturas…</p>}
+        {orden.length === 0 && <p className="py-8 text-center text-sm text-neutral-400">{t("map.collecting")}</p>}
       </div>
     </div>
   );
