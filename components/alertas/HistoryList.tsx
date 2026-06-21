@@ -5,17 +5,19 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col } from "@/lib/constants";
+import { useT } from "@/lib/state/I18nProvider";
 import { useHistorial } from "@/lib/state/useFleet";
 import { SURFACE } from "../ui/Card";
 import { Pill } from "../ui/Primitives";
 
 export function HistoryList() {
   const historial = useHistorial();
+  const t = useT();
 
   if (historial.length === 0) {
     return (
       <div className={`${SURFACE} px-8 py-16 text-center text-sm text-neutral-400`}>
-        Aún no hay eventos registrados. Aparecerán conforme el sistema detecte fallos.
+        {t("hist.empty")}
       </div>
     );
   }
@@ -39,7 +41,7 @@ export function HistoryList() {
                 {a.fecha} · {a.hora}
               </div>
             </div>
-            <Pill colorKey={resuelto ? "ok" : "crit"}>{a.estado}</Pill>
+            <Pill colorKey={resuelto ? "ok" : "crit"}>{resuelto ? t("hist.resolved") : t("hist.pending")}</Pill>
           </div>
         );
       })}

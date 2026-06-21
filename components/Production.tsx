@@ -9,6 +9,7 @@
 
 import { colorPorValor } from "@/lib/constants";
 import { DOWNTIME, ENERGIA, useOee } from "@/lib/data/oee";
+import { useT } from "@/lib/state/I18nProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AccessDenied } from "./AccessDenied";
 import { Card } from "./ui/Card";
@@ -19,18 +20,19 @@ import { Label, PageTitle, Stat } from "./ui/Typo";
 export function Production() {
   const { puede } = useSession();
   const oee = useOee();
+  const t = useT();
 
   if (!puede("produccion")) {
-    return <AccessDenied mensaje="La vista de Producción requiere un rol con acceso (Administrador, Jefe de planta o Técnico)." />;
+    return <AccessDenied mensaje={t("access.production")} />;
   }
 
   const oeeGlobal = oee.dispo * oee.rend * oee.cal;
-  const nivel = oeeGlobal >= 0.85 ? "World-class" : oeeGlobal >= 0.6 ? "Aceptable" : "Requiere mejora";
+  const nivel = oeeGlobal >= 0.85 ? t("prod.oeeWorldClass") : oeeGlobal >= 0.6 ? t("prod.oeeAcceptable") : t("prod.oeeNeedsImprovement");
 
   const metricas = [
-    { label: "Disponibilidad", val: oee.dispo },
-    { label: "Rendimiento", val: oee.rend },
-    { label: "Calidad", val: oee.cal },
+    { label: t("prod.availability"), val: oee.dispo },
+    { label: t("prod.performance"), val: oee.rend },
+    { label: t("prod.quality"), val: oee.cal },
   ];
 
   const downtime = DOWNTIME;
@@ -41,14 +43,14 @@ export function Production() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <Label>Turno actual · Línea 1</Label>
-          <PageTitle className="mt-2">Producción y eficiencia</PageTitle>
+          <Label>{t("prod.shift")}</Label>
+          <PageTitle className="mt-2">{t("prod.title")}</PageTitle>
         </header>
 
         {/* OEE global + las 3 métricas */}
         <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
           <Card className="px-6 py-6 text-center">
-            <Label>OEE Global</Label>
+            <Label>{t("prod.oeeGlobal")}</Label>
             <div className="mt-2 flex justify-center">
               <GaugeCircular pct={oeeGlobal * 100} label="OEE %" />
             </div>
@@ -74,16 +76,16 @@ export function Production() {
 
         {/* Contadores */}
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-4">
-          <Contador label="Piezas buenas" value={oee.buenas.toLocaleString("es-ES")} colorKey="ok" />
-          <Contador label="Rechazos" value={String(oee.malas)} colorKey="crit" />
-          <Contador label="Objetivo turno" value="4,200" muted />
-          <Contador label="Ritmo (pzs/min)" value={oee.ritmo.toFixed(1)} sub="meta 9.0" />
+          <Contador label={t("prod.goodParts")} value={oee.buenas.toLocaleString()} colorKey="ok" />
+          <Contador label={t("prod.rejects")} value={String(oee.malas)} colorKey="crit" />
+          <Contador label={t("prod.shiftTarget")} value="4,200" muted />
+          <Contador label={t("prod.rate")} value={oee.ritmo.toFixed(1)} sub={t("prod.rateTarget")} />
         </div>
 
         {/* Dona de paros + energía */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card className="px-7 py-6">
-            <Label>Tiempos de inactividad · por causa</Label>
+            <Label>{t("prod.downtime")}</Label>
             <div className="mt-4 flex items-center gap-6">
               <DonutParos data={downtime} total={totalDt} />
               <div className="flex-1 space-y-1.5">
@@ -101,7 +103,7 @@ export function Production() {
           </Card>
 
           <Card className="px-7 py-6">
-            <Label>Consumo energético · turno</Label>
+            <Label>{t("prod.energy")}</Label>
             <div className="mt-4 space-y-4">
               {energia.map((e) => (
                 <div key={e.n}>
@@ -135,6 +137,7 @@ function Contador({ label, value, colorKey, sub, muted }: { label: string; value
 }
 
 function DonutParos({ data, total }: { data: { c: string; m: number; color: string }[]; total: number }) {
+  const t = useT();
   const r = 46;
   const cc = 2 * Math.PI * r;
   let acc = 0;
@@ -163,7 +166,7 @@ function DonutParos({ data, total }: { data: { c: string; m: number; color: stri
         {total}
       </text>
       <text x={60} y={72} textAnchor="middle" fontSize={9} fill="#9ca3af">
-        min
+        {t("prod.min")}
       </text>
     </svg>
   );
