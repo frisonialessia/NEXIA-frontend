@@ -10,6 +10,7 @@ export type Permiso =
   | "produccion" // ver Producción / OEE
   | "auditar" // etiquetar alertas (human-in-the-loop)
   | "mantenimiento" // marcar mantenimiento hecho
+  | "activos" // gestionar máquinas (agregar/editar/quitar)
   | "conexiones" // configurar protocolos
   | "usuarios" // gestionar usuarios y permisos
   | "ajustesPlanta" // cambiar ajustes de planta (umbrales, etc.)
@@ -20,6 +21,7 @@ export const PERMISOS: Record<Permiso, Rol[]> = {
   produccion: ["admin", "jefe", "tecnico"],
   auditar: ["admin", "jefe", "tecnico", "operador"],
   mantenimiento: ["admin", "jefe", "tecnico"],
+  activos: ["admin", "tecnico"],
   conexiones: ["admin", "tecnico"],
   usuarios: ["admin"],
   ajustesPlanta: ["admin", "jefe"],
@@ -32,6 +34,7 @@ export const PERMISO_LABEL: Record<Permiso, string> = {
   produccion: "Ver producción / OEE",
   auditar: "Auditar y etiquetar alertas",
   mantenimiento: "Marcar mantenimiento hecho",
+  activos: "Gestionar activos (máquinas)",
   exportar: "Exportar reportes",
   conexiones: "Configurar conexiones",
   ajustesPlanta: "Cambiar ajustes de planta",
@@ -44,6 +47,7 @@ export const PERMISOS_ORDEN: Permiso[] = [
   "produccion",
   "auditar",
   "mantenimiento",
+  "activos",
   "exportar",
   "conexiones",
   "ajustesPlanta",

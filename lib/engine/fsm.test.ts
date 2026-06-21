@@ -86,3 +86,10 @@ describe("causa principal", () => {
     expect(causaPrincipal("ventilador")).toBe("Desbalance de aspas");
   });
 });
+
+describe("umbral por máquina", () => {
+  it("diasAFallo respeta el umbral propio de la máquina", () => {
+    const m = { hist: [{ t: 0, v: 4.5, exp: 2 }], ritmoDia: 0.5, umbral: 5 } as unknown as Maquina;
+    expect(diasAFallo(m)).toBeCloseTo((5 - 4.5) / 0.5, 5);
+  });
+});
