@@ -7,6 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col } from "@/lib/constants";
+import { useOrg } from "@/lib/state/OrgProvider";
 import { useEventos, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { EventsFeed } from "./pro/EventsFeed";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
@@ -18,6 +19,7 @@ export function CommandCenter() {
   const maquinas = useMaquinas();
   const savings = useSavings();
   const eventos = useEventos();
+  const { plantaActiva } = useOrg();
 
   const total = maquinas.length;
   const atencion = maquinas.filter((m) => m.estado !== "STABLE").length;
@@ -26,7 +28,7 @@ export function CommandCenter() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">En vivo · actualizando cada 2s</span>
+          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">En vivo · {plantaActiva.nombre} · actualizando cada 2s</span>
           <div className="mt-2 flex items-end justify-between">
             <h1 className="font-serif text-3xl tracking-tight">Centro de mando</h1>
             <p className="text-sm text-neutral-500">

@@ -11,6 +11,8 @@ export type Permiso =
   | "auditar" // etiquetar alertas (human-in-the-loop)
   | "mantenimiento" // marcar mantenimiento hecho
   | "activos" // gestionar máquinas (agregar/editar/quitar)
+  | "plantas" // gestionar plantas de la organización
+  | "facturacion" // ver y cambiar plan / facturación
   | "conexiones" // configurar protocolos
   | "usuarios" // gestionar usuarios y permisos
   | "ajustesPlanta" // cambiar ajustes de planta (umbrales, etc.)
@@ -22,6 +24,8 @@ export const PERMISOS: Record<Permiso, Rol[]> = {
   auditar: ["admin", "jefe", "tecnico", "operador"],
   mantenimiento: ["admin", "jefe", "tecnico"],
   activos: ["admin", "tecnico"],
+  plantas: ["admin", "jefe"],
+  facturacion: ["admin"],
   conexiones: ["admin", "tecnico"],
   usuarios: ["admin"],
   ajustesPlanta: ["admin", "jefe"],
@@ -35,6 +39,8 @@ export const PERMISO_LABEL: Record<Permiso, string> = {
   auditar: "Auditar y etiquetar alertas",
   mantenimiento: "Marcar mantenimiento hecho",
   activos: "Gestionar activos (máquinas)",
+  plantas: "Gestionar plantas",
+  facturacion: "Ver y cambiar facturación",
   exportar: "Exportar reportes",
   conexiones: "Configurar conexiones",
   ajustesPlanta: "Cambiar ajustes de planta",
@@ -48,9 +54,11 @@ export const PERMISOS_ORDEN: Permiso[] = [
   "auditar",
   "mantenimiento",
   "activos",
+  "plantas",
   "exportar",
   "conexiones",
   "ajustesPlanta",
+  "facturacion",
   "tendencia",
   "usuarios",
 ];
