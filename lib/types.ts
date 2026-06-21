@@ -98,6 +98,28 @@ export interface Evento {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// Mantenimiento (órdenes de trabajo)
+// ──────────────────────────────────────────────────────────────────────────
+
+export type TipoMantenimiento = "preventivo" | "correctivo";
+export type EstadoOrden = "programada" | "en_curso" | "completada";
+export type Prioridad = "alta" | "media" | "baja";
+
+export interface OrdenMantenimiento {
+  id: string;
+  maquinaId: string;
+  maquina: string;
+  tipo: TipoMantenimiento;
+  estado: EstadoOrden;
+  prioridad: Prioridad;
+  ts: number;
+  fecha: string;
+  programadaPara: string;
+  responsable: string;
+  notas: string;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // Roles y permisos
 // ──────────────────────────────────────────────────────────────────────────
 

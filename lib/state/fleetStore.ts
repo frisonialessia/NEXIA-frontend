@@ -175,3 +175,34 @@ export function etiquetarAlerta(id: string, veredicto: Veredicto) {
 export function cerrarNotif() {
   set({ notif: null });
 }
+
+/**
+ * Repara una máquina (cierre del ciclo predecir→actuar): calma su vibración,
+ * la pone en recuperación, resuelve sus alertas abiertas y registra el evento.
+ * Lo llama el módulo de mantenimiento al completar una orden.
+ */
+export function repararMaquina(id: string) {
+  const m = flota.find((x) => x.id === id);
+  if (m) {
+    m.esc = "sano";
+    m.ritmoDia = 0;
+    m.cSube = 0;
+    m.cBaja = 0;
+    m.estado = "RECOVERY_PROBATION";
+    m.prob = 0.05;
+  }
+  notificadas[id] = false;
+  const alertas = snapshot.alertas.filter((a) => a.maquina !== id);
+  const historial = snapshot.historial.map((h) =>
+    h.maquina === id && h.estado === "Pendiente" ? { ...h, estado: "Resuelto" as const } : h
+  );
+  const evento: Evento = {
+    id: "ev-mant-" + id + "-" + Date.now(),
+    ts: Date.now(),
+    hora: ahora(),
+    tipo: "resolucion",
+    maquina: id,
+    detalle: "Mantenimiento completado · máquina en recuperación",
+  };
+  set({ maquinas: [...flota], alertas, historial, eventos: [evento, ...snapshot.eventos].slice(0, MAX_EVENTOS) });
+}

@@ -17,7 +17,7 @@ import {
   subscribe,
 } from "./fleetStore";
 
-export { etiquetarAlerta, cerrarNotif } from "./fleetStore";
+export { etiquetarAlerta, cerrarNotif, repararMaquina } from "./fleetStore";
 export type { NotifMovil, Savings } from "./fleetStore";
 
 export function useEventos() {
