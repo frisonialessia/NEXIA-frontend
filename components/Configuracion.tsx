@@ -11,6 +11,7 @@ import { useSession } from "@/lib/state/SessionProvider";
 import { AuditLogBody } from "./config/AuditLogBody";
 import { ConnectBody } from "./config/ConnectBody";
 import { EquipoBody } from "./config/EquipoBody";
+import { NotificationsBody } from "./config/NotificationsBody";
 import { SettingsBody } from "./config/SettingsBody";
 import { Tabs, type TabDef } from "./ui/Tabs";
 
@@ -19,6 +20,7 @@ export function Configuracion() {
 
   const tabs: TabDef[] = [
     { id: "ajustes", label: "Ajustes" },
+    ...(puede("ajustesPlanta") ? [{ id: "notificaciones", label: "Notificaciones" }] : []),
     ...(puede("conexiones") ? [{ id: "conexiones", label: "Conexiones" }] : []),
     ...(puede("usuarios") ? [{ id: "equipo", label: "Equipo" }] : []),
     ...(puede("usuarios") ? [{ id: "registro", label: "Registro" }] : []),
@@ -42,6 +44,7 @@ export function Configuracion() {
         )}
 
         {activo === "ajustes" && <SettingsBody />}
+        {activo === "notificaciones" && <NotificationsBody />}
         {activo === "conexiones" && <ConnectBody />}
         {activo === "equipo" && <EquipoBody />}
         {activo === "registro" && <AuditLogBody />}

@@ -29,6 +29,23 @@ export function Pill({ colorKey, children }: { colorKey: ColorKey; children: Rea
   );
 }
 
+/** Interruptor on/off accesible. */
+export function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label?: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+      className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-neutral-200 transition-colors dark:bg-neutral-700"
+      style={checked ? { background: col("brand") } : undefined}
+    >
+      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${checked ? "translate-x-4" : "translate-x-0.5"}`} />
+    </button>
+  );
+}
+
 type Variant = "primary" | "secondary" | "ghost";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

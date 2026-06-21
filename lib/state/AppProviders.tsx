@@ -8,6 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { AdminProvider } from "./AdminProvider";
+import { IntegrationsProvider } from "./IntegrationsProvider";
 import { MaintenanceProvider } from "./MaintenanceProvider";
 import { SessionProvider } from "./SessionProvider";
 import { ThemeProvider } from "./ThemeProvider";
@@ -17,7 +18,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
     <ThemeProvider>
       <SessionProvider>
         <AdminProvider>
-          <MaintenanceProvider>{children}</MaintenanceProvider>
+          <MaintenanceProvider>
+            <IntegrationsProvider>{children}</IntegrationsProvider>
+          </MaintenanceProvider>
         </AdminProvider>
       </SessionProvider>
     </ThemeProvider>
