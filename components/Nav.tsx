@@ -29,6 +29,7 @@ interface NavItem {
 const ITEMS: NavItem[] = [
   { href: "/", label: "Mando", icon: "gauge", permiso: null },
   { href: "/produccion", label: "Producción", icon: "chart", permiso: "produccion" },
+  { href: "/reportes", label: "Reportes", icon: "report", permiso: "tendencia" },
   { href: "/alertas", label: "Alertas", icon: "clipboard", permiso: null },
   { href: "/mantenimiento", label: "Mantenimiento", icon: "tool", permiso: "mantenimiento" },
   { href: "/asistente", label: "Asistente", icon: "spark", permiso: null },

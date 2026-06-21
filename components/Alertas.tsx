@@ -8,7 +8,8 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAlertas } from "@/lib/state/useFleet";
+import { descargarCSV } from "@/lib/reports/exporter";
+import { useAlertas, useHistorial } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AuditQueue } from "./alertas/AuditQueue";
 import { HistoryList } from "./alertas/HistoryList";
@@ -19,8 +20,22 @@ import { Label, PageTitle } from "./ui/Typo";
 
 export function Alertas() {
   const alertas = useAlertas();
+  const historial = useHistorial();
   const { puede } = useSession();
   const [tab, setTab] = useState("pendientes");
+
+  function exportar() {
+    if (historial.length === 0) {
+      toast("Aún no hay eventos para exportar");
+      return;
+    }
+    const filas: (string | number)[][] = [
+      ["Máquina", "Causa", "Probabilidad", "Fecha", "Hora", "Estado"],
+      ...historial.map((h) => [h.maquina, h.causa, `${Math.round(h.prob * 100)}%`, h.fecha, h.hora, h.estado]),
+    ];
+    descargarCSV(`nexia-alertas-${Date.now()}.csv`, filas);
+    toast("Historial de alertas exportado");
+  }
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
@@ -30,11 +45,7 @@ export function Alertas() {
           <div className="mt-2 flex items-end justify-between">
             <PageTitle>Alertas</PageTitle>
             {puede("exportar") && (
-              <Button
-                variant="secondary"
-                className="px-3 py-1.5 text-xs"
-                onClick={() => toast("En la versión real: exporta un PDF para llevar a la reunión.")}
-              >
+              <Button variant="secondary" className="px-3 py-1.5 text-xs" onClick={exportar}>
                 <Icon name="download" className="h-3.5 w-3.5" />
                 Exportar reporte
               </Button>
