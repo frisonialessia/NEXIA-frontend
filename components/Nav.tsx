@@ -89,12 +89,13 @@ export function Nav() {
     </button>
   );
 
-  const menuCuenta = cuenta && <AccountMenu nombre={cuenta.nombre} email={cuenta.email} color={cuenta.color} onSalir={cerrarSesion} />;
+  const menuCuenta = cuenta && <AccountMenu nombre={cuenta.nombre} email={cuenta.email} color={cuenta.color} rol={rol} onRol={setRol} onSalir={cerrarSesion} />;
 
   return (
     <nav className="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 sm:px-8">
-        <div className="flex min-w-0 items-center gap-1">
+      <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-3 sm:px-8">
+        {/* Izquierda: marca + planta activa */}
+        <div className="flex shrink-0 items-center gap-1">
           <Link href="/" className="flex items-center gap-2.5">
             <span className="relative flex h-2.5 w-2.5">
               <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />
@@ -102,24 +103,26 @@ export function Nav() {
             </span>
             <span className="font-serif text-lg tracking-tight">NEXIA</span>
           </Link>
-          <span className="ml-1 hidden text-neutral-300 sm:inline dark:text-neutral-700">/</span>
-          <div className="hidden sm:block">
+          <span className="ml-1 hidden text-neutral-300 md:inline dark:text-neutral-700">/</span>
+          <div className="hidden md:block">
             <OrgSwitcher />
           </div>
         </div>
 
-        {/* Escritorio */}
-        <div className="hidden items-center gap-0.5 text-sm md:flex">
+        {/* Centro: navegación (toma el espacio disponible; se desplaza si no cabe) */}
+        <div className="no-scrollbar hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto text-sm md:flex">
           {visibles.map((item) => renderItem(item, true))}
-          <div className="mx-1.5 h-5 w-px bg-neutral-200 dark:bg-neutral-700" />
+        </div>
+
+        {/* Derecha: controles */}
+        <div className="hidden shrink-0 items-center gap-2 md:flex">
           <NotificationBell />
-          {selectRol}
           {botonTema}
           {menuCuenta}
         </div>
 
         {/* Móvil */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="ml-auto flex items-center gap-2 md:hidden">
           <NotificationBell />
           {botonTema}
           <button
@@ -245,8 +248,8 @@ function PlantaSelectMovil() {
   );
 }
 
-/** Avatar con menú desplegable: perfil y cierre de sesión (escritorio). */
-function AccountMenu({ nombre, email, color, onSalir }: { nombre: string; email: string; color: string; onSalir: () => void }) {
+/** Avatar con menú desplegable: perfil, rol (demo) y cierre de sesión (escritorio). */
+function AccountMenu({ nombre, email, color, rol, onRol, onSalir }: { nombre: string; email: string; color: string; rol: Rol; onRol: (r: Rol) => void; onSalir: () => void }) {
   const [abierto, setAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -275,10 +278,24 @@ function AccountMenu({ nombre, email, color, onSalir }: { nombre: string; email:
       </button>
 
       {abierto && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
           <div className="border-b border-neutral-100 px-4 py-3 dark:border-neutral-800">
             <div className="truncate text-sm font-medium">{nombre}</div>
             <div className="truncate text-xs text-neutral-400">{email}</div>
+          </div>
+          <div className="border-b border-neutral-100 px-4 py-3 dark:border-neutral-800">
+            <label className="mb-1.5 block text-[10px] uppercase tracking-[0.14em] text-neutral-400">Ver como rol · demo</label>
+            <select
+              value={rol}
+              onChange={(e) => onRol(e.target.value as Rol)}
+              className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            >
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {ROL_NOMBRE[r]}
+                </option>
+              ))}
+            </select>
           </div>
           <Link href="/cuenta" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800">
             <Icon name="user" className="h-4 w-4" />
