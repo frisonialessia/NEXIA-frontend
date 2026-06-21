@@ -10,6 +10,7 @@
 import { AdminProvider } from "./AdminProvider";
 import { IntegrationsProvider } from "./IntegrationsProvider";
 import { MaintenanceProvider } from "./MaintenanceProvider";
+import { OrgProvider } from "./OrgProvider";
 import { SessionProvider } from "./SessionProvider";
 import { ThemeProvider } from "./ThemeProvider";
 
@@ -17,11 +18,13 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <SessionProvider>
-        <AdminProvider>
-          <MaintenanceProvider>
-            <IntegrationsProvider>{children}</IntegrationsProvider>
-          </MaintenanceProvider>
-        </AdminProvider>
+        <OrgProvider>
+          <AdminProvider>
+            <MaintenanceProvider>
+              <IntegrationsProvider>{children}</IntegrationsProvider>
+            </MaintenanceProvider>
+          </AdminProvider>
+        </OrgProvider>
       </SessionProvider>
     </ThemeProvider>
   );

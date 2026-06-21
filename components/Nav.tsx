@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { ROLES, ROL_NOMBRE, col } from "@/lib/constants";
 import { iniciales } from "@/lib/account";
 import type { Permiso } from "@/lib/permissions";
+import { useOrg } from "@/lib/state/OrgProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Rol } from "@/lib/types";
@@ -93,13 +94,19 @@ export function Nav() {
   return (
     <nav className="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/90 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3 sm:px-8">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: col("ok") }} />
-          </span>
-          <span className="font-serif text-lg tracking-tight">NEXIA</span>
-        </Link>
+        <div className="flex min-w-0 items-center gap-1">
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok") }} />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: col("ok") }} />
+            </span>
+            <span className="font-serif text-lg tracking-tight">NEXIA</span>
+          </Link>
+          <span className="ml-1 hidden text-neutral-300 sm:inline dark:text-neutral-700">/</span>
+          <div className="hidden sm:block">
+            <OrgSwitcher />
+          </div>
+        </div>
 
         {/* Escritorio */}
         <div className="hidden items-center gap-0.5 text-sm md:flex">
@@ -130,6 +137,10 @@ export function Nav() {
         <div className="border-t border-neutral-200 px-6 py-3 md:hidden dark:border-neutral-800">
           <div className="flex flex-col gap-1">{visibles.map((item) => renderItem(item, false))}</div>
           <div className="mt-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
+            <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">Planta activa</label>
+            <PlantaSelectMovil />
+          </div>
+          <div className="mt-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
             <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">Rol activo</label>
             {selectRol}
           </div>
@@ -152,6 +163,85 @@ export function Nav() {
         </div>
       )}
     </nav>
+  );
+}
+
+/** Selector de planta activa (escritorio): breadcrumb desplegable. */
+function OrgSwitcher() {
+  const { plantas, plantaActiva, setPlantaActiva } = useOrg();
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  useEffect(() => setAbierto(false), [pathname]);
+  useEffect(() => {
+    if (!abierto) return;
+    function fuera(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setAbierto(false);
+    }
+    document.addEventListener("mousedown", fuera);
+    return () => document.removeEventListener("mousedown", fuera);
+  }, [abierto]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setAbierto((v) => !v)}
+        aria-label="Cambiar de planta"
+        aria-expanded={abierto}
+        className="flex max-w-[12rem] items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+      >
+        <span className="truncate font-medium">{plantaActiva.nombre}</span>
+        <Icon name="chart" className="h-3 w-3 rotate-90 text-neutral-400" />
+      </button>
+
+      {abierto && (
+        <div className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="px-3 pb-1 pt-2.5 text-[10px] uppercase tracking-[0.14em] text-neutral-400">Plantas</div>
+          {plantas.map((p) => {
+            const activa = p.id === plantaActiva.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setPlantaActiva(p.id);
+                  setAbierto(false);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800"
+              >
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: activa ? col("ok") : "transparent", outline: activa ? "none" : "1px solid #cbd5e1" }} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">{p.nombre}</span>
+                  <span className="block truncate text-xs text-neutral-400">{p.ubicacion}</span>
+                </span>
+                {activa && <Icon name="check" className="h-3.5 w-3.5" style={{ color: col("ok") }} />}
+              </button>
+            );
+          })}
+          <Link href="/configuracion" className="block border-t border-neutral-100 px-3 py-2.5 text-xs text-neutral-500 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
+            Gestionar plantas
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Selector de planta nativo para el menú móvil. */
+function PlantaSelectMovil() {
+  const { plantas, plantaActivaId, setPlantaActiva } = useOrg();
+  return (
+    <select
+      value={plantaActivaId}
+      onChange={(e) => setPlantaActiva(e.target.value)}
+      className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+    >
+      {plantas.map((p) => (
+        <option key={p.id} value={p.id}>
+          {p.nombre}
+        </option>
+      ))}
+    </select>
   );
 }
 
