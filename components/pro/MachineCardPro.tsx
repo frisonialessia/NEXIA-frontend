@@ -7,7 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
-import { ESTADOS, col, estadoColor } from "@/lib/constants";
+import { ESTADOS, col, colorSalud } from "@/lib/constants";
 import { diasAFallo } from "@/lib/engine/fsm";
 import type { Maquina } from "@/lib/types";
 import { MiniLineChart } from "../ui/MiniLineChart";
@@ -15,7 +15,7 @@ import { ProbabilityRing } from "../ui/ProbabilityRing";
 import { SURFACE } from "./surface";
 
 export function MachineCardPro({ m }: { m: Maquina }) {
-  const ec = estadoColor(m.estado);
+  const ec = colorSalud(m.estado, m.prob);
   const dias = diasAFallo(m);
   const pulsa = m.estado === "CRITICAL_ALERT" || m.estado === "RECOVERY_PROBATION";
   const mostrarPrediccion = m.estado !== "STABLE" && dias !== Infinity && dias < 30;

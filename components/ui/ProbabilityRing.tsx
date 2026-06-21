@@ -2,16 +2,17 @@
 
 // ──────────────────────────────────────────────────────────────────────────
 // ANILLO DE PROBABILIDAD — radial compacto para las tarjetas de máquina
-// Verde (bajo), ámbar (medio), rojo (alto). Color por token (se adapta al tema).
+// Tonos de verde graduados por probabilidad (más claro = más sano) y ROJO
+// cuando es alta (≥ 60 %). Coherente con `tonoVerde` y el mapa de salud.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { col } from "@/lib/constants";
+import { col, tonoVerde } from "@/lib/constants";
 
 export function ProbabilityRing({ pct, size = 48 }: { pct: number; size?: number }) {
   const r = size / 2 - 5;
   const c = 2 * Math.PI * r;
   const off = c * (1 - Math.max(0, Math.min(100, pct)) / 100);
-  const key = pct >= 60 ? "crit" : "ok";
+  const stroke = pct >= 60 ? col("crit") : tonoVerde(pct / 100);
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`${Math.round(pct)}% de probabilidad de fallo`}>
@@ -21,7 +22,7 @@ export function ProbabilityRing({ pct, size = 48 }: { pct: number; size?: number
         cy={size / 2}
         r={r}
         fill="none"
-        stroke={col(key)}
+        stroke={stroke}
         strokeWidth={4}
         strokeLinecap="round"
         strokeDasharray={c}

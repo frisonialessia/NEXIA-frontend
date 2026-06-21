@@ -26,8 +26,9 @@ function blend(a: string, b: string, t: number): string {
   );
 }
 
-/** Genera el SVG del ícono. `maskable` deja margen de zona segura. */
-export function brandIconSvg({ size = 512, maskable = false }: { size?: number; maskable?: boolean } = {}): string {
+/** Genera el SVG del ícono. `maskable` deja margen de zona segura. `bg` permite
+ *  cambiar el fondo (por defecto oscuro; "transparent" o un hex para fondo claro). */
+export function brandIconSvg({ size = 512, maskable = false, bg = DARK }: { size?: number; maskable?: boolean; bg?: string } = {}): string {
   const S = size;
   const inset = (maskable ? 0.16 : 0.07) * S;
   const span = S - inset * 2;
@@ -50,9 +51,9 @@ export function brandIconSvg({ size = 512, maskable = false }: { size?: number; 
   add(1, 2);
   add(1, 3);
 
+  const fondo = bg === "transparent" ? "" : `<rect width="${S}" height="${S}" rx="${bgR}" fill="${bg}"/>\n  `;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
-  <rect width="${S}" height="${S}" rx="${bgR}" fill="${DARK}"/>
-  ${dots.join("\n  ")}
+  ${fondo}${dots.join("\n  ")}
 </svg>`;
 }
 
