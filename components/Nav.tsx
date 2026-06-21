@@ -2,17 +2,17 @@
 
 // ──────────────────────────────────────────────────────────────────────────
 // BARRA DE NAVEGACIÓN (responsiva, adaptada por rol)
-// Menú consolidado a 5: Mando · Producción · Alertas · Asistente · Configuración.
-// Cada ítem aparece solo si el rol tiene acceso. Incluye notificaciones,
-// selector de rol y toggle de tema. Escritorio en fila; móvil con hamburguesa.
+// Cada ítem aparece solo si el rol tiene acceso. Incluye notificaciones, tema
+// y menú de cuenta (con selector de rol demo). Textos vía i18n.
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ROLES, ROL_NOMBRE, col } from "@/lib/constants";
+import { ROLES, col } from "@/lib/constants";
 import { iniciales } from "@/lib/account";
 import type { Permiso } from "@/lib/permissions";
+import { useT } from "@/lib/state/I18nProvider";
 import { useOrg } from "@/lib/state/OrgProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -23,26 +23,27 @@ import { Icon, type IconName } from "./ui/Icon";
 
 interface NavItem {
   href: string;
-  label: string;
+  labelKey: string;
   icon: IconName;
   /** Permiso requerido para ver el ítem, o null si es libre. */
   permiso: Permiso | null;
 }
 
 const ITEMS: NavItem[] = [
-  { href: "/", label: "Mando", icon: "gauge", permiso: null },
-  { href: "/produccion", label: "Producción", icon: "chart", permiso: "produccion" },
-  { href: "/reportes", label: "Reportes", icon: "report", permiso: "tendencia" },
-  { href: "/alertas", label: "Alertas", icon: "clipboard", permiso: null },
-  { href: "/mantenimiento", label: "Mantenimiento", icon: "tool", permiso: "mantenimiento" },
-  { href: "/asistente", label: "Asistente", icon: "spark", permiso: null },
-  { href: "/configuracion", label: "Configuración", icon: "settings", permiso: null },
+  { href: "/", labelKey: "nav.command", icon: "gauge", permiso: null },
+  { href: "/produccion", labelKey: "nav.production", icon: "chart", permiso: "produccion" },
+  { href: "/reportes", labelKey: "nav.reports", icon: "report", permiso: "tendencia" },
+  { href: "/alertas", labelKey: "nav.alerts", icon: "clipboard", permiso: null },
+  { href: "/mantenimiento", labelKey: "nav.maintenance", icon: "tool", permiso: "mantenimiento" },
+  { href: "/asistente", labelKey: "nav.assistant", icon: "spark", permiso: null },
+  { href: "/configuracion", labelKey: "nav.settings", icon: "settings", permiso: null },
 ];
 
 export function Nav() {
   const pathname = usePathname();
   const { rol, setRol, puede, cuenta, cerrarSesion } = useSession();
   const { dark, toggle } = useTheme();
+  const t = useT();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
   useEffect(() => {
@@ -61,29 +62,17 @@ export function Nav() {
     return (
       <Link key={item.href} href={item.href} className={clases} style={estilo}>
         <Icon name={item.icon} className="h-4 w-4 shrink-0" />
-        <span className={compacto ? "hidden lg:inline" : ""}>{item.label}</span>
+        <span className={compacto ? "hidden lg:inline" : ""}>{t(item.labelKey)}</span>
       </Link>
     );
   }
 
-  const selectRol = (
-    <select
-      value={rol}
-      onChange={(e) => setRol(e.target.value as Rol)}
-      className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
-    >
-      {ROLES.map((r) => (
-        <option key={r} value={r}>
-          {ROL_NOMBRE[r]}
-        </option>
-      ))}
-    </select>
-  );
+  const selectRol = <RoleSelect rol={rol} onRol={setRol} />;
 
   const botonTema = (
     <button
       onClick={toggle}
-      aria-label="Cambiar tema"
+      aria-label={t("nav.toggleTheme")}
       className="rounded-lg border border-neutral-200 p-1.5 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
     >
       <Icon name={dark ? "sun" : "moon"} className="h-4 w-4" />
@@ -127,7 +116,7 @@ export function Nav() {
             {botonTema}
             <button
               onClick={() => setMenuAbierto((v) => !v)}
-              aria-label="Abrir menú"
+              aria-label={t("nav.openMenu")}
               aria-expanded={menuAbierto}
               className="rounded-lg border border-neutral-200 p-1.5 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
             >
@@ -141,11 +130,11 @@ export function Nav() {
         <div className="border-t border-neutral-200 px-6 py-3 md:hidden dark:border-neutral-800">
           <div className="flex flex-col gap-1">{visibles.map((item) => renderItem(item, false))}</div>
           <div className="mt-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
-            <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">Planta activa</label>
+            <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">{t("nav.activePlant")}</label>
             <PlantaSelectMovil />
           </div>
           <div className="mt-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
-            <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">Rol activo</label>
+            <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">{t("nav.activeRole")}</label>
             {selectRol}
           </div>
           {cuenta && (
@@ -156,10 +145,10 @@ export function Nav() {
                 </span>
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">{cuenta.nombre}</span>
-                  <span className="block truncate text-xs text-neutral-400">Mi perfil</span>
+                  <span className="block truncate text-xs text-neutral-400">{t("nav.myProfile")}</span>
                 </span>
               </Link>
-              <button onClick={cerrarSesion} aria-label="Cerrar sesión" className="rounded-lg border border-neutral-200 p-1.5 text-neutral-500 dark:border-neutral-700">
+              <button onClick={cerrarSesion} aria-label={t("nav.signOut")} className="rounded-lg border border-neutral-200 p-1.5 text-neutral-500 dark:border-neutral-700">
                 <Icon name="logout" className="h-4 w-4" />
               </button>
             </div>
@@ -170,9 +159,28 @@ export function Nav() {
   );
 }
 
+/** Selector de rol (demo), con nombres de rol traducidos. */
+function RoleSelect({ rol, onRol }: { rol: Rol; onRol: (r: Rol) => void }) {
+  const t = useT();
+  return (
+    <select
+      value={rol}
+      onChange={(e) => onRol(e.target.value as Rol)}
+      className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+    >
+      {ROLES.map((r) => (
+        <option key={r} value={r}>
+          {t(`roles.${r}`)}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 /** Selector de planta activa (escritorio): breadcrumb desplegable. */
 function OrgSwitcher() {
   const { plantas, plantaActiva, setPlantaActiva } = useOrg();
+  const t = useT();
   const [abierto, setAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -191,7 +199,7 @@ function OrgSwitcher() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setAbierto((v) => !v)}
-        aria-label="Cambiar de planta"
+        aria-label={t("nav.switchPlant")}
         aria-expanded={abierto}
         className="flex max-w-[12rem] items-center gap-1.5 rounded-lg px-2 py-1 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
       >
@@ -201,7 +209,7 @@ function OrgSwitcher() {
 
       {abierto && (
         <div className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900">
-          <div className="px-3 pb-1 pt-2.5 text-[10px] uppercase tracking-[0.14em] text-neutral-400">Plantas</div>
+          <div className="px-3 pb-1 pt-2.5 text-[10px] uppercase tracking-[0.14em] text-neutral-400">{t("nav.plants")}</div>
           {plantas.map((p) => {
             const activa = p.id === plantaActiva.id;
             return (
@@ -223,7 +231,7 @@ function OrgSwitcher() {
             );
           })}
           <Link href="/configuracion" className="block border-t border-neutral-100 px-3 py-2.5 text-xs text-neutral-500 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-800">
-            Gestionar plantas
+            {t("nav.managePlants")}
           </Link>
         </div>
       )}
@@ -251,6 +259,7 @@ function PlantaSelectMovil() {
 
 /** Avatar con menú desplegable: perfil, rol (demo) y cierre de sesión (escritorio). */
 function AccountMenu({ nombre, email, color, rol, onRol, onSalir }: { nombre: string; email: string; color: string; rol: Rol; onRol: (r: Rol) => void; onSalir: () => void }) {
+  const t = useT();
   const [abierto, setAbierto] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -270,7 +279,7 @@ function AccountMenu({ nombre, email, color, rol, onRol, onSalir }: { nombre: st
     <div ref={ref} className="relative ml-0.5">
       <button
         onClick={() => setAbierto((v) => !v)}
-        aria-label="Cuenta"
+        aria-label={t("nav.account")}
         aria-expanded={abierto}
         className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
         style={{ background: color }}
@@ -285,22 +294,12 @@ function AccountMenu({ nombre, email, color, rol, onRol, onSalir }: { nombre: st
             <div className="truncate text-xs text-neutral-400">{email}</div>
           </div>
           <div className="border-b border-neutral-100 px-4 py-3 dark:border-neutral-800">
-            <label className="mb-1.5 block text-[10px] uppercase tracking-[0.14em] text-neutral-400">Ver como rol · demo</label>
-            <select
-              value={rol}
-              onChange={(e) => onRol(e.target.value as Rol)}
-              className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
-            >
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {ROL_NOMBRE[r]}
-                </option>
-              ))}
-            </select>
+            <label className="mb-1.5 block text-[10px] uppercase tracking-[0.14em] text-neutral-400">{t("nav.viewAsRole")}</label>
+            <RoleSelect rol={rol} onRol={onRol} />
           </div>
           <Link href="/cuenta" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800">
             <Icon name="user" className="h-4 w-4" />
-            Mi perfil
+            {t("nav.myProfile")}
           </Link>
           <button
             onClick={() => {
@@ -310,7 +309,7 @@ function AccountMenu({ nombre, email, color, rol, onRol, onSalir }: { nombre: st
             className="flex w-full items-center gap-2.5 border-t border-neutral-100 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <Icon name="logout" className="h-4 w-4" />
-            Cerrar sesión
+            {t("nav.signOut")}
           </button>
         </div>
       )}
