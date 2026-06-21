@@ -111,6 +111,61 @@ const en: Dict = {
   "sort.unpin": "Unpin machine",
   "sort.pin": "Pin machine to top",
   "sort.drag": "Drag to reorder",
+
+  // Acceso restringido
+  "access.title": "Access restricted",
+  "access.back": "Back to command center",
+  "access.production": "The Production view requires a role with access (Administrator, Plant manager or Technician).",
+  "access.maintenance": "The maintenance module requires a role with access (Administrator, Manager or Technician).",
+
+  // Producción / OEE
+  "prod.shift": "Current shift · Line 1",
+  "prod.title": "Production & efficiency",
+  "prod.oeeWorldClass": "World-class",
+  "prod.oeeAcceptable": "Acceptable",
+  "prod.oeeNeedsImprovement": "Needs improvement",
+  "prod.oeeGlobal": "Overall OEE",
+  "prod.availability": "Availability",
+  "prod.performance": "Performance",
+  "prod.quality": "Quality",
+  "prod.goodParts": "Good parts",
+  "prod.rejects": "Rejects",
+  "prod.shiftTarget": "Shift target",
+  "prod.rate": "Rate (pcs/min)",
+  "prod.rateTarget": "target 9.0",
+  "prod.downtime": "Downtime · by cause",
+  "prod.energy": "Energy use · shift",
+  "prod.min": "min",
+
+  // Alertas
+  "alerts.hitl": "Human-in-the-loop",
+  "alerts.title": "Alerts",
+  "alerts.export": "Export report",
+  "alerts.noExport": "No events to export yet",
+  "alerts.exported": "Alert history exported",
+  "alerts.pending": "Pending",
+  "alerts.history": "History",
+
+  // Cola de auditoría
+  "audit.empty1": "No pending alerts.",
+  "audit.empty2": "All caught up.",
+  "audit.pendingPill": "Pending",
+  "audit.confirmTitle": "Confirm event",
+  "audit.probableCause": "Probable cause (AI)",
+  "audit.wasCorrect": "Was the alert correct?",
+  "audit.real": "Real failure",
+  "audit.false": "False alarm",
+  "audit.nc": "Inconclusive",
+  "audit.rootCause": "Root cause",
+  "audit.actionTaken": "Action taken",
+  "audit.cancel": "Cancel",
+  "audit.confirm": "Confirm",
+  "audit.labeled": "Event labeled · dataset updated",
+
+  // Historial
+  "hist.empty": "No events recorded yet. They'll appear as the system detects failures.",
+  "hist.resolved": "Resolved",
+  "hist.pending": "Pending",
 };
 
 const es: Dict = {
@@ -204,6 +259,56 @@ const es: Dict = {
   "sort.unpin": "Desfijar máquina",
   "sort.pin": "Fijar máquina arriba",
   "sort.drag": "Arrastrar para reordenar",
+
+  "access.title": "Acceso restringido",
+  "access.back": "Volver al centro de mando",
+  "access.production": "La vista de Producción requiere un rol con acceso (Administrador, Jefe de planta o Técnico).",
+  "access.maintenance": "El módulo de mantenimiento requiere un rol con acceso (Administrador, Jefe o Técnico).",
+
+  "prod.shift": "Turno actual · Línea 1",
+  "prod.title": "Producción y eficiencia",
+  "prod.oeeWorldClass": "World-class",
+  "prod.oeeAcceptable": "Aceptable",
+  "prod.oeeNeedsImprovement": "Requiere mejora",
+  "prod.oeeGlobal": "OEE Global",
+  "prod.availability": "Disponibilidad",
+  "prod.performance": "Rendimiento",
+  "prod.quality": "Calidad",
+  "prod.goodParts": "Piezas buenas",
+  "prod.rejects": "Rechazos",
+  "prod.shiftTarget": "Objetivo turno",
+  "prod.rate": "Ritmo (pzs/min)",
+  "prod.rateTarget": "meta 9.0",
+  "prod.downtime": "Tiempos de inactividad · por causa",
+  "prod.energy": "Consumo energético · turno",
+  "prod.min": "min",
+
+  "alerts.hitl": "Human-in-the-loop",
+  "alerts.title": "Alertas",
+  "alerts.export": "Exportar reporte",
+  "alerts.noExport": "Aún no hay eventos para exportar",
+  "alerts.exported": "Historial de alertas exportado",
+  "alerts.pending": "Pendientes",
+  "alerts.history": "Historial",
+
+  "audit.empty1": "No hay alertas pendientes.",
+  "audit.empty2": "Todo el trabajo está al día.",
+  "audit.pendingPill": "Pendiente",
+  "audit.confirmTitle": "Confirmar evento",
+  "audit.probableCause": "Causa probable (IA)",
+  "audit.wasCorrect": "¿La alerta fue correcta?",
+  "audit.real": "Fallo real",
+  "audit.false": "Falsa alarma",
+  "audit.nc": "No concluyente",
+  "audit.rootCause": "Causa raíz",
+  "audit.actionTaken": "Acción tomada",
+  "audit.cancel": "Cancelar",
+  "audit.confirm": "Confirmar",
+  "audit.labeled": "Evento etiquetado · dataset actualizado",
+
+  "hist.empty": "Aún no hay eventos registrados. Aparecerán conforme el sistema detecte fallos.",
+  "hist.resolved": "Resuelto",
+  "hist.pending": "Pendiente",
 };
 
 export const MESSAGES: Partial<Record<Idioma, Dict>> = { en, es };

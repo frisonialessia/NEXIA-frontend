@@ -12,6 +12,7 @@ import { ACCIONES, ARC, CAUSAS, ROL_NOMBRE, col, mix, soft } from "@/lib/constan
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
 import { etiquetarAlerta, useAlertas } from "@/lib/state/useFleet";
 import { useAdmin } from "@/lib/state/AdminProvider";
+import { useT } from "@/lib/state/I18nProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Alerta, Veredicto } from "@/lib/types";
@@ -23,6 +24,7 @@ export function AuditQueue() {
   const alertas = useAlertas();
   const { dark } = useTheme();
   const { puede } = useSession();
+  const t = useT();
   const [abierta, setAbierta] = useState<Alerta | null>(null);
 
   const puedeAuditar = puede("auditar");
@@ -31,8 +33,8 @@ export function AuditQueue() {
     return (
       <div className={`${SURFACE} px-8 py-16 text-center`}>
         <Icon name="check" className="mx-auto h-8 w-8" style={{ color: col("ok", dark) }} />
-        <p className="mt-4 text-sm text-neutral-500">No hay alertas pendientes.</p>
-        <p className="mt-1 text-xs text-neutral-400">Todo el trabajo está al día.</p>
+        <p className="mt-4 text-sm text-neutral-500">{t("audit.empty1")}</p>
+        <p className="mt-1 text-xs text-neutral-400">{t("audit.empty2")}</p>
       </div>
     );
   }
@@ -57,7 +59,7 @@ export function AuditQueue() {
               <div className="hidden shrink-0 text-right md:block">
                 <div className="font-mono text-xs text-neutral-500">{a.hora}</div>
               </div>
-              <Pill colorKey="crit">Pendiente</Pill>
+              <Pill colorKey="crit">{t("audit.pendingPill")}</Pill>
             </>
           );
           const borde = i === alertas.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800";
@@ -87,6 +89,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
   const { dark } = useTheme();
   const { rol } = useSession();
   const { registrar } = useAdmin();
+  const t = useT();
   const [veredicto, setVeredicto] = useState<Veredicto | null>(null);
   const [causaSel, setCausaSel] = useState<string | null>(null);
   const [accionSel, setAccionSel] = useState<string | null>(null);
@@ -104,7 +107,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
     etiquetarAlerta(alerta.id, veredicto!);
     registrar(ROL_NOMBRE[rol], "Etiquetó una alerta", `${alerta.maquina} · ${etiqueta}`);
     onClose();
-    toast("Evento etiquetado · dataset actualizado");
+    toast(t("audit.labeled"));
   }
 
   return (
@@ -119,21 +122,21 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
         onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-neutral-100 px-8 pt-8 pb-6 dark:border-neutral-800">
-          <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Human-in-the-loop</span>
-          <h2 id="audit-modal-title" className="mt-3 font-display text-2xl tracking-tight">Confirmar evento</h2>
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("alerts.hitl")}</span>
+          <h2 id="audit-modal-title" className="mt-3 font-display text-2xl tracking-tight">{t("audit.confirmTitle")}</h2>
           <div className="mt-3 rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800">
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400">Causa probable (IA)</span>
+            <span className="text-[11px] uppercase tracking-wider text-neutral-400">{t("audit.probableCause")}</span>
             <p className="mt-0.5 text-sm text-neutral-700 dark:text-neutral-200">{alerta.causa}</p>
           </div>
         </div>
 
         <div className="px-8 py-7">
-          <label className="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">¿La alerta fue correcta?</label>
+          <label className="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("audit.wasCorrect")}</label>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {([
-              ["real", "Fallo real"],
-              ["falsa", "Falsa alarma"],
-              ["nc", "No concluyente"],
+              ["real", t("audit.real")],
+              ["falsa", t("audit.false")],
+              ["nc", t("audit.nc")],
             ] as [Veredicto, string][]).map(([v, label]) => {
               const sel = veredicto === v;
               const cc = colorVeredicto(v);
@@ -156,13 +159,13 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
 
           {veredicto === "real" && (
             <div className="mt-6">
-              <label className="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Causa raíz</label>
+              <label className="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("audit.rootCause")}</label>
               <div className="grid gap-1.5">
                 {causas.map((c) => (
                   <OpcionBtn key={c} label={c} sel={causaSel === c} onClick={() => setCausaSel(c)} dark={dark} />
                 ))}
               </div>
-              <label className="mb-2 mt-5 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Acción tomada</label>
+              <label className="mb-2 mt-5 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("audit.actionTaken")}</label>
               <div className="grid gap-1.5">
                 {ACCIONES.map((a) => (
                   <OpcionBtn key={a} label={a} sel={accionSel === a} onClick={() => setAccionSel(a)} dark={dark} />
@@ -174,7 +177,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
 
         <div className="flex items-center justify-end gap-3 border-t border-neutral-100 px-8 py-5 dark:border-neutral-800">
           <button onClick={onClose} className="rounded-xl px-5 py-2.5 text-sm text-neutral-500 transition-colors hover:text-neutral-800">
-            Cancelar
+            {t("audit.cancel")}
           </button>
           <button
             onClick={guardar}
@@ -182,7 +185,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
             className="rounded-xl px-6 py-2.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-400 dark:disabled:bg-neutral-700"
             style={puedeGuardar ? { background: col("brand", dark) } : undefined}
           >
-            Confirmar
+            {t("audit.confirm")}
           </button>
         </div>
       </div>

@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { descargarCSV } from "@/lib/reports/exporter";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAlertas, useHistorial } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AuditQueue } from "./alertas/AuditQueue";
@@ -22,11 +23,12 @@ export function Alertas() {
   const alertas = useAlertas();
   const historial = useHistorial();
   const { puede } = useSession();
+  const t = useT();
   const [tab, setTab] = useState("pendientes");
 
   function exportar() {
     if (historial.length === 0) {
-      toast("Aún no hay eventos para exportar");
+      toast(t("alerts.noExport"));
       return;
     }
     const filas: (string | number)[][] = [
@@ -34,20 +36,20 @@ export function Alertas() {
       ...historial.map((h) => [h.maquina, h.causa, `${Math.round(h.prob * 100)}%`, h.fecha, h.hora, h.estado]),
     ];
     descargarCSV(`nexia-alertas-${Date.now()}.csv`, filas);
-    toast("Historial de alertas exportado");
+    toast(t("alerts.exported"));
   }
 
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <Label>Human-in-the-loop</Label>
+          <Label>{t("alerts.hitl")}</Label>
           <div className="mt-2 flex items-end justify-between">
-            <PageTitle>Alertas</PageTitle>
+            <PageTitle>{t("alerts.title")}</PageTitle>
             {puede("exportar") && (
               <Button variant="secondary" className="px-3 py-1.5 text-xs" onClick={exportar}>
                 <Icon name="download" className="h-3.5 w-3.5" />
-                Exportar reporte
+                {t("alerts.export")}
               </Button>
             )}
           </div>
@@ -56,8 +58,8 @@ export function Alertas() {
         <div className="mb-5">
           <Tabs
             tabs={[
-              { id: "pendientes", label: "Pendientes", badge: alertas.length },
-              { id: "historial", label: "Historial" },
+              { id: "pendientes", label: t("alerts.pending"), badge: alertas.length },
+              { id: "historial", label: t("alerts.history") },
             ]}
             activo={tab}
             onChange={setTab}
