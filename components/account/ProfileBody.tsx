@@ -18,6 +18,7 @@ import { Card } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 import { Button } from "../ui/Primitives";
 import { Label } from "../ui/Typo";
+import { LanguageRow } from "../config/LanguageRow";
 
 export function ProfileBody() {
   const { cuenta, actualizarPerfil, cerrarSesion, rol } = useSession();
@@ -99,15 +100,7 @@ export function ProfileBody() {
           <Card className="px-7 py-6">
             <Label>Preferencias</Label>
             <div className="mt-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm">Idioma</div>
-                  <div className="text-xs text-neutral-400">Idioma de la interfaz · próximamente</div>
-                </div>
-                <select disabled className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-400 dark:border-neutral-700 dark:bg-neutral-800">
-                  <option>Español</option>
-                </select>
-              </div>
+              <LanguageRow />
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm">Tema oscuro</div>

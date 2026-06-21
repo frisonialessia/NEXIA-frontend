@@ -17,6 +17,7 @@ import type { Magnitud, SistemaUnidades } from "@/lib/types";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Primitives";
 import { Label } from "../ui/Typo";
+import { LanguageRow } from "./LanguageRow";
 
 export function SettingsBody() {
   const { sistema, setSistema, puede, rol } = useSession();
@@ -51,15 +52,7 @@ export function SettingsBody() {
 
       <Seccion titulo="Preferencias">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm">Idioma</div>
-              <div className="text-xs text-neutral-400">Idioma de la interfaz · próximamente</div>
-            </div>
-            <select disabled className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-400 dark:border-neutral-700 dark:bg-neutral-800">
-              <option>Español</option>
-            </select>
-          </div>
+          <LanguageRow />
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm">Tema oscuro</div>

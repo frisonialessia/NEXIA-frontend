@@ -8,6 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { AdminProvider } from "./AdminProvider";
+import { I18nProvider } from "./I18nProvider";
 import { IntegrationsProvider } from "./IntegrationsProvider";
 import { MaintenanceProvider } from "./MaintenanceProvider";
 import { OrgProvider } from "./OrgProvider";
@@ -17,15 +18,17 @@ import { ThemeProvider } from "./ThemeProvider";
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <SessionProvider>
-        <OrgProvider>
-          <AdminProvider>
-            <MaintenanceProvider>
-              <IntegrationsProvider>{children}</IntegrationsProvider>
-            </MaintenanceProvider>
-          </AdminProvider>
-        </OrgProvider>
-      </SessionProvider>
+      <I18nProvider>
+        <SessionProvider>
+          <OrgProvider>
+            <AdminProvider>
+              <MaintenanceProvider>
+                <IntegrationsProvider>{children}</IntegrationsProvider>
+              </MaintenanceProvider>
+            </AdminProvider>
+          </OrgProvider>
+        </SessionProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 }
