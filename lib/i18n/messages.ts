@@ -52,6 +52,65 @@ const en: Dict = {
   // Preferencias de idioma (Ajustes / Perfil)
   "lang.title": "Language",
   "lang.desc": "Interface language",
+
+  // Estados de máquina
+  "estados.STABLE": "Stable",
+  "estados.WARNING_PROBATION": "Watching",
+  "estados.CRITICAL_ALERT": "Critical alert",
+  "estados.RECOVERY_PROBATION": "Recovering",
+
+  // Centro de mando
+  "cc.live": "Live · {plant} · updating every 2s",
+  "cc.title": "Command center",
+  "cc.connecting": "Connecting to the engine…",
+  "cc.collecting": "Collecting the first fleet readings…",
+  "cc.assetsAllOrder": "assets · all in order",
+  "cc.needsAttentionOne": "requires attention",
+  "cc.needsAttentionMany": "require attention",
+  "cc.ofTotal": "· of {total}",
+  "cc.fleetDrag": "Fleet · drag to reorder",
+  "cc.activity": "Activity",
+
+  // KPIs
+  "kpi.savingMonth": "Savings · month",
+  "kpi.inStops": "in downtime avoided",
+  "kpi.stopsAvoided": "Downtime avoided",
+  "kpi.thisMonth": "this month",
+  "kpi.plantHealth": "Plant health",
+  "kpi.stableAssets": "stable assets",
+  "kpi.needAttention": "Need attention",
+  "kpi.allOk": "all in order",
+  "kpi.oneAtRisk": "machine at risk",
+  "kpi.manyAtRisk": "machines at risk",
+
+  // Tarjeta de máquina
+  "card.aiActive": "AI active",
+  "card.prob": "prob.",
+  "card.ofFailure": "of failure",
+  "card.failsIn": "fails in ~{n} days",
+  "card.collecting": "Collecting…",
+
+  // Feed de eventos
+  "events.liveActivity": "Live activity",
+  "events.none": "No recent events.",
+  "events.willAppear": "Detections will appear here.",
+  "events.resolved": "Resolved",
+  "events.anomaly": "Anomaly",
+  "events.probSuffix": "{n}% prob.",
+
+  // Mapa de salud
+  "map.title": "Fleet health map",
+  "map.desc": "Each cell is a vibration reading; the color shows how far it deviates from expected.",
+  "map.veryHealthy": "Very healthy",
+  "map.normal": "Normal",
+  "map.watch": "Watch",
+  "map.critical": "Critical",
+  "map.collecting": "Collecting readings…",
+
+  // Flota arrastrable
+  "sort.unpin": "Unpin machine",
+  "sort.pin": "Pin machine to top",
+  "sort.drag": "Drag to reorder",
 };
 
 const es: Dict = {
@@ -93,6 +152,58 @@ const es: Dict = {
 
   "lang.title": "Idioma",
   "lang.desc": "Idioma de la interfaz",
+
+  "estados.STABLE": "Estable",
+  "estados.WARNING_PROBATION": "En observación",
+  "estados.CRITICAL_ALERT": "Alerta crítica",
+  "estados.RECOVERY_PROBATION": "Recuperación",
+
+  "cc.live": "En vivo · {plant} · actualizando cada 2s",
+  "cc.title": "Centro de mando",
+  "cc.connecting": "Conectando con el motor…",
+  "cc.collecting": "Recopilando las primeras lecturas de la flota…",
+  "cc.assetsAllOrder": "activos · todo en orden",
+  "cc.needsAttentionOne": "requiere atención",
+  "cc.needsAttentionMany": "requieren atención",
+  "cc.ofTotal": "· de {total}",
+  "cc.fleetDrag": "Flota · arrastra para ordenar",
+  "cc.activity": "Actividad",
+
+  "kpi.savingMonth": "Ahorro · mes",
+  "kpi.inStops": "en paradas evitadas",
+  "kpi.stopsAvoided": "Paradas evitadas",
+  "kpi.thisMonth": "este mes",
+  "kpi.plantHealth": "Salud de planta",
+  "kpi.stableAssets": "activos estables",
+  "kpi.needAttention": "Requieren atención",
+  "kpi.allOk": "todo en orden",
+  "kpi.oneAtRisk": "máquina en riesgo",
+  "kpi.manyAtRisk": "máquinas en riesgo",
+
+  "card.aiActive": "IA activa",
+  "card.prob": "prob.",
+  "card.ofFailure": "de fallo",
+  "card.failsIn": "falla en ~{n} días",
+  "card.collecting": "Recopilando…",
+
+  "events.liveActivity": "Actividad en vivo",
+  "events.none": "Sin eventos recientes.",
+  "events.willAppear": "Las detecciones aparecerán aquí.",
+  "events.resolved": "Resuelto",
+  "events.anomaly": "Anomalía",
+  "events.probSuffix": "{n}% prob.",
+
+  "map.title": "Mapa de salud de la flota",
+  "map.desc": "Cada celda es una lectura de vibración; el color indica cuánto se desvía de lo esperado.",
+  "map.veryHealthy": "Muy sano",
+  "map.normal": "Normal",
+  "map.watch": "Vigilar",
+  "map.critical": "Crítico",
+  "map.collecting": "Recopilando lecturas…",
+
+  "sort.unpin": "Desfijar máquina",
+  "sort.pin": "Fijar máquina arriba",
+  "sort.drag": "Arrastrar para reordenar",
 };
 
 export const MESSAGES: Partial<Record<Idioma, Dict>> = { en, es };

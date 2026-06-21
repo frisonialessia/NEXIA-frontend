@@ -20,6 +20,7 @@ import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordi
 import { CSS } from "@dnd-kit/utilities";
 import { col } from "@/lib/constants";
 import { ordenarConPreferencias } from "@/lib/domain/flota";
+import { useT } from "@/lib/state/I18nProvider";
 import { useFleetOrder } from "@/lib/state/useFleetOrder";
 import type { Maquina } from "@/lib/types";
 import { Icon } from "../ui/Icon";
@@ -58,6 +59,7 @@ export function SortableFleet({ maquinas }: { maquinas: Maquina[] }) {
 }
 
 function SortableCard({ m, pinned, onPin }: { m: Maquina; pinned: boolean; onPin: () => void }) {
+  const t = useT();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: m.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -82,7 +84,7 @@ function SortableCard({ m, pinned, onPin }: { m: Maquina; pinned: boolean; onPin
             e.stopPropagation();
             onPin();
           }}
-          aria-label={pinned ? "Desfijar máquina" : "Fijar máquina arriba"}
+          aria-label={pinned ? t("sort.unpin") : t("sort.pin")}
           aria-pressed={pinned}
           className={ctrlBtn}
           style={pinned ? { color: col("brand") } : undefined}
@@ -91,7 +93,7 @@ function SortableCard({ m, pinned, onPin }: { m: Maquina; pinned: boolean; onPin
         </button>
         <button
           type="button"
-          aria-label="Arrastrar para reordenar"
+          aria-label={t("sort.drag")}
           className={`${ctrlBtn} cursor-grab touch-none active:cursor-grabbing`}
           {...attributes}
           {...listeners}

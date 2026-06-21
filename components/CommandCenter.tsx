@@ -7,6 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col } from "@/lib/constants";
+import { useT } from "@/lib/state/I18nProvider";
 import { useOrg } from "@/lib/state/OrgProvider";
 import { useEventos, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { EventsFeed } from "./pro/EventsFeed";
@@ -20,6 +21,7 @@ export function CommandCenter() {
   const savings = useSavings();
   const eventos = useEventos();
   const { plantaActiva } = useOrg();
+  const t = useT();
 
   const total = maquinas.length;
   const atencion = maquinas.filter((m) => m.estado !== "STABLE").length;
@@ -28,23 +30,23 @@ export function CommandCenter() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">En vivo · {plantaActiva.nombre} · actualizando cada 2s</span>
+          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t("cc.live", { plant: plantaActiva.nombre })}</span>
           <div className="mt-2 flex items-end justify-between">
-            <h1 className="font-display text-3xl tracking-tight">Centro de mando</h1>
+            <h1 className="font-display text-3xl tracking-tight">{t("cc.title")}</h1>
             <p className="text-sm text-neutral-500">
               {total === 0 ? (
-                "Conectando con el motor…"
+                t("cc.connecting")
               ) : atencion === 0 ? (
                 <>
-                  <span className="font-mono">{total}</span> activos · todo en orden
+                  <span className="font-mono">{total}</span> {t("cc.assetsAllOrder")}
                 </>
               ) : (
                 <>
                   <span className="font-mono font-medium" style={{ color: col("crit") }}>
                     {atencion}
                   </span>{" "}
-                  {atencion === 1 ? "requiere" : "requieren"} atención{" "}
-                  <span className="text-neutral-300">· de {total}</span>
+                  {atencion === 1 ? t("cc.needsAttentionOne") : t("cc.needsAttentionMany")}{" "}
+                  <span className="text-neutral-300">{t("cc.ofTotal", { total })}</span>
                 </>
               )}
             </p>
@@ -53,7 +55,7 @@ export function CommandCenter() {
 
         {total === 0 ? (
           <div className={`${SURFACE} px-8 py-20 text-center text-sm text-neutral-400`}>
-            Recopilando las primeras lecturas de la flota…
+            {t("cc.collecting")}
           </div>
         ) : (
           <div className="space-y-5">
@@ -62,13 +64,13 @@ export function CommandCenter() {
             <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
               <section className="lg:col-span-2">
                 <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
-                  Flota · arrastra para ordenar
+                  {t("cc.fleetDrag")}
                 </h2>
                 <SortableFleet maquinas={maquinas} />
               </section>
 
               <section className="lg:sticky lg:top-24 lg:col-span-1">
-                <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Actividad</h2>
+                <h2 className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("cc.activity")}</h2>
                 <EventsFeed eventos={eventos} />
               </section>
             </div>

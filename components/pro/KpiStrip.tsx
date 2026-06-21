@@ -13,6 +13,7 @@ import { AHORRO_SEMANAL, SALUD_SEMANAL } from "@/lib/data/trend";
 import { dinero } from "@/lib/format";
 import type { Maquina } from "@/lib/types";
 import type { Savings } from "@/lib/state/useFleet";
+import { useT } from "@/lib/state/I18nProvider";
 import { Icon, type IconName } from "../ui/Icon";
 import { MiniLineChart } from "../ui/MiniLineChart";
 import { Label, Stat } from "../ui/Typo";
@@ -24,6 +25,7 @@ interface Delta {
 }
 
 export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: Savings }) {
+  const t = useT();
   const total = maquinas.length;
   const salud = total ? Math.round((maquinas.filter((m) => m.estado === "STABLE").length / total) * 100) : 100;
   const enRiesgo = maquinas.filter((m) => m.estado !== "STABLE").length;
@@ -40,37 +42,37 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
       <KpiTile
-        titulo="Ahorro · mes"
+        titulo={t("kpi.savingMonth")}
         icono="chart"
         accentKey="ok"
         valor={dinero(savings.ahorroMes)}
-        sub="en paradas evitadas"
+        sub={t("kpi.inStops")}
         spark={{ data: AHORRO_SEMANAL, colorKey: "ok" }}
         delta={{ texto: `+${ahorroPct}%`, bueno: true }}
       />
       <KpiTile
-        titulo="Paradas evitadas"
+        titulo={t("kpi.stopsAvoided")}
         icono="shield"
         accentKey="ok"
         valor={String(savings.paradasEvitadas)}
-        sub="este mes"
+        sub={t("kpi.thisMonth")}
         spark={{ data: paradasSemanal, colorKey: "ok" }}
       />
       <KpiTile
-        titulo="Salud de planta"
+        titulo={t("kpi.plantHealth")}
         icono="gauge"
         accentKey={saludKey}
         valor={`${salud}%`}
-        sub="activos estables"
+        sub={t("kpi.stableAssets")}
         spark={{ data: SALUD_SEMANAL, colorKey: saludKey }}
         delta={{ texto: `${saludDelta >= 0 ? "+" : ""}${saludDelta} pts`, bueno: saludDelta >= 0 }}
       />
       <KpiTile
-        titulo="Requieren atención"
+        titulo={t("kpi.needAttention")}
         icono={enRiesgo > 0 ? "alert" : "check"}
         accentKey={enRiesgo > 0 ? "crit" : "ok"}
         valor={String(enRiesgo)}
-        sub={enRiesgo === 0 ? "todo en orden" : enRiesgo === 1 ? "máquina en riesgo" : "máquinas en riesgo"}
+        sub={enRiesgo === 0 ? t("kpi.allOk") : enRiesgo === 1 ? t("kpi.oneAtRisk") : t("kpi.manyAtRisk")}
         extra={
           <div className="flex h-full items-center gap-1.5">
             {dots.map((c, i) => (
