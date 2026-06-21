@@ -108,7 +108,7 @@ function OrdenRow({ orden: o }: { orden: OrdenMantenimiento }) {
     <Card className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-serif text-base tracking-tight">{o.maquina}</span>
+          <span className="font-display text-base tracking-tight">{o.maquina}</span>
           <Pill colorKey={PRIORIDAD_COLOR[o.prioridad]}>{o.prioridad}</Pill>
           <Pill colorKey={ESTADO_COLOR[o.estado]}>{ESTADO_LABEL[o.estado]}</Pill>
         </div>
@@ -183,7 +183,7 @@ function CrearModal({ onClose }: { onClose: () => void }) {
       >
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
           <Label>Operaciones</Label>
-          <h2 id="ot-title" className="mt-2 font-serif text-2xl tracking-tight">Nueva orden de mantenimiento</h2>
+          <h2 id="ot-title" className="mt-2 font-display text-2xl tracking-tight">Nueva orden de mantenimiento</h2>
         </div>
 
         <div className="space-y-4 px-7 py-6">

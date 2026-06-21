@@ -9,7 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ["var(--font-serif)", "serif"],
+        // Display (logo + títulos): grotesca geométrica moderna (Space Grotesk).
+        display: ["var(--font-display)", "ui-sans-serif", "sans-serif"],
         sans: ["var(--font-sans)", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
       },

@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 // PRIMITIVOS DE TIPOGRAFÍA (sistema de diseño NEXIA)
 // Reglas:
-//  · PageTitle  → Fraunces (serif): solo títulos de página. Identidad editorial.
+//  · PageTitle  → Space Grotesk (display): solo títulos de página. Moderna, técnica.
 //  · Label      → Inter, mayúsculas con tracking: etiquetas y encabezados de sección.
 //  · Stat       → Inter semibold (sans): números héroe. (Mono opcional para datos.)
 // ──────────────────────────────────────────────────────────────────────────
@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 import { col, type ColorKey } from "@/lib/constants";
 
 export function PageTitle({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <h1 className={`font-serif text-3xl tracking-tight ${className}`}>{children}</h1>;
+  return <h1 className={`font-display text-3xl tracking-tight ${className}`}>{children}</h1>;
 }
 
 export function Label({ children, className = "" }: { children: ReactNode; className?: string }) {

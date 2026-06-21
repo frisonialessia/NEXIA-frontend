@@ -48,7 +48,7 @@ export function AuditQueue() {
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ background: col("crit", dark) }} />
               </span>
               <div className="min-w-0 flex-1">
-                <span className="font-serif text-base">{a.maquina}</span>
+                <span className="font-display text-base">{a.maquina}</span>
                 <p className="mt-0.5 truncate text-sm text-neutral-500">{a.causa}</p>
               </div>
               <div className="hidden shrink-0 text-right sm:block">
@@ -120,7 +120,7 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
       >
         <div className="border-b border-neutral-100 px-8 pt-8 pb-6 dark:border-neutral-800">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">Human-in-the-loop</span>
-          <h2 id="audit-modal-title" className="mt-3 font-serif text-2xl tracking-tight">Confirmar evento</h2>
+          <h2 id="audit-modal-title" className="mt-3 font-display text-2xl tracking-tight">Confirmar evento</h2>
           <div className="mt-3 rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800">
             <span className="text-[11px] uppercase tracking-wider text-neutral-400">Causa probable (IA)</span>
             <p className="mt-0.5 text-sm text-neutral-700 dark:text-neutral-200">{alerta.causa}</p>

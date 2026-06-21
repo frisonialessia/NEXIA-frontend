@@ -63,7 +63,7 @@ export function BillingBody() {
           <div>
             <Label>Plan actual</Label>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-serif text-2xl tracking-tight">{plan.nombre}</span>
+              <span className="font-display text-2xl tracking-tight">{plan.nombre}</span>
               <span className="font-mono text-sm text-neutral-400">
                 {plan.precio === 0 ? "Gratis" : `${dinero(precioMes)} / mes · por planta`}
               </span>
@@ -97,7 +97,7 @@ export function BillingBody() {
             <div key={p.id} className={`${actual ? "rounded-2xl ring-2" : ""}`} style={actual ? ({ ["--tw-ring-color"]: col("ok") } as React.CSSProperties) : undefined}>
             <Card className="flex h-full flex-col px-6 py-6">
               <div className="flex items-center justify-between">
-                <span className="font-serif text-xl tracking-tight">{p.nombre}</span>
+                <span className="font-display text-xl tracking-tight">{p.nombre}</span>
                 {p.destacado && !actual && (
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{ background: mix(col("brand")), color: col("brand") }}>
                     Popular
@@ -238,7 +238,7 @@ function PaymentModal({ actual, onSave, onClose }: { actual: MetodoPago; onSave:
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="pay-title" tabIndex={-1} className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white shadow-xl outline-none dark:border-neutral-700 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
           <Label>Método de pago</Label>
-          <h2 id="pay-title" className="mt-2 font-serif text-2xl tracking-tight">Actualizar tarjeta</h2>
+          <h2 id="pay-title" className="mt-2 font-display text-2xl tracking-tight">Actualizar tarjeta</h2>
         </div>
         <div className="space-y-4 px-7 py-6">
           <label className="block">

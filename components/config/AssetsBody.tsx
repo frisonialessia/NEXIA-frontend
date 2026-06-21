@@ -132,7 +132,7 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
       >
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
           <Label>Activo</Label>
-          <h2 id="asset-title" className="mt-2 font-serif text-2xl tracking-tight">{esEdicion ? "Editar máquina" : "Agregar máquina"}</h2>
+          <h2 id="asset-title" className="mt-2 font-display text-2xl tracking-tight">{esEdicion ? "Editar máquina" : "Agregar máquina"}</h2>
         </div>
 
         <div className="space-y-4 px-7 py-6">

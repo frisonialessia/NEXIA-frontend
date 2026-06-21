@@ -41,7 +41,7 @@ export function Configuracion() {
       <div className={`mx-auto ${ancho}`}>
         <header className="mb-6">
           <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Configuración</span>
-          <h1 className="mt-2 font-serif text-3xl tracking-tight">Configuración</h1>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">Configuración</h1>
         </header>
 
         {tabs.length > 1 && (

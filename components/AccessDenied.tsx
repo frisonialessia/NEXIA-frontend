@@ -20,7 +20,7 @@ export function AccessDenied({ mensaje }: { mensaje: string }) {
       <div className="mx-auto max-w-4xl">
         <div className={`${SURFACE} px-8 py-16 text-center`}>
           <Icon name="shield" className="mx-auto h-8 w-8" style={{ color: col("gray", dark) }} />
-          <h1 className="mt-4 font-serif text-2xl tracking-tight">Acceso restringido</h1>
+          <h1 className="mt-4 font-display text-2xl tracking-tight">Acceso restringido</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-neutral-500">{mensaje}</p>
           <Link
             href="/"

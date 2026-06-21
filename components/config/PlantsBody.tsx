@@ -151,7 +151,7 @@ function PlantModal({ planta, onClose }: { planta: Planta | null; onClose: () =>
       >
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
           <Label>Planta</Label>
-          <h2 id="plant-title" className="mt-2 font-serif text-2xl tracking-tight">{esEdicion ? "Editar planta" : "Agregar planta"}</h2>
+          <h2 id="plant-title" className="mt-2 font-display text-2xl tracking-tight">{esEdicion ? "Editar planta" : "Agregar planta"}</h2>
         </div>
 
         <div className="space-y-4 px-7 py-6">
