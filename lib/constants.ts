@@ -243,20 +243,7 @@ export const PROTO_SPECIAL: Protocolo[] = [
   { n: "BACnet", d: "Automatización de edificios / HVAC", estado: "configurar" },
 ];
 
-// ──────────────────────────────────────────────────────────────────────────
-// PERMISOS POR ROL (vista Admin) — orden: [Admin, Jefe, Técnico, Operador, Lectura]
-// ──────────────────────────────────────────────────────────────────────────
-
-export const MATRIZ_PERMISOS: { f: string; v: number[] }[] = [
-  { f: "Ver centro de mando", v: [1, 1, 1, 1, 1] },
-  { f: "Ver producción / OEE", v: [1, 1, 1, 0, 0] },
-  { f: "Ver detalle de activos", v: [1, 1, 1, 1, 1] },
-  { f: "Auditar y etiquetar", v: [1, 1, 1, 1, 0] },
-  { f: "Marcar mantenimiento hecho", v: [1, 1, 1, 0, 0] },
-  { f: "Configurar conexiones", v: [1, 0, 1, 0, 0] },
-  { f: "Gestionar usuarios", v: [1, 0, 0, 0, 0] },
-  { f: "Cambiar ajustes de planta", v: [1, 1, 0, 0, 0] },
-  { f: "Exportar reportes", v: [1, 1, 1, 0, 1] },
-];
+// La matriz de permisos (vista Admin) ahora es editable y vive en
+// lib/permissions.ts (PERMISOS / PERMISO_LABEL) + el override en SessionProvider.
 
 // El control de acceso por rol vive en lib/permissions.ts (PERMISOS / puede()).

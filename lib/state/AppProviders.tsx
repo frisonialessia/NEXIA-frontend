@@ -7,13 +7,16 @@
 // fleetStore + useFleet).
 // ──────────────────────────────────────────────────────────────────────────
 
+import { AdminProvider } from "./AdminProvider";
 import { SessionProvider } from "./SessionProvider";
 import { ThemeProvider } from "./ThemeProvider";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider>
+        <AdminProvider>{children}</AdminProvider>
+      </SessionProvider>
     </ThemeProvider>
   );
 }
