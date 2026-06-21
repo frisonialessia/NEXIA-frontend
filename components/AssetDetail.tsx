@@ -9,12 +9,16 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ESTADOS, AHORRO_POR_PARADA, col, estadoColor, surf } from "@/lib/constants";
+import { toast } from "sonner";
+import { ESTADOS, AHORRO_POR_PARADA, ROL_NOMBRE, col, estadoColor, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
+import { useAdmin } from "@/lib/state/AdminProvider";
+import { useMantenimiento } from "@/lib/state/MaintenanceProvider";
 import { useMaquinas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -22,13 +26,17 @@ import type { Lectura } from "@/lib/types";
 import { Card, SURFACE } from "./ui/Card";
 import { Gauge } from "./ui/Gauge";
 import { Icon } from "./ui/Icon";
+import { Button } from "./ui/Primitives";
 import { Label, Stat } from "./ui/Typo";
 import { VibrationChart } from "./ui/VibrationChart";
 
 export function AssetDetail({ id }: { id: string }) {
   const maquinas = useMaquinas();
-  const { sistema } = useSession();
+  const { sistema, puede, rol } = useSession();
   const { dark } = useTheme();
+  const { crear } = useMantenimiento();
+  const { registrar, usuarios } = useAdmin();
+  const router = useRouter();
 
   const m = maquinas.find((x) => x.id === id);
 
@@ -94,6 +102,16 @@ export function AssetDetail({ id }: { id: string }) {
     }, 110);
   }
 
+  function programar() {
+    if (!m) return;
+    const tipo = m.estado === "STABLE" ? "preventivo" : "correctivo";
+    const prioridad = m.estado === "CRITICAL_ALERT" ? "alta" : m.estado === "STABLE" ? "baja" : "media";
+    crear({ maquinaId: m.id, maquina: m.id, tipo, prioridad, programadaPara: "", responsable: usuarios[0]?.n ?? "", notas: "" });
+    registrar(ROL_NOMBRE[rol], "Creó orden de mantenimiento", `${m.id} · ${tipo}`);
+    toast("Orden creada · te llevo a Mantenimiento");
+    router.push("/mantenimiento");
+  }
+
   return (
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-5xl">
@@ -111,6 +129,15 @@ export function AssetDetail({ id }: { id: string }) {
             {m.sensor} · {m.sector} · IA activa
           </p>
         </header>
+
+        {puede("mantenimiento") && (
+          <div className="mb-5 flex justify-end">
+            <Button variant="secondary" className="px-4 py-2 text-sm" onClick={programar}>
+              <Icon name="tool" className="h-4 w-4" />
+              Programar mantenimiento
+            </Button>
+          </div>
+        )}
 
         {/* Pronóstico */}
         <div className="mb-5 rounded-2xl border px-7 py-5" style={predEstilo}>
