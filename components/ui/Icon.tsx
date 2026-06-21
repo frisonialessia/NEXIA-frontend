@@ -28,7 +28,8 @@ export type IconName =
   | "x"
   | "grip"
   | "pin"
-  | "tool";
+  | "tool"
+  | "report";
 
 /** Contenido vectorial de cada icono (paths/círculos dentro del viewBox 24×24). */
 const PATHS: Record<IconName, React.ReactNode> = {
@@ -70,6 +71,7 @@ const PATHS: Record<IconName, React.ReactNode> = {
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   x: <path d="M18 6L6 18M6 6l12 12" />,
   tool: <path d="M7 10h3V7l-3.5-3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1-3 3l-6-6a6 6 0 0 1-8-8z" />,
+  report: <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 14v3M13 11v6" />,
   grip: <path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01" />,
   pin: <path d="M15 4.5l-3.25 3.25a4 4 0 0 1-1.564 .976l-2.187 .73a1 1 0 0 0-.41 1.66l5.077 5.077a1 1 0 0 0 1.66-.41l.73-2.188a4 4 0 0 1 .976-1.563l3.25-3.25M9 15l-4.5 4.5M14.5 4l5.5 5.5" />,
 };
