@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ARC, col, mix, soft } from "@/lib/constants";
 import { SUGERENCIAS, responderIA, type AccionIA } from "@/lib/assistant/respond";
+import { useT } from "@/lib/state/I18nProvider";
 import { etiquetarAlerta, useAlertas, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { useTheme } from "@/lib/state/ThemeProvider";
 import { SURFACE } from "./ui/Card";
@@ -30,6 +31,7 @@ export function Assistant() {
   const { ahorroMes, paradasEvitadas } = useSavings();
   const { dark } = useTheme();
   const router = useRouter();
+  const t = useT();
   const brand = col("brand", dark);
 
   const [chat, setChat] = useState<Mensaje[]>([]);
@@ -62,8 +64,8 @@ export function Assistant() {
       etiquetarAlerta(a.alertaId, "real");
       setHechas((prev) => new Set(prev).add(a.id));
       setConfirmando(null);
-      toast("Alerta reconocida · registrada como fallo real");
-      setChat((prev) => [...prev, { rol: "ia", txt: `Hecho. Reconocí la alerta de la ${a.maquina} como fallo real y la registré en el historial.`, acciones: [] }]);
+      toast(t("asst.ackToast"));
+      setChat((prev) => [...prev, { rol: "ia", txt: t("asst.ackMsg", { machine: a.maquina }), acciones: [] }]);
     }
   }
 
@@ -73,19 +75,16 @@ export function Assistant() {
         <header className="mb-6">
           <div className="flex items-center gap-2">
             <Icon name="spark" className="h-4 w-4" style={{ color: brand }} />
-            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Inteligencia aumentada</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t("asst.eyebrow")}</span>
           </div>
-          <h1 className="mt-2 font-display text-3xl tracking-tight">Asistente NEXIA</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-500">
-            Pregunta en lenguaje natural sobre el estado de tus máquinas. El asistente analiza los datos en tiempo real y
-            puede proponer acciones que tú confirmas.
-          </p>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">{t("asst.title")}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-500">{t("asst.desc")}</p>
         </header>
 
         <div className={SURFACE}>
           <div ref={logRef} className="max-h-[440px] space-y-4 overflow-y-auto px-6 py-6">
             {chat.length === 0 ? (
-              <Burbuja brand={brand}>Hola. Pregúntame sobre el estado de tus máquinas, qué priorizar, o por qué algo está en riesgo.</Burbuja>
+              <Burbuja brand={brand}>{t("asst.greeting")}</Burbuja>
             ) : (
               chat.map((m, i) =>
                 m.rol === "user" ? (
@@ -103,16 +102,16 @@ export function Assistant() {
                           hechas.has(a.id) ? (
                             <span key={a.id} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ background: soft("ok"), color: col("ok", dark) }}>
                               <Icon name="check" className="h-3.5 w-3.5" />
-                              Hecho
+                              {t("asst.done")}
                             </span>
                           ) : confirmando === a.id ? (
                             <span key={a.id} className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs dark:border-neutral-700">
-                              <span className="text-neutral-500">¿Confirmar?</span>
+                              <span className="text-neutral-500">{t("asst.confirmQ")}</span>
                               <button onClick={() => ejecutar(a)} className="font-medium" style={{ color: col("ok", dark) }}>
-                                Sí
+                                {t("asst.yes")}
                               </button>
                               <button onClick={() => setConfirmando(null)} className="font-medium text-neutral-400">
-                                No
+                                {t("asst.no")}
                               </button>
                             </span>
                           ) : (
@@ -150,20 +149,17 @@ export function Assistant() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") enviar();
                 }}
-                placeholder="Pregunta sobre tus máquinas…"
+                placeholder={t("asst.placeholder")}
                 className="flex-1 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm outline-none focus:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800"
               />
-              <button onClick={() => enviar()} aria-label="Enviar" className="flex h-10 w-10 items-center justify-center rounded-xl text-white" style={{ background: brand }}>
+              <button onClick={() => enviar()} aria-label={t("asst.send")} className="flex h-10 w-10 items-center justify-center rounded-xl text-white" style={{ background: brand }}>
                 <Icon name="send" className="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
 
-        <p className="mt-3 text-center text-[11px] text-neutral-400">
-          El asistente analiza los datos simulados de la demo. En producción se conecta a un modelo de lenguaje (Claude)
-          con acceso a tu planta y permisos por rol.
-        </p>
+        <p className="mt-3 text-center text-[11px] text-neutral-400">{t("asst.footer")}</p>
       </div>
     </main>
   );
