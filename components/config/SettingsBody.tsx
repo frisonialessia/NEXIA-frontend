@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ROL_NOMBRE, UNIDADES, UNIDADES_UNIVERSALES, col } from "@/lib/constants";
 import { uni } from "@/lib/format";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -23,21 +24,22 @@ export function SettingsBody() {
   const { sistema, setSistema, puede, rol } = useSession();
   const { registrar } = useAdmin();
   const { toggle, dark } = useTheme();
+  const t = useT();
   const [umbral, setUmbral] = useState(60);
   const brand = col("brand", dark);
   const puedeAjustesPlanta = puede("ajustesPlanta");
 
   return (
     <div className="space-y-4">
-      <Seccion titulo="Sistema de unidades">
+      <Seccion titulo={t("set.units")}>
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm">Sistema de medida</div>
-            <div className="text-xs text-neutral-400">Cambia todas las unidades de doble sistema a la vez</div>
+            <div className="text-sm">{t("set.measureSystem")}</div>
+            <div className="text-xs text-neutral-400">{t("set.measureDesc")}</div>
           </div>
           <div className="flex gap-1 rounded-lg border border-neutral-200 p-0.5 dark:border-neutral-700">
-            <BotonSistema valor="metrico" actual={sistema} onClick={setSistema} brand={brand} label="Métrico (SI)" />
-            <BotonSistema valor="imperial" actual={sistema} onClick={setSistema} brand={brand} label="Imperial (EE.UU.)" />
+            <BotonSistema valor="metrico" actual={sistema} onClick={setSistema} brand={brand} label={t("set.metric")} />
+            <BotonSistema valor="imperial" actual={sistema} onClick={setSistema} brand={brand} label={t("set.imperial")} />
           </div>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3">
@@ -50,32 +52,32 @@ export function SettingsBody() {
         </div>
       </Seccion>
 
-      <Seccion titulo="Preferencias">
+      <Seccion titulo={t("set.preferences")}>
         <div className="space-y-4">
           <LanguageRow />
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm">Tema oscuro</div>
-              <div className="text-xs text-neutral-400">Cambia el aspecto general</div>
+              <div className="text-sm">{t("set.darkTheme")}</div>
+              <div className="text-xs text-neutral-400">{t("set.darkDesc")}</div>
             </div>
             <button onClick={toggle} className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm dark:border-neutral-700">
-              Alternar
+              {t("set.toggle")}
             </button>
           </div>
         </div>
       </Seccion>
 
       {puedeAjustesPlanta && (
-        <Seccion titulo="Umbrales de alerta">
+        <Seccion titulo={t("set.thresholds")}>
           <div className="space-y-4">
             <label className="block">
               <div className="flex justify-between text-sm">
-                <span className="text-neutral-600 dark:text-neutral-300">Sensibilidad de detección</span>
+                <span className="text-neutral-600 dark:text-neutral-300">{t("set.sensitivity")}</span>
                 <span className="font-mono text-neutral-400">{umbral}%</span>
               </div>
               <input type="range" min={40} max={90} value={umbral} onChange={(e) => setUmbral(Number(e.target.value))} className="mt-2 w-full" style={{ accentColor: brand }} />
             </label>
-            <p className="text-xs text-neutral-400">Más bajo = más sensible (más alertas). Más alto = solo casos claros.</p>
+            <p className="text-xs text-neutral-400">{t("set.sensitivityDesc")}</p>
           </div>
         </Seccion>
       )}
@@ -84,10 +86,10 @@ export function SettingsBody() {
         <Button
           onClick={() => {
             registrar(ROL_NOMBRE[rol], "Guardó ajustes", `Sistema ${sistema}`);
-            toast("Ajustes guardados");
+            toast(t("set.savedToast"));
           }}
         >
-          Guardar cambios
+          {t("set.save")}
         </Button>
       </div>
     </div>

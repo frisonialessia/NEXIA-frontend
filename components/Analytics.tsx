@@ -20,6 +20,7 @@ import {
   SEMANAS,
 } from "@/lib/data/analytics";
 import { descargarCSV, imprimirReporte } from "@/lib/reports/exporter";
+import { useT } from "@/lib/state/I18nProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AccessDenied } from "./AccessDenied";
 import { Card } from "./ui/Card";
@@ -29,21 +30,22 @@ import { MiniLineChart } from "./ui/MiniLineChart";
 import { Button } from "./ui/Primitives";
 import { Label, PageTitle, Stat } from "./ui/Typo";
 
-const RANGOS = ["Últimas 8 semanas", "Últimos 30 días", "Este trimestre"];
+const RANGOS = ["rep.range8w", "rep.range30d", "rep.rangeQ"];
 
 export function Analytics() {
   const { puede } = useSession();
+  const t = useT();
   const [rango, setRango] = useState(RANGOS[0]);
 
   if (!puede("tendencia")) {
-    return <AccessDenied mensaje="Reportes y analítica requiere un rol gerencial (Administrador o Jefe de planta)." />;
+    return <AccessDenied mensaje={t("access.reports")} />;
   }
 
   const maxRoi = Math.max(...ROI_POR_MAQUINA.map((r) => r.ahorro));
 
   function exportarCSV() {
     const filas: (string | number)[][] = [
-      ["NEXIA · Reporte", rango],
+      ["NEXIA · Reporte", t(rango)],
       [],
       ["Semana", "Ahorro acumulado", "Salud %", "Alertas"],
       ...SEMANAS.map((s, i) => [s, AHORRO_SEMANAL[i], SALUD_SEMANAL[i], ALERTAS_SEMANAL[i]]),
@@ -55,13 +57,13 @@ export function Analytics() {
       ...CAUSAS_FRECUENTES.map((c) => [c.causa, c.n]),
     ];
     descargarCSV(`nexia-reporte-${Date.now()}.csv`, filas);
-    toast("Reporte CSV descargado");
+    toast(t("rep.csvToast"));
   }
 
   function exportarPDF() {
     const html = `
       <h1>Reporte de mantenimiento predictivo</h1>
-      <div class="sub">${rango} · Planta Norte · Línea 1</div>
+      <div class="sub">${t(rango)} · Planta Norte · Línea 1</div>
       <div class="kpis">
         <div class="kpi"><div class="l">Ahorro acumulado</div><div class="v">${dinero(ANALYTICS_KPIS.ahorroAcumulado)}</div></div>
         <div class="kpi"><div class="l">Paradas evitadas</div><div class="v">${ANALYTICS_KPIS.paradasEvitadas}</div></div>
@@ -87,9 +89,9 @@ export function Analytics() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <Label>Inteligencia de negocio</Label>
+          <Label>{t("rep.bi")}</Label>
           <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-            <PageTitle>Reportes y analítica</PageTitle>
+            <PageTitle>{t("rep.title")}</PageTitle>
             <div className="flex items-center gap-2">
               <select
                 value={rango}
@@ -97,7 +99,9 @@ export function Analytics() {
                 className="rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
               >
                 {RANGOS.map((r) => (
-                  <option key={r}>{r}</option>
+                  <option key={r} value={r}>
+                    {t(r)}
+                  </option>
                 ))}
               </select>
               <Button variant="secondary" className="px-3 py-2 text-sm" onClick={exportarCSV}>
@@ -114,30 +118,30 @@ export function Analytics() {
 
         {/* KPIs */}
         <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <KpiCard label="Ahorro acumulado" value={dinero(ANALYTICS_KPIS.ahorroAcumulado)} colorKey="ok" />
-          <KpiCard label="Paradas evitadas" value={String(ANALYTICS_KPIS.paradasEvitadas)} />
+          <KpiCard label={t("rep.cumSavings")} value={dinero(ANALYTICS_KPIS.ahorroAcumulado)} colorKey="ok" />
+          <KpiCard label={t("rep.stopsAvoided")} value={String(ANALYTICS_KPIS.paradasEvitadas)} />
           <KpiCard label="MTBF" value={ANALYTICS_KPIS.mtbf} />
-          <KpiCard label="Disponibilidad" value={`${ANALYTICS_KPIS.disponibilidad}%`} colorKey="ok" />
+          <KpiCard label={t("rep.availability")} value={`${ANALYTICS_KPIS.disponibilidad}%`} colorKey="ok" />
         </div>
 
         {/* Tendencias */}
         <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Card className="px-6 py-5">
-            <Label>Ahorro acumulado</Label>
+            <Label>{t("rep.cumSavings")}</Label>
             <Stat className="mt-1" value={dinero(AHORRO_SEMANAL[AHORRO_SEMANAL.length - 1])} size="md" colorKey="ok" />
             <div className="mt-2 h-16 overflow-hidden">
               <MiniLineChart data={AHORRO_SEMANAL} color={col("ok")} />
             </div>
           </Card>
           <Card className="px-6 py-5">
-            <Label>Salud de planta</Label>
+            <Label>{t("kpi.plantHealth")}</Label>
             <Stat className="mt-1" value={`${SALUD_SEMANAL[SALUD_SEMANAL.length - 1]}%`} size="md" colorKey="ok" />
             <div className="mt-2 h-16 overflow-hidden">
               <MiniLineChart data={SALUD_SEMANAL} color={VERDES.oscuro} />
             </div>
           </Card>
           <Card className="px-6 py-5">
-            <Label>Alertas por semana</Label>
+            <Label>{t("rep.alertsPerWeek")}</Label>
             <Stat className="mt-1" value={String(ALERTAS_SEMANAL.reduce((s, v) => s + v, 0))} size="md" />
             <div className="mt-2">
               <ColumnChart data={ALERTAS_SEMANAL} labels={SEMANAS} color={col("crit")} />
@@ -148,7 +152,7 @@ export function Analytics() {
         {/* ROI + causas */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card className="px-7 py-6">
-            <Label>ROI por máquina · ahorro atribuible</Label>
+            <Label>{t("rep.roi")}</Label>
             <div className="mt-4 space-y-3">
               {ROI_POR_MAQUINA.map((r) => (
                 <div key={r.maquina}>
@@ -165,7 +169,7 @@ export function Analytics() {
           </Card>
 
           <Card className="px-7 py-6">
-            <Label>Causas raíz más frecuentes</Label>
+            <Label>{t("rep.rootCauses")}</Label>
             <div className="mt-4 space-y-2.5">
               {CAUSAS_FRECUENTES.map((c) => (
                 <div key={c.causa} className="flex items-center gap-3 text-sm">

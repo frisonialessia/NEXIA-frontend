@@ -7,6 +7,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { useState } from "react";
+import { useT } from "@/lib/state/I18nProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AssetsBody } from "./config/AssetsBody";
 import { AuditLogBody } from "./config/AuditLogBody";
@@ -20,16 +21,17 @@ import { Tabs, type TabDef } from "./ui/Tabs";
 
 export function Configuracion() {
   const { puede } = useSession();
+  const t = useT();
 
   const tabs: TabDef[] = [
-    { id: "ajustes", label: "Ajustes" },
-    ...(puede("activos") ? [{ id: "activos", label: "Activos" }] : []),
-    ...(puede("plantas") ? [{ id: "plantas", label: "Plantas" }] : []),
-    ...(puede("ajustesPlanta") ? [{ id: "notificaciones", label: "Notificaciones" }] : []),
-    ...(puede("conexiones") ? [{ id: "conexiones", label: "Conexiones" }] : []),
-    ...(puede("usuarios") ? [{ id: "equipo", label: "Equipo" }] : []),
-    ...(puede("facturacion") ? [{ id: "facturacion", label: "Facturación" }] : []),
-    ...(puede("usuarios") ? [{ id: "registro", label: "Registro" }] : []),
+    { id: "ajustes", label: t("cfg.tabAjustes") },
+    ...(puede("activos") ? [{ id: "activos", label: t("cfg.tabActivos") }] : []),
+    ...(puede("plantas") ? [{ id: "plantas", label: t("cfg.tabPlantas") }] : []),
+    ...(puede("ajustesPlanta") ? [{ id: "notificaciones", label: t("cfg.tabNotificaciones") }] : []),
+    ...(puede("conexiones") ? [{ id: "conexiones", label: t("cfg.tabConexiones") }] : []),
+    ...(puede("usuarios") ? [{ id: "equipo", label: t("cfg.tabEquipo") }] : []),
+    ...(puede("facturacion") ? [{ id: "facturacion", label: t("cfg.tabFacturacion") }] : []),
+    ...(puede("usuarios") ? [{ id: "registro", label: t("cfg.tabRegistro") }] : []),
   ];
 
   const [tab, setTab] = useState("ajustes");
@@ -39,8 +41,8 @@ export function Configuracion() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">Configuración</span>
-          <h1 className="mt-2 font-display text-3xl tracking-tight">Configuración</h1>
+          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t("cfg.title")}</span>
+          <h1 className="mt-2 font-display text-3xl tracking-tight">{t("cfg.title")}</h1>
         </header>
 
         {tabs.length > 1 && (
