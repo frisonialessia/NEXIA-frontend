@@ -15,6 +15,7 @@ import { Nav } from "./Nav";
 import { PhoneAlert } from "./PhoneAlert";
 import { PwaRegister } from "./PwaRegister";
 import { BrandMark } from "./account/BrandMark";
+import { WelcomeTour } from "./onboarding/WelcomeTour";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { sesionActiva, hidratado } = useSession();
@@ -35,6 +36,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           <PhoneAlert />
           <LiveAnnouncer />
           <PwaRegister />
+          <WelcomeTour />
         </>
       )}
     </div>
