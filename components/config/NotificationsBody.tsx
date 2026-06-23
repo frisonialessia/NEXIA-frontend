@@ -10,6 +10,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ROLES, ROL_NOMBRE } from "@/lib/constants";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useIntegraciones, type NotifPrefs } from "@/lib/state/IntegrationsProvider";
 import { useSession } from "@/lib/state/SessionProvider";
@@ -22,6 +23,7 @@ export function NotificationsBody() {
   const { notif, setNotif } = useIntegraciones();
   const { registrar } = useAdmin();
   const { rol } = useSession();
+  const t = useT();
   const [f, setF] = useState<NotifPrefs>(notif);
 
   const set = (parcial: Partial<NotifPrefs>) => setF((prev) => ({ ...prev, ...parcial }));
@@ -30,51 +32,51 @@ export function NotificationsBody() {
   function guardar() {
     setNotif(f);
     registrar(ROL_NOMBRE[rol], "Guardó notificaciones", `Canales: ${[f.inApp && "app", f.email && "correo", f.sms && "SMS", f.whatsapp && "WhatsApp"].filter(Boolean).join(", ") || "ninguno"}`);
-    toast("Preferencias de notificación guardadas");
+    toast(t("notif.savedToast"));
   }
 
   return (
     <div className="space-y-4">
       {/* Canales */}
       <Card className="px-7 py-6">
-        <Label>Canales</Label>
+        <Label>{t("notif.channels")}</Label>
         <div className="mt-4 space-y-4">
-          <Fila titulo="En la app" desc="Campana y avisos dentro de NEXIA">
-            <Switch checked={f.inApp} onChange={(v) => set({ inApp: v })} label="En la app" />
+          <Fila titulo={t("notif.inApp")} desc={t("notif.inAppDesc")}>
+            <Switch checked={f.inApp} onChange={(v) => set({ inApp: v })} label={t("notif.inApp")} />
           </Fila>
-          <Fila titulo="Correo electrónico" desc="Aviso por email al responsable">
+          <Fila titulo={t("notif.email")} desc={t("notif.emailDesc")}>
             <div className="flex items-center gap-3">
               {f.email && (
-                <input value={f.emailDest} onChange={(e) => set({ emailDest: e.target.value })} placeholder="correo@planta.com" className={input} />
+                <input value={f.emailDest} onChange={(e) => set({ emailDest: e.target.value })} placeholder={t("team.emailPlaceholder")} className={input} />
               )}
-              <Switch checked={f.email} onChange={(v) => set({ email: v })} label="Correo" />
+              <Switch checked={f.email} onChange={(v) => set({ email: v })} label={t("notif.email")} />
             </div>
           </Fila>
-          <Fila titulo="SMS" desc="Mensaje de texto al responsable">
+          <Fila titulo={t("notif.sms")} desc={t("notif.smsDesc")}>
             <div className="flex items-center gap-3">
               {f.sms && (
                 <input value={f.telDest} onChange={(e) => set({ telDest: e.target.value })} placeholder="+52 …" className={input} />
               )}
-              <Switch checked={f.sms} onChange={(v) => set({ sms: v })} label="SMS" />
+              <Switch checked={f.sms} onChange={(v) => set({ sms: v })} label={t("notif.sms")} />
             </div>
           </Fila>
-          <Fila titulo="WhatsApp" desc="Mensaje de WhatsApp (usa el mismo número)">
-            <Switch checked={f.whatsapp} onChange={(v) => set({ whatsapp: v })} label="WhatsApp" />
+          <Fila titulo={t("notif.whatsapp")} desc={t("notif.whatsappDesc")}>
+            <Switch checked={f.whatsapp} onChange={(v) => set({ whatsapp: v })} label={t("notif.whatsapp")} />
           </Fila>
         </div>
       </Card>
 
       {/* Cuándo notificar + escalado */}
       <Card className="px-7 py-6">
-        <Label>Cuándo notificar</Label>
+        <Label>{t("notif.when")}</Label>
         <div className="mt-4 space-y-4">
-          <Fila titulo="Alertas críticas" desc="Siempre recomendado">
-            <Switch checked={f.critico} onChange={(v) => set({ critico: v })} label="Críticas" />
+          <Fila titulo={t("notif.critical")} desc={t("notif.criticalDesc")}>
+            <Switch checked={f.critico} onChange={(v) => set({ critico: v })} label={t("notif.critical")} />
           </Fila>
-          <Fila titulo="Avisos en observación" desc="Cuando una máquina entra en vigilancia">
-            <Switch checked={f.advertencia} onChange={(v) => set({ advertencia: v })} label="En observación" />
+          <Fila titulo={t("notif.warning")} desc={t("notif.warningDesc")}>
+            <Switch checked={f.advertencia} onChange={(v) => set({ advertencia: v })} label={t("notif.warning")} />
           </Fila>
-          <Fila titulo="Escalar si nadie atiende" desc="Avisa al siguiente responsable tras unos minutos">
+          <Fila titulo={t("notif.escalate")} desc={t("notif.escalateDesc")}>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -83,11 +85,11 @@ export function NotificationsBody() {
                 onChange={(e) => set({ escaladoMin: Number(e.target.value) })}
                 className={`${input} w-16`}
               />
-              <span className="text-xs text-neutral-400">min →</span>
+              <span className="text-xs text-neutral-400">{t("notif.minTo")}</span>
               <select value={f.escalarA} onChange={(e) => set({ escalarA: e.target.value as Rol })} className={input}>
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
-                    {ROL_NOMBRE[r]}
+                    {t(`roles.${r}`)}
                   </option>
                 ))}
               </select>
@@ -98,22 +100,22 @@ export function NotificationsBody() {
 
       {/* Horario silencioso */}
       <Card className="px-7 py-6">
-        <Label>Horario silencioso</Label>
+        <Label>{t("notif.quiet")}</Label>
         <div className="mt-4 flex items-center justify-between">
           <div>
-            <div className="text-sm">No molestar</div>
-            <div className="text-xs text-neutral-400">Solo las críticas se envían en este rango</div>
+            <div className="text-sm">{t("notif.dnd")}</div>
+            <div className="text-xs text-neutral-400">{t("notif.dndDesc")}</div>
           </div>
           <div className="flex items-center gap-2">
             <input type="time" value={f.silencioInicio} onChange={(e) => set({ silencioInicio: e.target.value })} className={input} />
-            <span className="text-xs text-neutral-400">a</span>
+            <span className="text-xs text-neutral-400">{t("notif.to")}</span>
             <input type="time" value={f.silencioFin} onChange={(e) => set({ silencioFin: e.target.value })} className={input} />
           </div>
         </div>
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={guardar}>Guardar notificaciones</Button>
+        <Button onClick={guardar}>{t("notif.save")}</Button>
       </div>
     </div>
   );

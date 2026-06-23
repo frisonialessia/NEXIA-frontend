@@ -10,7 +10,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ROLES, ROL_NOMBRE, col, mix } from "@/lib/constants";
-import { PERMISOS_ORDEN, PERMISO_LABEL } from "@/lib/permissions";
+import { PERMISOS_ORDEN } from "@/lib/permissions";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import type { Rol } from "@/lib/types";
@@ -19,17 +20,12 @@ import { Icon } from "../ui/Icon";
 import { Button } from "../ui/Primitives";
 import { Label } from "../ui/Typo";
 
-const COLS: { rol: Rol; corto: string }[] = [
-  { rol: "admin", corto: "Admin" },
-  { rol: "jefe", corto: "Jefe" },
-  { rol: "tecnico", corto: "Técnico" },
-  { rol: "operador", corto: "Operador" },
-  { rol: "lectura", corto: "Lectura" },
-];
+const COLS: Rol[] = ["admin", "jefe", "tecnico", "operador", "lectura"];
 
 export function EquipoBody() {
   const { usuarios, invitar, cambiarRol, quitar, registrar } = useAdmin();
   const { rol, matriz, togglePermiso, resetPermisos } = useSession();
+  const t = useT();
   const actor = ROL_NOMBRE[rol];
 
   const [email, setEmail] = useState("");
@@ -38,12 +34,12 @@ export function EquipoBody() {
   function enviarInvitacion() {
     const e = email.trim();
     if (!e || !e.includes("@")) {
-      toast.error("Escribe un correo válido");
+      toast.error(t("team.invalidEmail"));
       return;
     }
     invitar("", e, nuevoRol);
     registrar(actor, "Invitó a un usuario", `${e} como ${ROL_NOMBRE[nuevoRol]}`);
-    toast("Invitación enviada a " + e);
+    toast(t("team.invitedToast", { email: e }));
     setEmail("");
   }
 
@@ -51,14 +47,14 @@ export function EquipoBody() {
     <div className="space-y-6">
       {/* Invitar */}
       <div className={`${SURFACE} px-6 py-5`}>
-        <Label>Invitar a un miembro</Label>
+        <Label>{t("team.invite")}</Label>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && enviarInvitacion()}
-            placeholder="correo@planta.com"
+            placeholder={t("team.emailPlaceholder")}
             className="flex-1 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800"
           />
           <select
@@ -68,13 +64,13 @@ export function EquipoBody() {
           >
             {ROLES.map((r) => (
               <option key={r} value={r}>
-                {ROL_NOMBRE[r]}
+                {t(`roles.${r}`)}
               </option>
             ))}
           </select>
           <Button onClick={enviarInvitacion} className="px-4 py-2">
             <Icon name="plus" className="h-4 w-4" />
-            Invitar
+            {t("team.inviteBtn")}
           </Button>
         </div>
       </div>
@@ -82,7 +78,7 @@ export function EquipoBody() {
       {/* Usuarios */}
       <div className={`${SURFACE} overflow-hidden`}>
         <div className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
-          <Label>Usuarios · {usuarios.length}</Label>
+          <Label>{t("team.users")} · {usuarios.length}</Label>
         </div>
         {usuarios.map((u, i) => (
           <div key={u.id} className={`flex items-center gap-4 px-6 py-4 ${i === usuarios.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}`}>
@@ -94,7 +90,7 @@ export function EquipoBody() {
                 <span className="truncate text-sm font-medium">{u.n}</span>
                 {u.estado === "invitado" && (
                   <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] uppercase tracking-wide text-neutral-500 dark:bg-neutral-800">
-                    Invitado
+                    {t("team.invited")}
                   </span>
                 )}
               </div>
@@ -110,7 +106,7 @@ export function EquipoBody() {
             >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
-                  {ROL_NOMBRE[r]}
+                  {t(`roles.${r}`)}
                 </option>
               ))}
             </select>
@@ -118,9 +114,9 @@ export function EquipoBody() {
               onClick={() => {
                 quitar(u.id);
                 registrar(actor, "Quitó a un usuario", u.e);
-                toast("Usuario eliminado");
+                toast(t("team.userRemoved"));
               }}
-              aria-label="Quitar usuario"
+              aria-label={t("team.removeUser")}
               className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200"
             >
               <Icon name="x" className="h-4 w-4" />
@@ -132,26 +128,26 @@ export function EquipoBody() {
       {/* Matriz de permisos editable */}
       <div className={`${SURFACE} overflow-hidden`}>
         <div className="flex items-center justify-between border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
-          <Label>Matriz de permisos · clic para cambiar</Label>
+          <Label>{t("team.matrix")}</Label>
           <button
             onClick={() => {
               resetPermisos();
               registrar(actor, "Restauró permisos", "valores por defecto");
-              toast("Permisos restaurados");
+              toast(t("team.permsReset"));
             }}
             className="text-xs text-neutral-500 transition-colors hover:text-neutral-800 dark:hover:text-neutral-200"
           >
-            Restaurar
+            {t("team.reset")}
           </button>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-neutral-100 text-xs uppercase tracking-wider text-neutral-400 dark:border-neutral-800">
-                <th className="px-6 py-3 text-left font-medium">Permiso</th>
+                <th className="px-6 py-3 text-left font-medium">{t("team.permission")}</th>
                 {COLS.map((c) => (
-                  <th key={c.rol} className="px-3 py-3 text-center font-medium">
-                    {c.corto}
+                  <th key={c} className="px-3 py-3 text-center font-medium">
+                    {t(`rolesShort.${c}`)}
                   </th>
                 ))}
               </tr>
@@ -159,17 +155,17 @@ export function EquipoBody() {
             <tbody>
               {PERMISOS_ORDEN.map((permiso, i) => (
                 <tr key={permiso} className={i === PERMISOS_ORDEN.length - 1 ? "" : "border-b border-neutral-100 dark:border-neutral-800"}>
-                  <td className="px-6 py-3 text-neutral-600 dark:text-neutral-300">{PERMISO_LABEL[permiso]}</td>
+                  <td className="px-6 py-3 text-neutral-600 dark:text-neutral-300">{t(`perm.${permiso}`)}</td>
                   {COLS.map((c) => {
-                    const activo = matriz[permiso].includes(c.rol);
+                    const activo = matriz[permiso].includes(c);
                     return (
-                      <td key={c.rol} className="px-3 py-3 text-center">
+                      <td key={c} className="px-3 py-3 text-center">
                         <button
                           onClick={() => {
-                            togglePermiso(permiso, c.rol);
-                            registrar(actor, activo ? "Quitó un permiso" : "Otorgó un permiso", `${PERMISO_LABEL[permiso]} · ${ROL_NOMBRE[c.rol]}`);
+                            togglePermiso(permiso, c);
+                            registrar(actor, activo ? "Quitó un permiso" : "Otorgó un permiso", `${t(`perm.${permiso}`)} · ${ROL_NOMBRE[c]}`);
                           }}
-                          aria-label={`${activo ? "Quitar" : "Otorgar"} ${PERMISO_LABEL[permiso]} a ${ROL_NOMBRE[c.rol]}`}
+                          aria-label={`${activo ? t("team.revoke") : t("team.grant")} ${t(`perm.${permiso}`)} · ${t(`roles.${c}`)}`}
                           aria-pressed={activo}
                           className="mx-auto flex h-6 w-6 items-center justify-center rounded-md transition-colors"
                           style={activo ? { background: mix(col("ok"), 16), color: col("ok") } : undefined}
