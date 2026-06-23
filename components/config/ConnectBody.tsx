@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { PROTO_ESENCIAL, PROTO_SPECIAL, PROTO_VENDOR, ROL_NOMBRE, col, soft } from "@/lib/constants";
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useIntegraciones } from "@/lib/state/IntegrationsProvider";
 import { useSession } from "@/lib/state/SessionProvider";
@@ -20,17 +21,15 @@ import { Button } from "../ui/Primitives";
 
 export function ConnectBody() {
   const { conexiones } = useIntegraciones();
+  const t = useT();
   const [abierto, setAbierto] = useState<Protocolo | null>(null);
 
   return (
     <div className="space-y-6">
-      <p className="max-w-2xl text-sm leading-relaxed text-neutral-500">
-        Conecta NEXIA a tus máquinas por protocolos industriales estándar. Selecciona el de tu PLC o controlador para
-        configurarlo. Un gateway traduce la señal de tu equipo al sistema.
-      </p>
-      <Grupo titulo="Protocolos esenciales" protocolos={PROTO_ESENCIAL} estados={conexiones} onAbrir={setAbierto} />
-      <Grupo titulo="Por fabricante de PLC" protocolos={PROTO_VENDOR} estados={conexiones} onAbrir={setAbierto} />
-      <Grupo titulo="Buses industriales especializados" protocolos={PROTO_SPECIAL} estados={conexiones} onAbrir={setAbierto} />
+      <p className="max-w-2xl text-sm leading-relaxed text-neutral-500">{t("conn.intro")}</p>
+      <Grupo titulo={t("conn.essential")} protocolos={PROTO_ESENCIAL} estados={conexiones} onAbrir={setAbierto} />
+      <Grupo titulo={t("conn.byVendor")} protocolos={PROTO_VENDOR} estados={conexiones} onAbrir={setAbierto} />
+      <Grupo titulo={t("conn.specialized")} protocolos={PROTO_SPECIAL} estados={conexiones} onAbrir={setAbierto} />
 
       {abierto && <ConfigModal protocolo={abierto} onClose={() => setAbierto(null)} />}
     </div>
@@ -82,15 +81,16 @@ function ProtocoloCard({ p, estado, onClick }: { p: Protocolo; estado: EstadoPro
 }
 
 function EstadoPill({ estado }: { estado: EstadoProtocolo }) {
+  const t = useT();
   const map: Record<EstadoProtocolo, [string, string]> = {
-    conectado: [col("ok"), "Conectado"],
-    disponible: [col("brand"), "Disponible"],
-    configurar: [col("gray"), "Configurar"],
+    conectado: [col("ok"), t("conn.connected")],
+    disponible: [col("brand"), t("conn.available")],
+    configurar: [col("gray"), t("conn.configure")],
   };
-  const [c, t] = map[estado];
+  const [c, label] = map[estado];
   return (
     <span className="rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide" style={{ background: `${c}1a`, color: c }}>
-      {t}
+      {label}
     </span>
   );
 }
@@ -99,6 +99,7 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
   const { conexiones, configurar, conectar, desconectar } = useIntegraciones();
   const { registrar } = useAdmin();
   const { rol } = useSession();
+  const t = useT();
   const dialogRef = useModalA11y<HTMLDivElement>(onClose);
   const actor = ROL_NOMBRE[rol];
 
@@ -113,20 +114,20 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
 
   function probar() {
     if (!host) {
-      toast.error("Indica el host o IP");
+      toast.error(t("conn.needHost"));
       return;
     }
     setProbando(true);
     setTimeout(() => {
       setProbando(false);
-      toast.success("Conexión exitosa · el gateway respondió");
+      toast.success(t("conn.testOk"));
     }, 900);
   }
 
   function guardar() {
     configurar(protocolo.n, { host, puerto, intervalo });
     registrar(actor, "Configuró conexión", protocolo.n);
-    toast(protocolo.n + " configurado");
+    toast(t("conn.configuredToast", { name: protocolo.n }));
     onClose();
   }
 
@@ -143,7 +144,7 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
       >
         <div className="flex items-start justify-between border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
           <div>
-            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-400">Integración</span>
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-400">{t("conn.integration")}</span>
             <h2 id="conx-title" className="mt-2 font-display text-2xl tracking-tight">{protocolo.n}</h2>
             <p className="mt-1 text-sm text-neutral-500">{protocolo.d}</p>
           </div>
@@ -151,14 +152,14 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
         </div>
 
         <div className="space-y-4 px-7 py-6">
-          <Campo label="Host / IP">
+          <Campo label={t("conn.hostIp")}>
             <input value={host} onChange={(e) => setHost(e.target.value)} placeholder="192.168.1.50" className={input} />
           </Campo>
           <div className="grid grid-cols-2 gap-4">
-            <Campo label="Puerto">
+            <Campo label={t("conn.port")}>
               <input value={puerto} onChange={(e) => setPuerto(e.target.value)} placeholder="502" className={input} />
             </Campo>
-            <Campo label="Intervalo de sondeo (ms)">
+            <Campo label={t("conn.pollInterval")}>
               <input value={intervalo} onChange={(e) => setIntervalo(e.target.value)} placeholder="1000" className={input} />
             </Campo>
           </div>
@@ -169,7 +170,7 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
             style={{ background: soft("ok"), color: col("ok") }}
           >
             <Icon name="check" className="h-3.5 w-3.5" />
-            {probando ? "Probando…" : "Probar conexión"}
+            {probando ? t("conn.testing") : t("conn.testConn")}
           </button>
         </div>
 
@@ -180,11 +181,11 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
               onClick={() => {
                 desconectar(protocolo.n);
                 registrar(actor, "Desconectó", protocolo.n);
-                toast(protocolo.n + " desconectado");
+                toast(t("conn.disconnectedToast", { name: protocolo.n }));
                 onClose();
               }}
             >
-              Desconectar
+              {t("conn.disconnect")}
             </Button>
           ) : (
             <Button
@@ -192,18 +193,18 @@ function ConfigModal({ protocolo, onClose }: { protocolo: Protocolo; onClose: ()
               onClick={() => {
                 conectar(protocolo.n);
                 registrar(actor, "Conectó", protocolo.n);
-                toast.success(protocolo.n + " conectado");
+                toast.success(t("conn.connectedToast", { name: protocolo.n }));
                 onClose();
               }}
             >
-              Conectar
+              {t("conn.connect")}
             </Button>
           )}
           <div className="flex gap-3">
             <Button variant="ghost" onClick={onClose}>
-              Cancelar
+              {t("conn.cancel")}
             </Button>
-            <Button onClick={guardar}>Guardar</Button>
+            <Button onClick={guardar}>{t("conn.save")}</Button>
           </div>
         </div>
       </div>

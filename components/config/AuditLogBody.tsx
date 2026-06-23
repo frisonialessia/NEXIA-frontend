@@ -7,19 +7,21 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col } from "@/lib/constants";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { SURFACE } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 
 export function AuditLogBody() {
   const { auditoria } = useAdmin();
+  const t = useT();
 
   if (auditoria.length === 0) {
     return (
       <div className={`${SURFACE} px-8 py-16 text-center`}>
         <Icon name="clipboard" className="mx-auto h-7 w-7 text-neutral-300" />
-        <p className="mt-3 text-sm text-neutral-500">Aún no hay actividad registrada.</p>
-        <p className="mt-1 text-xs text-neutral-400">Las acciones (invitar, cambiar rol o permiso, etiquetar alertas…) aparecerán aquí.</p>
+        <p className="mt-3 text-sm text-neutral-500">{t("log.empty1")}</p>
+        <p className="mt-1 text-xs text-neutral-400">{t("log.empty2")}</p>
       </div>
     );
   }
