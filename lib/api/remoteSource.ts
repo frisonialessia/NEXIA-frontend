@@ -22,6 +22,7 @@ export interface ParcheRemoto {
   nuevasAlertas?: Alerta[];
   nuevosEventos?: Evento[];
   savings?: { ahorroMes: number; paradasEvitadas: number };
+  registro?: { real: number; falsa: number; nc: number };
 }
 
 export interface CallbacksRemoto {
@@ -95,6 +96,7 @@ export function conectarRemoto(cb: CallbacksRemoto): OrigenRemoto {
           nuevasAlertas: msg.nuevasAlertas?.map(aAlerta),
           nuevosEventos: msg.nuevosEventos?.map(aEvento),
           savings: msg.savings,
+          registro: msg.registro,
         });
       }
     };

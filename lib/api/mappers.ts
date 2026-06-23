@@ -73,6 +73,7 @@ export interface SnapshotDominio {
   historial: EventoHistorial[];
   eventos: Evento[];
   savings: { ahorroMes: number; paradasEvitadas: number };
+  registro: { real: number; falsa: number; nc: number };
   roster: MaquinaSeed[];
 }
 
@@ -83,6 +84,7 @@ export function aSnapshot(d: SnapshotDTO): SnapshotDominio {
     historial: d.historial.map(aHistorial),
     eventos: d.eventos.map(aEvento),
     savings: d.savings,
+    registro: d.registro,
     roster: aRoster(d.maquinas),
   };
 }

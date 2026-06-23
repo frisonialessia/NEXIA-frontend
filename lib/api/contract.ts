@@ -129,6 +129,13 @@ export interface SavingsDTO {
   paradasEvitadas: number;
 }
 
+/** Track record del modelo (veredictos humanos acumulados). */
+export interface RegistroDTO {
+  real: number;
+  falsa: number;
+  nc: number;
+}
+
 /** GET /v1/fleet/snapshot */
 export interface SnapshotDTO {
   maquinas: MaquinaDTO[];
@@ -136,6 +143,7 @@ export interface SnapshotDTO {
   historial: AlertaDTO[];
   eventos: EventoDTO[];
   savings: SavingsDTO;
+  registro: RegistroDTO;
 }
 
 // ── Mensajes del WebSocket en vivo ──────────────────────────────────────────
@@ -154,6 +162,8 @@ export type MensajeVivo =
       nuevosEventos?: EventoDTO[];
       /** ahorro actualizado */
       savings?: SavingsDTO;
+      /** track record actualizado */
+      registro?: RegistroDTO;
     };
 
 // ── Comandos (acciones del usuario hacia el backend) ────────────────────────

@@ -14,6 +14,7 @@ import { useAlertas, useHistorial } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { AuditQueue } from "./alertas/AuditQueue";
 import { HistoryList } from "./alertas/HistoryList";
+import { TrackRecord } from "./alertas/TrackRecord";
 import { Icon } from "./ui/Icon";
 import { Button } from "./ui/Primitives";
 import { Tabs } from "./ui/Tabs";
@@ -54,6 +55,10 @@ export function Alertas() {
             )}
           </div>
         </header>
+
+        <div className="mb-5">
+          <TrackRecord />
+        </div>
 
         <div className="mb-5">
           <Tabs
