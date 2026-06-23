@@ -6,11 +6,14 @@
 // se suscriben a su slice vía useSyncExternalStore y NO se re-renderizan cada
 // 2s si su parte no cambió.
 //
-// 🔌  PARA UN BACKEND REAL: reemplazar warmUp()/step() por consultas de red
-//    (TanStack Query). Las firmas de los hooks no cambian → cero cambios en las
-//    vistas.
+// 🔌  BACKEND REAL: si se define NEXT_PUBLIC_API_URL, este store se conecta al
+//    backend (snapshot REST + WebSocket en vivo) en lugar de simular, con
+//    respaldo automático a la simulación si la conexión falla. Ver lib/api/.
+//    Las firmas de los hooks NO cambian → cero cambios en las vistas.
 // ──────────────────────────────────────────────────────────────────────────
 
+import { apiConfigurada } from "../api/contract";
+import { comandos, conectarRemoto, type OrigenRemoto, type ParcheRemoto } from "../api/remoteSource";
 import { AHORRO_POR_PARADA, FLOTA } from "../constants";
 import { aEventoHistorial, crearFlota, crearMaquina, tickMaquina } from "../data/simulated";
 import { causaPrincipal } from "../engine/fsm";
@@ -76,6 +79,11 @@ const listeners = new Set<() => void>();
 let intervalo: ReturnType<typeof setInterval> | null = null;
 let suscriptores = 0;
 let calentado = false;
+
+// Modo remoto (backend real). Cuando hay conexión viva, las acciones se envían
+// como comandos y el servidor reemite la verdad por el WebSocket.
+let origenRemoto: OrigenRemoto | null = null;
+let remotoActivo = false;
 
 function emit() {
   listeners.forEach((l) => l());
@@ -152,24 +160,86 @@ function paso() {
   set(patch);
 }
 
-/** Suscripción para useSyncExternalStore. Arranca el motor con el primer
- *  suscriptor (solo en cliente) y lo detiene cuando no queda ninguno. */
+/** Arranca la simulación local (motor en el navegador). Es también el respaldo
+ *  cuando hay backend configurado pero la conexión falla. */
+function arrancarSimulacion() {
+  if (!calentado) {
+    calentar();
+    calentado = true;
+  }
+  if (!intervalo) intervalo = setInterval(paso, INTERVALO_MS);
+}
+
+/** Aplica un parche que llega del backend por el WebSocket (mismo merge que la
+ *  simulación: reemplaza la flota y antepone alertas/eventos). */
+function aplicarParche(p: ParcheRemoto) {
+  const patch: Partial<Snapshot> = {};
+  if (p.maquinas) {
+    flota = p.maquinas;
+    patch.maquinas = p.maquinas;
+    patch.roster = p.maquinas.map((m) => ({ id: m.id, sensor: m.sensor, sector: m.sector, base: m.base, esc: m.esc, tipo: m.tipo, umbral: m.umbral }));
+  }
+  if (p.nuevasAlertas?.length) {
+    patch.alertas = [...p.nuevasAlertas, ...snapshot.alertas];
+    patch.historial = [...p.nuevasAlertas.map(aEventoHistorial), ...snapshot.historial];
+    const aNotif = p.nuevasAlertas.find((a) => !notificadas[a.maquina]);
+    if (aNotif) {
+      notificadas[aNotif.maquina] = true;
+      patch.notif = { maquina: aNotif.maquina, causa: aNotif.causa };
+    }
+  }
+  if (p.nuevosEventos?.length) {
+    patch.eventos = [...p.nuevosEventos, ...snapshot.eventos].slice(0, MAX_EVENTOS);
+  }
+  if (p.savings) patch.savings = p.savings;
+  set(patch);
+}
+
+/** Conecta al backend real. Si la conexión es irrecuperable, cae a simulación. */
+function arrancarRemoto() {
+  origenRemoto = conectarRemoto({
+    onSnapshot: (s) => {
+      calentado = true;
+      remotoActivo = true;
+      flota = s.maquinas;
+      s.alertas.forEach((a) => (notificadas[a.maquina] = true));
+      set({ maquinas: s.maquinas, alertas: s.alertas, historial: s.historial, eventos: s.eventos, savings: s.savings, roster: s.roster });
+    },
+    onUpdate: aplicarParche,
+    onConectado: () => {
+      remotoActivo = true;
+    },
+    onCaida: () => {
+      // El backend no responde: respaldo transparente a la simulación local.
+      remotoActivo = false;
+      origenRemoto = null;
+      arrancarSimulacion();
+    },
+  });
+}
+
+/** Suscripción para useSyncExternalStore. Arranca la fuente de datos (backend o
+ *  simulación) con el primer suscriptor y la detiene cuando no queda ninguno. */
 export function subscribe(listener: () => void): () => void {
   listeners.add(listener);
   suscriptores += 1;
   if (suscriptores === 1) {
-    if (!calentado) {
-      calentar();
-      calentado = true;
-    }
-    intervalo = setInterval(paso, INTERVALO_MS);
+    if (apiConfigurada()) arrancarRemoto();
+    else arrancarSimulacion();
   }
   return () => {
     listeners.delete(listener);
     suscriptores -= 1;
-    if (suscriptores === 0 && intervalo) {
-      clearInterval(intervalo);
-      intervalo = null;
+    if (suscriptores === 0) {
+      if (intervalo) {
+        clearInterval(intervalo);
+        intervalo = null;
+      }
+      if (origenRemoto) {
+        origenRemoto.cerrar();
+        origenRemoto = null;
+        remotoActivo = false;
+      }
     }
   };
 }
@@ -187,6 +257,7 @@ export const getRoster = () => snapshot.roster;
 
 /** Agrega una máquina nueva al roster y la pone a vivir de inmediato. */
 export function agregarMaquina(seed: MaquinaSeed) {
+  if (remotoActivo) return comandos.crearMaquina(seed); // el backend reemite la verdad
   if (rosterSeeds.some((s) => s.id === seed.id)) return; // nombre duplicado
   rosterSeeds = [...rosterSeeds, seed];
   flota.push(crearMaquina(seed));
@@ -196,6 +267,7 @@ export function agregarMaquina(seed: MaquinaSeed) {
 
 /** Edita los campos configurables de una máquina (el nombre es su identidad). */
 export function editarMaquina(id: string, parcial: Partial<MaquinaSeed>) {
+  if (remotoActivo) return comandos.editarMaquina(id, parcial);
   rosterSeeds = rosterSeeds.map((s) => (s.id === id ? { ...s, ...parcial, id } : s));
   const m = flota.find((x) => x.id === id);
   if (m) {
@@ -215,6 +287,7 @@ export function editarMaquina(id: string, parcial: Partial<MaquinaSeed>) {
 
 /** Quita una máquina del roster (y sus alertas abiertas). */
 export function quitarMaquina(id: string) {
+  if (remotoActivo) return comandos.quitarMaquina(id);
   rosterSeeds = rosterSeeds.filter((s) => s.id !== id);
   flota = flota.filter((m) => m.id !== id);
   persistirRoster();
@@ -227,6 +300,7 @@ export function quitarMaquina(id: string) {
 
 // Acciones (estables, importables directamente)
 export function etiquetarAlerta(id: string, veredicto: Veredicto) {
+  if (remotoActivo) return comandos.etiquetar(id, veredicto);
   const alerta = snapshot.alertas.find((a) => a.id === id);
   const alertas = snapshot.alertas.filter((a) => a.id !== id);
   const historial = snapshot.historial.map((h) => (h.id === id ? { ...h, estado: "Resuelto" as const } : h));
@@ -248,6 +322,7 @@ export function cerrarNotif() {
  * Lo llama el módulo de mantenimiento al completar una orden.
  */
 export function repararMaquina(id: string) {
+  if (remotoActivo) return comandos.reparar(id);
   const m = flota.find((x) => x.id === id);
   if (m) {
     m.esc = "sano";
