@@ -9,7 +9,7 @@
 import Link from "next/link";
 import { col, colorSalud } from "@/lib/constants";
 import { estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
-import { diasAFallo } from "@/lib/engine/fsm";
+import { diasAFallo, rangoDiasRedondeado } from "@/lib/engine/fsm";
 import { useT } from "@/lib/state/I18nProvider";
 import type { Maquina } from "@/lib/types";
 import { MiniLineChart } from "../ui/MiniLineChart";
@@ -79,7 +79,10 @@ export function MachineCardPro({ m }: { m: Maquina }) {
           <div className="text-right">
             {mostrarPrediccion ? (
               <span className="text-xs font-medium" style={{ color: col("crit") }}>
-                {t("card.failsIn", { n: Math.max(1, Math.ceil(dias)) })}
+                {(() => {
+                  const r = rangoDiasRedondeado(m);
+                  return r.esRango ? t("card.failsInRange", { a: r.a, b: r.b }) : t("card.failsIn", { n: r.a });
+                })()}
               </span>
             ) : (
               <span className="font-mono text-xs text-neutral-400">{serie.length ? serie[serie.length - 1].toFixed(2) : "—"}</span>

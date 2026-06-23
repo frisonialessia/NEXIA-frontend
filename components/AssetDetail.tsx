@@ -16,7 +16,7 @@ import { AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/cons
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, saludEnlace, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
-import { diasAFallo } from "@/lib/engine/fsm";
+import { diasAFallo, rangoDiasRedondeado } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
 import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
@@ -96,6 +96,7 @@ export function AssetDetail({ id }: { id: string }) {
   const calibPct = Math.round(progresoCalibracion(m) * 100);
   const ec = calibrando ? col("brand") : colorSalud(m.estado, m.prob);
   const dias = diasAFallo(m);
+  const rango = rangoDiasRedondeado(m);
   const last = m.hist[m.hist.length - 1];
 
   const sensores = sensoresDe(m.estado);
@@ -190,9 +191,12 @@ export function AssetDetail({ id }: { id: string }) {
             <div>
               <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">{t("detail.predictiveForecast")}</span>
               <p className="mt-1 font-display text-3xl" style={{ color: ec }}>
-                {t("detail.failIn", { n: Math.max(1, Math.ceil(dias)) })}
+                {rango.esRango
+                  ? t("detail.failInRange", { a: rango.a, b: rango.b })
+                  : t("detail.failIn", { n: rango.a })}
               </p>
-              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+              <p className="mt-1 text-xs text-neutral-400">{t("detail.estimateHint")}</p>
+              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                 {t("detail.avoidPrefix")}
                 <span className="font-semibold">{dinero(AHORRO_POR_PARADA)}</span>
                 {t("detail.avoidSuffix")}
