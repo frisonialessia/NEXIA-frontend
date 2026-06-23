@@ -64,6 +64,31 @@ a {
   text-decoration: none;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Quita el destello gris al tocar en móvil (los elementos ya tienen su propio
+   feedback de hover/active). */
+a,
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Accesibilidad: anillo de foco visible SOLO para navegación por teclado
+   (no aparece al hacer click con el ratón). */
+:focus-visible {
+  outline: 2px solid var(--c-brand);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Selección de texto con el tinte de marca (toque editorial). */
+::selection {
+  background: color-mix(in srgb, var(--c-brand) 22%, transparent);
+}
+
 /* ── Animaciones portadas de la demo de referencia ──────────────────────── */
 
 /* Pulso suave: aura que late en los puntos de estado crítico/recuperación */

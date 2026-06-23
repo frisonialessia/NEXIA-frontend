@@ -19,7 +19,13 @@ import { useTheme } from "@/lib/state/ThemeProvider";
 import type { Rol } from "@/lib/types";
 import { BrandMark } from "./account/BrandMark";
 import { NotificationBell } from "./NotificationBell";
+import { EVENTO_ABRIR_TOUR } from "./onboarding/WelcomeTour";
 import { Icon, type IconName } from "./ui/Icon";
+
+/** Reabre el tour de bienvenida (lo escucha WelcomeTour). */
+function abrirTour() {
+  window.dispatchEvent(new Event(EVENTO_ABRIR_TOUR));
+}
 
 interface NavItem {
   href: string;
@@ -137,6 +143,13 @@ export function Nav() {
             <label className="mb-1.5 block text-[11px] uppercase tracking-wider text-neutral-400">{t("nav.activeRole")}</label>
             {selectRol}
           </div>
+          <button
+            onClick={abrirTour}
+            className="mt-3 flex w-full items-center gap-3 border-t border-neutral-100 pt-3 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-300"
+          >
+            <Icon name="spark" className="h-4 w-4" />
+            {t("nav.tour")}
+          </button>
           {cuenta && (
             <div className="mt-3 flex items-center gap-3 border-t border-neutral-100 pt-3 dark:border-neutral-800">
               <Link href="/cuenta" className="flex min-w-0 flex-1 items-center gap-2.5">
@@ -297,6 +310,16 @@ function AccountMenu({ nombre, email, color, rol, onRol, onSalir }: { nombre: st
             <label className="mb-1.5 block text-[10px] uppercase tracking-[0.14em] text-neutral-400">{t("nav.viewAsRole")}</label>
             <RoleSelect rol={rol} onRol={onRol} />
           </div>
+          <button
+            onClick={() => {
+              setAbierto(false);
+              abrirTour();
+            }}
+            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800"
+          >
+            <Icon name="spark" className="h-4 w-4" />
+            {t("nav.tour")}
+          </button>
           <Link href="/cuenta" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-50 dark:text-neutral-300 dark:hover:bg-neutral-800">
             <Icon name="user" className="h-4 w-4" />
             {t("nav.myProfile")}
