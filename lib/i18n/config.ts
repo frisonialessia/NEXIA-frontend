@@ -16,5 +16,5 @@ export const IDIOMA_NOMBRE: Record<Idioma, string> = {
 /** Idiomas disponibles ahora mismo (italiano se activará más adelante). */
 export const IDIOMAS_ACTIVOS: Idioma[] = ["en", "es"];
 
-/** Idioma por defecto mientras se completa la traducción de todas las vistas. */
-export const IDIOMA_POR_DEFECTO: Idioma = "es";
+/** Idioma por defecto. La interfaz está traducida; inglés es el principal. */
+export const IDIOMA_POR_DEFECTO: Idioma = "en";

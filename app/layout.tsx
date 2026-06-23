@@ -33,7 +33,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${display.variable} ${inter.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${inter.variable} ${mono.variable}`}>
       <body className="font-sans antialiased">
         <Providers>
           <AppProviders>
