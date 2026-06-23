@@ -23,8 +23,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
       {!hidratado ? (
-        <div className="flex min-h-screen items-center justify-center">
+        <div className="flex min-h-screen flex-col items-center justify-center gap-4">
           <BrandMark size={48} className="animate-pulse" />
+          <span className="font-display text-lg tracking-tight text-neutral-400">NEXIA</span>
         </div>
       ) : !sesionActiva ? (
         <LoginScreen />
