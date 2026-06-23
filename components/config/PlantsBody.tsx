@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { ROL_NOMBRE, col, mix } from "@/lib/constants";
 import type { Planta } from "@/lib/data/plantas";
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useOrg } from "@/lib/state/OrgProvider";
 import { useSession } from "@/lib/state/SessionProvider";
@@ -24,33 +25,34 @@ export function PlantsBody() {
   const { plantas, plantaActivaId, setPlantaActiva, quitarPlanta } = useOrg();
   const { registrar } = useAdmin();
   const { rol } = useSession();
+  const t = useT();
   const actor = ROL_NOMBRE[rol];
   const [editar, setEditar] = useState<Planta | null>(null);
   const [nuevo, setNuevo] = useState(false);
 
   function activar(p: Planta) {
     setPlantaActiva(p.id);
-    toast(`Planta activa: ${p.nombre}`);
+    toast(t("plant.activeToast", { name: p.nombre }));
   }
 
   function borrar(p: Planta) {
     if (plantas.length <= 1) {
-      toast.error("Debe quedar al menos una planta");
+      toast.error(t("plant.atLeastOne"));
       return;
     }
-    if (typeof window !== "undefined" && !window.confirm(`¿Quitar la planta "${p.nombre}"?`)) return;
+    if (typeof window !== "undefined" && !window.confirm(t("plant.removeConfirm", { name: p.nombre }))) return;
     quitarPlanta(p.id);
     registrar(actor, "Quitó una planta", p.nombre);
-    toast("Planta eliminada");
+    toast(t("plant.removedToast"));
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-neutral-500">{plantas.length} plantas en tu organización.</p>
+        <p className="text-sm text-neutral-500">{t("plant.count", { n: plantas.length })}</p>
         <Button onClick={() => setNuevo(true)} className="shrink-0 px-4 py-2">
           <Icon name="plus" className="h-4 w-4" />
-          Agregar planta
+          {t("plant.add")}
         </Button>
       </div>
 
@@ -67,23 +69,23 @@ export function PlantsBody() {
                   <span className="truncate text-sm font-medium">{p.nombre}</span>
                   {activa && (
                     <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{ background: mix(col("ok")), color: col("ok") }}>
-                      Activa
+                      {t("plant.active")}
                     </span>
                   )}
                 </div>
                 <div className="truncate text-xs text-neutral-400">
-                  {p.ubicacion} · {p.zona} · {p.lineas} líneas · {p.maquinas} máquinas
+                  {p.ubicacion} · {p.zona} · {p.lineas} {t("plant.lines")} · {p.maquinas} {t("plant.machines")}
                 </div>
               </div>
               {!activa && (
                 <button onClick={() => activar(p)} className="rounded-lg border border-neutral-200 px-2.5 py-1 text-xs text-neutral-600 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:text-neutral-300">
-                  Activar
+                  {t("plant.activate")}
                 </button>
               )}
-              <button onClick={() => setEditar(p)} aria-label="Editar" className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
+              <button onClick={() => setEditar(p)} aria-label={t("plant.edit")} className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
                 <Icon name="settings" className="h-4 w-4" />
               </button>
-              <button onClick={() => borrar(p)} aria-label="Quitar" className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
+              <button onClick={() => borrar(p)} aria-label={t("plant.remove")} className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
                 <Icon name="x" className="h-4 w-4" />
               </button>
             </div>
@@ -108,6 +110,7 @@ function PlantModal({ planta, onClose }: { planta: Planta | null; onClose: () =>
   const { agregarPlanta, editarPlanta } = useOrg();
   const { registrar } = useAdmin();
   const { rol } = useSession();
+  const t = useT();
   const dialogRef = useModalA11y<HTMLDivElement>(onClose);
   const esEdicion = !!planta;
   const actor = ROL_NOMBRE[rol];
@@ -122,18 +125,18 @@ function PlantModal({ planta, onClose }: { planta: Planta | null; onClose: () =>
 
   function guardar() {
     if (!nombre.trim()) {
-      toast.error("Ponle un nombre a la planta");
+      toast.error(t("plant.nameRequired"));
       return;
     }
     const datos = { nombre: nombre.trim(), ubicacion: ubicacion.trim() || "Sin ubicación", zona, lineas: Number(lineas) || 1, maquinas: Number(maquinas) || 0 };
     if (esEdicion) {
       editarPlanta(planta!.id, datos);
       registrar(actor, "Editó una planta", datos.nombre);
-      toast("Planta actualizada");
+      toast(t("plant.updatedToast"));
     } else {
       agregarPlanta(datos);
       registrar(actor, "Agregó una planta", datos.nombre);
-      toast("Planta agregada");
+      toast(t("plant.addedToast"));
     }
     onClose();
   }
@@ -150,27 +153,27 @@ function PlantModal({ planta, onClose }: { planta: Planta | null; onClose: () =>
         onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
-          <Label>Planta</Label>
-          <h2 id="plant-title" className="mt-2 font-display text-2xl tracking-tight">{esEdicion ? "Editar planta" : "Agregar planta"}</h2>
+          <Label>{t("plant.plant")}</Label>
+          <h2 id="plant-title" className="mt-2 font-display text-2xl tracking-tight">{esEdicion ? t("plant.editTitle") : t("plant.addTitle")}</h2>
         </div>
 
         <div className="space-y-4 px-7 py-6">
-          <Campo label="Nombre">
+          <Campo label={t("plant.name")}>
             <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Planta Norte" className={input} />
           </Campo>
           <div className="grid grid-cols-2 gap-4">
-            <Campo label="Ubicación">
+            <Campo label={t("plant.location")}>
               <input value={ubicacion} onChange={(e) => setUbicacion(e.target.value)} placeholder="Monterrey, MX" className={input} />
             </Campo>
-            <Campo label="Zona horaria">
+            <Campo label={t("plant.timezone")}>
               <input value={zona} onChange={(e) => setZona(e.target.value)} className={input} />
             </Campo>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Campo label="Líneas">
+            <Campo label={t("plant.linesField")}>
               <input type="number" min="0" value={lineas} onChange={(e) => setLineas(e.target.value)} className={input} />
             </Campo>
-            <Campo label="Máquinas">
+            <Campo label={t("plant.machinesField")}>
               <input type="number" min="0" value={maquinas} onChange={(e) => setMaquinas(e.target.value)} className={input} />
             </Campo>
           </div>
@@ -178,9 +181,9 @@ function PlantModal({ planta, onClose }: { planta: Planta | null; onClose: () =>
 
         <div className="flex items-center justify-end gap-3 border-t border-neutral-100 px-7 py-5 dark:border-neutral-800">
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t("plant.cancel")}
           </Button>
-          <Button onClick={guardar}>{esEdicion ? "Guardar cambios" : "Agregar"}</Button>
+          <Button onClick={guardar}>{esEdicion ? t("plant.saveChanges") : t("plant.addBtn")}</Button>
         </div>
       </div>
     </div>

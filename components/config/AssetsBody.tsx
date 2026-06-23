@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ROL_NOMBRE, col, mix } from "@/lib/constants";
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { agregarMaquina, editarMaquina, quitarMaquina, useRoster } from "@/lib/state/useFleet";
@@ -25,24 +26,25 @@ export function AssetsBody() {
   const roster = useRoster();
   const { registrar } = useAdmin();
   const { rol } = useSession();
+  const t = useT();
   const actor = ROL_NOMBRE[rol];
   const [editar, setEditar] = useState<MaquinaSeed | null>(null);
   const [nuevo, setNuevo] = useState(false);
 
   function borrar(s: MaquinaSeed) {
-    if (typeof window !== "undefined" && !window.confirm(`¿Quitar "${s.id}" del monitoreo?`)) return;
+    if (typeof window !== "undefined" && !window.confirm(t("assets.removeConfirm", { id: s.id }))) return;
     quitarMaquina(s.id);
     registrar(actor, "Quitó una máquina", s.id);
-    toast("Máquina eliminada");
+    toast(t("assets.removedToast"));
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-neutral-500">{roster.length} máquinas monitoreadas. Los cambios se aplican al motor en vivo.</p>
+        <p className="text-sm text-neutral-500">{t("assets.monitored", { n: roster.length })}</p>
         <Button onClick={() => setNuevo(true)} className="shrink-0 px-4 py-2">
           <Icon name="plus" className="h-4 w-4" />
-          Agregar máquina
+          {t("assets.add")}
         </Button>
       </div>
 
@@ -55,17 +57,17 @@ export function AssetsBody() {
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{s.id}</div>
               <div className="truncate text-xs text-neutral-400">
-                {s.sector} · {s.tipo ?? "—"} · {s.sensor}
+                {s.sector} · {s.tipo ? t(`tipo.${s.tipo}`) : "—"} · {s.sensor}
               </div>
             </div>
             <div className="hidden text-right sm:block">
-              <div className="font-mono text-xs text-neutral-500">umbral {s.umbral ?? "—"}</div>
-              <div className="text-[11px] text-neutral-400">base {s.base}</div>
+              <div className="font-mono text-xs text-neutral-500">{t("assets.threshold", { v: s.umbral ?? "—" })}</div>
+              <div className="text-[11px] text-neutral-400">{t("assets.base", { v: s.base })}</div>
             </div>
-            <button onClick={() => setEditar(s)} aria-label="Editar" className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
+            <button onClick={() => setEditar(s)} aria-label={t("assets.edit")} className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
               <Icon name="settings" className="h-4 w-4" />
             </button>
-            <button onClick={() => borrar(s)} aria-label="Quitar" className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
+            <button onClick={() => borrar(s)} aria-label={t("assets.remove")} className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:hover:text-neutral-200">
               <Icon name="x" className="h-4 w-4" />
             </button>
           </div>
@@ -88,6 +90,7 @@ export function AssetsBody() {
 function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () => void }) {
   const { registrar } = useAdmin();
   const { rol } = useSession();
+  const t = useT();
   const dialogRef = useModalA11y<HTMLDivElement>(onClose);
   const esEdicion = !!seed;
   const actor = ROL_NOMBRE[rol];
@@ -103,18 +106,18 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
 
   function guardar() {
     if (!esEdicion && !nombre.trim()) {
-      toast.error("Ponle un nombre a la máquina");
+      toast.error(t("assets.nameRequired"));
       return;
     }
     if (esEdicion) {
       editarMaquina(seed!.id, { sector, tipo, sensor, base: Number(base), umbral: Number(umbral) });
       registrar(actor, "Editó una máquina", seed!.id);
-      toast("Máquina actualizada");
+      toast(t("assets.updatedToast"));
     } else {
       const nueva: MaquinaSeed = { id: nombre.trim(), sector: sector || "Sin sector", tipo, sensor, base: Number(base) || 2, umbral: Number(umbral) || 6.5, esc: "sano" };
       agregarMaquina(nueva);
       registrar(actor, "Agregó una máquina", nueva.id);
-      toast("Máquina agregada al monitoreo");
+      toast(t("assets.addedToast"));
     }
     onClose();
   }
@@ -131,36 +134,36 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
         onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
-          <Label>Activo</Label>
-          <h2 id="asset-title" className="mt-2 font-display text-2xl tracking-tight">{esEdicion ? "Editar máquina" : "Agregar máquina"}</h2>
+          <Label>{t("assets.asset")}</Label>
+          <h2 id="asset-title" className="mt-2 font-display text-2xl tracking-tight">{esEdicion ? t("assets.editTitle") : t("assets.addTitle")}</h2>
         </div>
 
         <div className="space-y-4 px-7 py-6">
-          <Campo label="Nombre">
-            <input value={nombre} onChange={(e) => setNombre(e.target.value)} disabled={esEdicion} placeholder="Bomba de llenado #2" className={`${input} ${esEdicion ? "opacity-60" : ""}`} />
+          <Campo label={t("assets.name")}>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} disabled={esEdicion} placeholder={t("assets.namePlaceholder")} className={`${input} ${esEdicion ? "opacity-60" : ""}`} />
           </Campo>
           <div className="grid grid-cols-2 gap-4">
-            <Campo label="Sector">
-              <input value={sector} onChange={(e) => setSector(e.target.value)} placeholder="Embotelladora" className={input} />
+            <Campo label={t("assets.sector")}>
+              <input value={sector} onChange={(e) => setSector(e.target.value)} placeholder={t("assets.sectorPlaceholder")} className={input} />
             </Campo>
-            <Campo label="Tipo">
+            <Campo label={t("assets.type")}>
               <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoMaquina)} className={input}>
-                {TIPOS.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {TIPOS.map((tp) => (
+                  <option key={tp} value={tp}>
+                    {t(`tipo.${tp}`)}
                   </option>
                 ))}
               </select>
             </Campo>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Campo label="Sensor">
+            <Campo label={t("assets.sensor")}>
               <input value={sensor} onChange={(e) => setSensor(e.target.value)} className={input} />
             </Campo>
-            <Campo label="Baseline (mm/s)">
+            <Campo label={t("assets.baseline")}>
               <input type="number" step="0.1" value={base} onChange={(e) => setBase(e.target.value)} className={input} />
             </Campo>
-            <Campo label="Umbral crítico">
+            <Campo label={t("assets.critThreshold")}>
               <input type="number" step="0.1" value={umbral} onChange={(e) => setUmbral(e.target.value)} className={input} />
             </Campo>
           </div>
@@ -168,9 +171,9 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
 
         <div className="flex items-center justify-end gap-3 border-t border-neutral-100 px-7 py-5 dark:border-neutral-800">
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t("assets.cancel")}
           </Button>
-          <Button onClick={guardar}>{esEdicion ? "Guardar cambios" : "Agregar"}</Button>
+          <Button onClick={guardar}>{esEdicion ? t("assets.saveChanges") : t("assets.addBtn")}</Button>
         </div>
       </div>
     </div>

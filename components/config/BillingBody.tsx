@@ -14,6 +14,7 @@ import { DESCUENTO_ANUAL, PLANES, planPorId, type Ciclo, type MetodoPago, type P
 import { dinero } from "@/lib/format";
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
 import { descargarCSV } from "@/lib/reports/exporter";
+import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useOrg } from "@/lib/state/OrgProvider";
 import { useSession } from "@/lib/state/SessionProvider";
@@ -28,6 +29,7 @@ export function BillingBody() {
   const { usuarios, registrar } = useAdmin();
   const { rol } = useSession();
   const roster = useRoster();
+  const t = useT();
   const actor = ROL_NOMBRE[rol];
 
   const plan = planPorId(planId);
@@ -39,7 +41,7 @@ export function BillingBody() {
     if (id === planId) return;
     cambiarPlan(id);
     registrar(actor, "Cambió de plan", planPorId(id).nombre);
-    toast(`Plan actualizado a ${planPorId(id).nombre}`);
+    toast(t("bill.updatedToast", { name: planPorId(id).nombre }));
   }
 
   function cambiarCiclo(c: Ciclo) {
@@ -52,7 +54,7 @@ export function BillingBody() {
       "facturas-nexia.csv",
       [["Factura", "Fecha", "Concepto", "Monto (USD)", "Estado"], ...facturas.map((f) => [f.id, f.fecha, f.concepto, f.monto, f.estado])]
     );
-    toast("Historial descargado");
+    toast(t("bill.historyToast"));
   }
 
   return (
@@ -61,30 +63,30 @@ export function BillingBody() {
       <Card className="px-7 py-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <Label>Plan actual</Label>
+            <Label>{t("bill.currentPlan")}</Label>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-display text-2xl tracking-tight">{plan.nombre}</span>
               <span className="font-mono text-sm text-neutral-400">
-                {plan.precio === 0 ? "Gratis" : `${dinero(precioMes)} / mes · por planta`}
+                {plan.precio === 0 ? t("bill.free") : t("bill.perMonthPerPlant", { price: dinero(precioMes) })}
               </span>
             </div>
             {plan.precio > 0 && (
               <p className="mt-1 text-xs text-neutral-400">
-                {plantas.length} {plantas.length === 1 ? "planta" : "plantas"} · total {dinero(precioMes * plantas.length)} / mes
+                {plantas.length} {plantas.length === 1 ? t("bill.plantOne") : t("bill.plantMany")} · {t("bill.totalPerMonth", { price: dinero(precioMes * plantas.length) })}
               </p>
             )}
           </div>
           <div className="flex gap-1 rounded-lg border border-neutral-200 p-0.5 dark:border-neutral-700">
-            <BotonCiclo valor="mensual" actual={ciclo} onClick={cambiarCiclo} label="Mensual" />
-            <BotonCiclo valor="anual" actual={ciclo} onClick={cambiarCiclo} label="Anual −17%" />
+            <BotonCiclo valor="mensual" actual={ciclo} onClick={cambiarCiclo} label={t("bill.monthly")} />
+            <BotonCiclo valor="anual" actual={ciclo} onClick={cambiarCiclo} label={t("bill.annual")} />
           </div>
         </div>
 
         {/* Uso frente a límites */}
         <div className="mt-6 grid gap-5 sm:grid-cols-3">
-          <Uso etiqueta="Máquinas" actual={roster.length} max={plan.maxMaquinas} />
-          <Uso etiqueta="Usuarios" actual={usuarios.length} max={plan.maxUsuarios} />
-          <Uso etiqueta="Plantas" actual={plantas.length} max={plan.maxPlantas} />
+          <Uso etiqueta={t("bill.machines")} actual={roster.length} max={plan.maxMaquinas} />
+          <Uso etiqueta={t("bill.users")} actual={usuarios.length} max={plan.maxUsuarios} />
+          <Uso etiqueta={t("bill.plants")} actual={plantas.length} max={plan.maxPlantas} />
         </div>
       </Card>
 
@@ -100,18 +102,18 @@ export function BillingBody() {
                 <span className="font-display text-xl tracking-tight">{p.nombre}</span>
                 {p.destacado && !actual && (
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{ background: mix(col("brand")), color: col("brand") }}>
-                    Popular
+                    {t("bill.popular")}
                   </span>
                 )}
                 {actual && (
                   <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{ background: mix(col("ok")), color: col("ok") }}>
-                    Actual
+                    {t("bill.current")}
                   </span>
                 )}
               </div>
               <div className="mt-2 flex items-baseline gap-1">
                 <span className="font-sans text-3xl font-semibold tracking-tight tabular-nums">{p.precio === 0 ? "$0" : dinero(precio)}</span>
-                <span className="text-xs text-neutral-400">/ mes</span>
+                <span className="text-xs text-neutral-400">{t("bill.perMonthShort")}</span>
               </div>
               <ul className="mt-4 flex-1 space-y-2">
                 {p.features.map((f) => (
@@ -124,11 +126,11 @@ export function BillingBody() {
               <div className="mt-5">
                 {actual ? (
                   <Button variant="secondary" disabled className="w-full">
-                    Plan actual
+                    {t("bill.currentPlanBtn")}
                   </Button>
                 ) : (
                   <Button onClick={() => elegirPlan(p.id)} className="w-full">
-                    Cambiar a {p.nombre}
+                    {t("bill.switchTo", { name: p.nombre })}
                   </Button>
                 )}
               </div>
@@ -148,21 +150,21 @@ export function BillingBody() {
             <div className="text-sm font-medium">
               {metodoPago.marca} ···· {metodoPago.ultimos4}
             </div>
-            <div className="text-xs text-neutral-400">Expira {metodoPago.expira}</div>
+            <div className="text-xs text-neutral-400">{t("bill.expires", { date: metodoPago.expira })}</div>
           </div>
         </div>
         <Button variant="secondary" onClick={() => setEditarPago(true)}>
-          Actualizar
+          {t("bill.update")}
         </Button>
       </Card>
 
       {/* Historial de facturas */}
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between border-b border-neutral-100 px-7 py-5 dark:border-neutral-800">
-          <Label>Historial de facturas</Label>
+          <Label>{t("bill.invoiceHistory")}</Label>
           <button onClick={descargar} className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs text-neutral-600 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:text-neutral-300">
             <Icon name="download" className="h-3.5 w-3.5" />
-            Descargar CSV
+            {t("bill.downloadCsv")}
           </button>
         </div>
         <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -175,7 +177,7 @@ export function BillingBody() {
                 </div>
               </div>
               <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide" style={{ background: mix(col(f.estado === "pagada" ? "ok" : "crit")), color: col(f.estado === "pagada" ? "ok" : "crit") }}>
-                {f.estado}
+                {f.estado === "pagada" ? t("bill.paid") : t("bill.pending")}
               </span>
               <span className="w-20 text-right font-mono text-sm tabular-nums">{dinero(f.monto)}</span>
             </div>
@@ -183,12 +185,13 @@ export function BillingBody() {
         </div>
       </Card>
 
-      {editarPago && <PaymentModal actual={metodoPago} onSave={(m) => { actualizarPago(m); registrar(actor, "Actualizó el método de pago", `···· ${m.ultimos4}`); toast("Método de pago actualizado"); }} onClose={() => setEditarPago(false)} />}
+      {editarPago && <PaymentModal actual={metodoPago} onSave={(m) => { actualizarPago(m); registrar(actor, "Actualizó el método de pago", `···· ${m.ultimos4}`); toast(t("bill.methodUpdatedToast")); }} onClose={() => setEditarPago(false)} />}
     </div>
   );
 }
 
 function Uso({ etiqueta, actual, max }: { etiqueta: string; actual: number; max: number }) {
+  const t = useT();
   const ilimitado = max >= 999;
   const pct = ilimitado ? 0 : Math.min(1, actual / max);
   const cerca = !ilimitado && pct >= 0.85;
@@ -203,7 +206,7 @@ function Uso({ etiqueta, actual, max }: { etiqueta: string; actual: number; max:
       <div className="mt-2">
         <ProgressBar value={ilimitado ? 0.04 : pct} colorKey={cerca ? "crit" : "ok"} />
       </div>
-      {cerca && <p className="mt-1 text-[11px]" style={{ color: col("crit") }}>Cerca del límite del plan</p>}
+      {cerca && <p className="mt-1 text-[11px]" style={{ color: col("crit") }}>{t("bill.nearLimit")}</p>}
     </div>
   );
 }
@@ -218,6 +221,7 @@ function BotonCiclo({ valor, actual, onClick, label }: { valor: Ciclo; actual: C
 }
 
 function PaymentModal({ actual, onSave, onClose }: { actual: MetodoPago; onSave: (m: MetodoPago) => void; onClose: () => void }) {
+  const t = useT();
   const dialogRef = useModalA11y<HTMLDivElement>(onClose);
   const [marca, setMarca] = useState(actual.marca);
   const [ultimos4, setUltimos4] = useState(actual.ultimos4);
@@ -226,7 +230,7 @@ function PaymentModal({ actual, onSave, onClose }: { actual: MetodoPago; onSave:
 
   function guardar() {
     if (!/^\d{4}$/.test(ultimos4)) {
-      toast.error("Escribe los últimos 4 dígitos");
+      toast.error(t("bill.last4Error"));
       return;
     }
     onSave({ marca: marca.trim() || "Tarjeta", ultimos4, expira: expira.trim() || "—" });
@@ -237,29 +241,29 @@ function PaymentModal({ actual, onSave, onClose }: { actual: MetodoPago; onSave:
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/30 px-4 backdrop-blur-sm" onClick={onClose}>
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="pay-title" tabIndex={-1} className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white shadow-xl outline-none dark:border-neutral-700 dark:bg-neutral-900" onClick={(e) => e.stopPropagation()}>
         <div className="border-b border-neutral-100 px-7 pt-7 pb-5 dark:border-neutral-800">
-          <Label>Método de pago</Label>
-          <h2 id="pay-title" className="mt-2 font-display text-2xl tracking-tight">Actualizar tarjeta</h2>
+          <Label>{t("bill.paymentMethod")}</Label>
+          <h2 id="pay-title" className="mt-2 font-display text-2xl tracking-tight">{t("bill.updateCard")}</h2>
         </div>
         <div className="space-y-4 px-7 py-6">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Marca</span>
+            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("bill.brand")}</span>
             <input value={marca} onChange={(e) => setMarca(e.target.value)} placeholder="Visa" className={input} />
           </label>
           <div className="grid grid-cols-2 gap-4">
             <label className="block">
-              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Últimos 4</span>
+              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("bill.last4")}</span>
               <input value={ultimos4} maxLength={4} inputMode="numeric" onChange={(e) => setUltimos4(e.target.value.replace(/\D/g, ""))} placeholder="4242" className={input} />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">Expira</span>
+              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("bill.expiresLabel")}</span>
               <input value={expira} onChange={(e) => setExpira(e.target.value)} placeholder="08/27" className={input} />
             </label>
           </div>
-          <p className="text-xs text-neutral-400">Modo demostración · no se procesan pagos reales.</p>
+          <p className="text-xs text-neutral-400">{t("bill.demoNote")}</p>
         </div>
         <div className="flex items-center justify-end gap-3 border-t border-neutral-100 px-7 py-5 dark:border-neutral-800">
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button onClick={guardar}>Guardar</Button>
+          <Button variant="ghost" onClick={onClose}>{t("bill.cancel")}</Button>
+          <Button onClick={guardar}>{t("bill.save")}</Button>
         </div>
       </div>
     </div>
