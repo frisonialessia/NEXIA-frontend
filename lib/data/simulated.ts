@@ -32,6 +32,9 @@ export function crearMaquina(d: MaquinaSeed): Maquina {
     ritmoDia: d.esc === "degradando" ? 0.7 : 0,
     horasOp: (2000 + Math.random() * 3000) | 0,
     umbral: d.umbral ?? UMBRAL_CRITICO,
+    // La flota inicial ya está calibrada (0). Las máquinas que el usuario añade
+    // arrancan calibrando: ver agregarMaquina() en el store.
+    calib: 0,
   };
 }
 
@@ -65,6 +68,21 @@ export function tickMaquina(m: Maquina): Alerta | null {
     v = m.expected + 4 + Math.random() * 2;
   }
   v = Math.max(0, +v.toFixed(3));
+
+  // ── Calibración: aprendiendo baseline ──────────────────────────────────
+  // Mientras calibra, la máquina recopila lecturas pero NO juzga: sin alertas,
+  // estado neutro y probabilidad baja. Así no inventa fallos antes de conocer
+  // su comportamiento normal (decisión de confianza).
+  if (m.calib > 0) {
+    m.calib -= 1;
+    m.prob = 0.05;
+    m.estado = "STABLE";
+    m.cSube = 0;
+    m.cBaja = 0;
+    m.hist.push({ t: Date.now(), v, exp: m.expected });
+    if (m.hist.length > VENTANA_HIST) m.hist.shift();
+    return null;
+  }
 
   // Probabilidad de fallo y transición de la FSM
   m.prob = probabilidadFallo(v, m.expected);

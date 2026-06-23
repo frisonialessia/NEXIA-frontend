@@ -14,7 +14,7 @@
 
 import { apiConfigurada } from "../api/contract";
 import { comandos, conectarRemoto, type OrigenRemoto, type ParcheRemoto } from "../api/remoteSource";
-import { AHORRO_POR_PARADA, FLOTA } from "../constants";
+import { AHORRO_POR_PARADA, CALIBRACION_TICKS, FLOTA } from "../constants";
 import { aEventoHistorial, crearFlota, crearMaquina, tickMaquina } from "../data/simulated";
 import { causaPrincipal } from "../engine/fsm";
 import type { Alerta, Evento, EventoHistorial, Maquina, MaquinaSeed, Veredicto } from "../types";
@@ -260,7 +260,9 @@ export function agregarMaquina(seed: MaquinaSeed) {
   if (remotoActivo) return comandos.crearMaquina(seed); // el backend reemite la verdad
   if (rosterSeeds.some((s) => s.id === seed.id)) return; // nombre duplicado
   rosterSeeds = [...rosterSeeds, seed];
-  flota.push(crearMaquina(seed));
+  const nueva = crearMaquina(seed);
+  nueva.calib = CALIBRACION_TICKS; // arranca aprendiendo su baseline
+  flota.push(nueva);
   persistirRoster();
   set({ maquinas: [...flota], roster: [...rosterSeeds] });
 }

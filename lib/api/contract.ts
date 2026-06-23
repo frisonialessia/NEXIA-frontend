@@ -92,6 +92,8 @@ export interface MaquinaDTO {
   hist: LecturaDTO[];
   /** escenario (opcional; informativo) */
   esc?: Escenario;
+  /** ticks/periodo de calibración restante (0 = monitoreando) */
+  calib?: number;
 }
 
 export interface AlertaDTO {

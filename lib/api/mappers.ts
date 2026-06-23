@@ -37,6 +37,7 @@ export function aMaquina(d: MaquinaDTO): Maquina {
     cSube: 0,
     cBaja: 0,
     tick: d.hist.length,
+    calib: d.calib ?? 0,
   };
 }
 

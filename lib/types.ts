@@ -63,6 +63,8 @@ export interface Maquina extends MaquinaSeed {
   horasOp: number;
   /** umbral crítico de vibración de esta máquina */
   umbral: number;
+  /** ticks de calibración restantes (0 = monitoreando; >0 = aprendiendo baseline) */
+  calib: number;
 }
 
 /** Una alerta generada cuando una máquina entra en estado crítico. */

@@ -89,6 +89,9 @@ const en: Dict = {
   "card.ofFailure": "of failure",
   "card.failsIn": "fails in ~{n} days",
   "card.collecting": "Collecting…",
+  "card.calibrating": "Learning baseline",
+  "card.calibratingPct": "Learning baseline · {n}%",
+  "card.calibratingHint": "No alerts until it learns its normal behavior.",
 
   // Feed de eventos
   "events.liveActivity": "Live activity",
@@ -567,6 +570,9 @@ const es: Dict = {
   "card.ofFailure": "de fallo",
   "card.failsIn": "falla en ~{n} días",
   "card.collecting": "Recopilando…",
+  "card.calibrating": "Aprendiendo baseline",
+  "card.calibratingPct": "Aprendiendo baseline · {n}%",
+  "card.calibratingHint": "Sin alertas hasta conocer su comportamiento normal.",
 
   "events.liveActivity": "Actividad en vivo",
   "events.none": "Sin eventos recientes.",

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
+import { estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
 import { diasAFallo } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
 import { useT } from "@/lib/state/I18nProvider";
@@ -76,7 +77,9 @@ export function AssetDetail({ id }: { id: string }) {
     );
   }
 
-  const ec = colorSalud(m.estado, m.prob);
+  const calibrando = estaCalibrando(m);
+  const calibPct = Math.round(progresoCalibracion(m) * 100);
+  const ec = calibrando ? col("brand") : colorSalud(m.estado, m.prob);
   const dias = diasAFallo(m);
   const last = m.hist[m.hist.length - 1];
 
@@ -124,13 +127,26 @@ export function AssetDetail({ id }: { id: string }) {
         <header className="mb-5">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: ec }} />
-            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t(`estados.${m.estado}`)}</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{calibrando ? t("card.calibrating") : t(`estados.${m.estado}`)}</span>
           </div>
           <h1 className="mt-2 font-display text-3xl tracking-tight">{m.id}</h1>
           <p className="mt-1 font-mono text-sm text-neutral-400">
             {m.sensor} · {m.sector} · {t("card.aiActive")}
           </p>
         </header>
+
+        {calibrando && (
+          <div className="mb-5 rounded-2xl border px-7 py-5" style={surf("brand")}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs uppercase tracking-[0.18em] text-neutral-500">{t("card.calibrating")}</span>
+              <span className="font-mono text-sm" style={{ color: ec }}>{calibPct}%</span>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+              <span className="block h-full rounded-full transition-all duration-500" style={{ width: `${calibPct}%`, background: ec }} />
+            </div>
+            <p className="mt-2 text-sm text-neutral-500">{t("card.calibratingHint")}</p>
+          </div>
+        )}
 
         {puede("mantenimiento") && (
           <div className="mb-5 flex justify-end">
