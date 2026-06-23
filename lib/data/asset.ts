@@ -5,7 +5,52 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { uni } from "../format";
-import type { Estado, SistemaUnidades } from "../types";
+import type { Estado, Maquina, SistemaUnidades } from "../types";
+
+// ── Salud del enlace (gateway + sensor) ─────────────────────────────────────
+// Que el comprador vea que el dato es REAL y FRESCO: cuándo llegó la última
+// lectura, fuerza de señal, batería del sensor, frecuencia de muestreo y
+// latencia. Hoy se derivan del estado (señal/batería estables por máquina vía
+// hash; frescura desde la última lectura). Con backend real → telemetría del
+// gateway.
+
+export interface SaludEnlace {
+  online: boolean;
+  /** segundos desde la última lectura recibida */
+  ultimaLecturaSeg: number;
+  /** fuerza de señal 0..100 (RSSI) */
+  senalPct: number;
+  /** batería del sensor 0..100 */
+  bateriaPct: number;
+  /** frecuencia de muestreo en Hz */
+  muestreoHz: number;
+  /** latencia de extremo a extremo en ms */
+  latenciaMs: number;
+}
+
+/** Hash determinista 0..1 a partir de una cadena (estable entre renders). */
+function hash01(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ((h >>> 0) % 1000) / 1000;
+}
+
+/** Salud del enlace de una máquina (telemetría del pipeline de datos). */
+export function saludEnlace(m: Maquina): SaludEnlace {
+  const last = m.hist[m.hist.length - 1];
+  const ultimaLecturaSeg = last ? Math.max(0, Math.round((Date.now() - last.t) / 1000)) : 0;
+  return {
+    online: ultimaLecturaSeg < 10,
+    ultimaLecturaSeg,
+    senalPct: 80 + Math.round(hash01(m.id) * 19), // 80..99, estable por máquina
+    bateriaPct: 55 + Math.round(hash01(m.id + "·bat") * 44), // 55..99
+    muestreoHz: [1, 2, 5][Math.floor(hash01(m.id + "·hz") * 3)],
+    latenciaMs: 20 + Math.round(hash01(m.id + "·lat") * 90), // 20..110 ms
+  };
+}
 
 export const MTBF = "182 h";
 export const MTTR = "3.2 h";

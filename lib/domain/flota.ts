@@ -6,8 +6,15 @@
 // cuando una máquina cambia de estado (poco frecuente, por la histéresis).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { RANK_ESTADO } from "../constants";
+import { CALIBRACION_TICKS, RANK_ESTADO } from "../constants";
 import type { Maquina } from "../types";
+
+/** ¿La máquina aún está aprendiendo su baseline (no juzga todavía)? */
+export const estaCalibrando = (m: Maquina): boolean => m.calib > 0;
+
+/** Progreso de calibración 0..1 (1 = lista para monitorear). */
+export const progresoCalibracion = (m: Maquina): number =>
+  Math.min(1, Math.max(0, 1 - m.calib / CALIBRACION_TICKS));
 
 export function ordenarFlota(maquinas: Maquina[]): Maquina[] {
   return [...maquinas].sort(

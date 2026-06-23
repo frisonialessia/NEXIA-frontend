@@ -14,7 +14,7 @@
 
 import { apiConfigurada } from "../api/contract";
 import { comandos, conectarRemoto, type OrigenRemoto, type ParcheRemoto } from "../api/remoteSource";
-import { AHORRO_POR_PARADA, FLOTA } from "../constants";
+import { AHORRO_POR_PARADA, CALIBRACION_TICKS, FLOTA } from "../constants";
 import { aEventoHistorial, crearFlota, crearMaquina, tickMaquina } from "../data/simulated";
 import { causaPrincipal } from "../engine/fsm";
 import type { Alerta, Evento, EventoHistorial, Maquina, MaquinaSeed, Veredicto } from "../types";
@@ -29,12 +29,24 @@ export interface Savings {
   paradasEvitadas: number;
 }
 
+/**
+ * Registro de aciertos del modelo (track record auditable). Cuenta los
+ * veredictos humanos sobre las alertas: confirmadas como fallo real (acierto),
+ * falsas alarmas y no concluyentes. La precisión = real / (real + falsa).
+ */
+export interface Registro {
+  real: number;
+  falsa: number;
+  nc: number;
+}
+
 interface Snapshot {
   maquinas: Maquina[];
   alertas: Alerta[];
   historial: EventoHistorial[];
   eventos: Evento[];
   savings: Savings;
+  registro: Registro;
   notif: NotifMovil | null;
   roster: MaquinaSeed[];
 }
@@ -54,6 +66,8 @@ let snapshot: Snapshot = {
   historial: [],
   eventos: [],
   savings: { ahorroMes: 2 * AHORRO_POR_PARADA, paradasEvitadas: 2 },
+  // Track record acumulado (histórico auditado antes de esta sesión).
+  registro: { real: 23, falsa: 4, nc: 3 },
   notif: null,
   roster: [],
 };
@@ -192,6 +206,7 @@ function aplicarParche(p: ParcheRemoto) {
     patch.eventos = [...p.nuevosEventos, ...snapshot.eventos].slice(0, MAX_EVENTOS);
   }
   if (p.savings) patch.savings = p.savings;
+  if (p.registro) patch.registro = p.registro;
   set(patch);
 }
 
@@ -203,7 +218,7 @@ function arrancarRemoto() {
       remotoActivo = true;
       flota = s.maquinas;
       s.alertas.forEach((a) => (notificadas[a.maquina] = true));
-      set({ maquinas: s.maquinas, alertas: s.alertas, historial: s.historial, eventos: s.eventos, savings: s.savings, roster: s.roster });
+      set({ maquinas: s.maquinas, alertas: s.alertas, historial: s.historial, eventos: s.eventos, savings: s.savings, registro: s.registro, roster: s.roster });
     },
     onUpdate: aplicarParche,
     onConectado: () => {
@@ -250,6 +265,7 @@ export const getAlertas = () => snapshot.alertas;
 export const getHistorial = () => snapshot.historial;
 export const getEventos = () => snapshot.eventos;
 export const getSavings = () => snapshot.savings;
+export const getRegistro = () => snapshot.registro;
 export const getNotif = () => snapshot.notif;
 export const getRoster = () => snapshot.roster;
 
@@ -260,7 +276,9 @@ export function agregarMaquina(seed: MaquinaSeed) {
   if (remotoActivo) return comandos.crearMaquina(seed); // el backend reemite la verdad
   if (rosterSeeds.some((s) => s.id === seed.id)) return; // nombre duplicado
   rosterSeeds = [...rosterSeeds, seed];
-  flota.push(crearMaquina(seed));
+  const nueva = crearMaquina(seed);
+  nueva.calib = CALIBRACION_TICKS; // arranca aprendiendo su baseline
+  flota.push(nueva);
   persistirRoster();
   set({ maquinas: [...flota], roster: [...rosterSeeds] });
 }
@@ -308,8 +326,11 @@ export function etiquetarAlerta(id: string, veredicto: Veredicto) {
   if (alerta && veredicto === "real") {
     savings = { ahorroMes: savings.ahorroMes + AHORRO_POR_PARADA, paradasEvitadas: savings.paradasEvitadas + 1 };
   }
+  // Suma el veredicto al track record del modelo (precisión auditable).
+  const r = snapshot.registro;
+  const registro: Registro = { ...r, [veredicto]: r[veredicto] + 1 };
   const eventos = alerta ? [eventoResolucion(alerta, veredicto), ...snapshot.eventos].slice(0, MAX_EVENTOS) : snapshot.eventos;
-  set({ alertas, historial, savings, eventos });
+  set({ alertas, historial, savings, registro, eventos });
 }
 
 export function cerrarNotif() {

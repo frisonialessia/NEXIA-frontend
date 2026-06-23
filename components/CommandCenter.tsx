@@ -10,6 +10,7 @@ import { col } from "@/lib/constants";
 import { useT } from "@/lib/state/I18nProvider";
 import { useOrg } from "@/lib/state/OrgProvider";
 import { useEventos, useMaquinas, useSavings } from "@/lib/state/useFleet";
+import { ConnectionStrip } from "./pro/ConnectionStrip";
 import { EventsFeed } from "./pro/EventsFeed";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
 import { KpiStrip } from "./pro/KpiStrip";
@@ -59,6 +60,7 @@ export function CommandCenter() {
           </div>
         ) : (
           <div className="space-y-5">
+            <ConnectionStrip maquinas={maquinas} />
             <KpiStrip maquinas={maquinas} savings={savings} />
 
             <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">

@@ -79,6 +79,46 @@ export function diasAFallo(m: Maquina): number {
   return (umbral - last.v) / m.ritmoDia;
 }
 
+/**
+ * Incertidumbre asumida del ritmo de degradación (±30 %). Honestidad: la
+ * predicción se comunica como un RANGO, no como un número falsamente preciso.
+ */
+export const INCERTIDUMBRE_RITMO = 0.3;
+
+export interface RangoDias {
+  /** escenario pesimista (degrada más rápido → falla antes) */
+  min: number;
+  /** escenario optimista (degrada más lento → falla después) */
+  max: number;
+  /** estimación central */
+  centro: number;
+}
+
+/**
+ * Rango de "días a fallo" propagando la incertidumbre del ritmo de degradación.
+ * Un ritmo más rápido adelanta el fallo (min); uno más lento lo retrasa (max).
+ */
+export function rangoDiasAFallo(m: Maquina): RangoDias {
+  const centro = diasAFallo(m);
+  if (!isFinite(centro)) return { min: centro, max: centro, centro };
+  return {
+    min: centro / (1 + INCERTIDUMBRE_RITMO),
+    max: centro / (1 - INCERTIDUMBRE_RITMO),
+    centro,
+  };
+}
+
+/**
+ * Rango de días a fallo ya redondeado para la UI: extremos en días enteros
+ * (mínimo 1) y si conviene mostrarlo como rango (a–b) o como un único valor.
+ */
+export function rangoDiasRedondeado(m: Maquina): { a: number; b: number; esRango: boolean } {
+  const r = rangoDiasAFallo(m);
+  const a = Math.max(1, Math.ceil(r.min));
+  const b = Math.max(1, Math.ceil(r.max));
+  return { a, b, esRango: a !== b };
+}
+
 /** Indica si una lectura (por su probabilidad) cuenta como "alta". */
 export function esAlta(prob: number): boolean {
   return prob >= PROB_ALTA;

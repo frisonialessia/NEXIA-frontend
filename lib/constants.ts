@@ -24,6 +24,13 @@ export const AHORRO_POR_PARADA = COSTO_HORA_PARADA * HORAS_PARADA_TIPICA;
 // ── Umbral de fallo ────────────────────────────────────────────────────────
 export const UMBRAL_CRITICO = 6.5;
 
+// ── Calibración inicial (onboarding de una máquina nueva) ───────────────────
+// Una máquina recién conectada NO emite alertas hasta aprender su baseline.
+// Es una decisión de confianza: el sistema no "grita lobo" el primer día; se
+// gana la confianza calibrando antes de juzgar. (En la simulación: nº de ticks;
+// con backend real, será una ventana de tiempo de aprendizaje.)
+export const CALIBRACION_TICKS = 6;
+
 // ──────────────────────────────────────────────────────────────────────────
 // PALETA — Opción "Tech moderna" (9 colores), con variante clara y oscura.
 // Los 5 primeros son SEMÁNTICOS (estado de máquina). Los 4 últimos solo

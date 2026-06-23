@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { causaPrincipal, diasAFallo, esAlta, probabilidadFallo, transicion } from "./fsm";
+import { causaPrincipal, diasAFallo, esAlta, INCERTIDUMBRE_RITMO, probabilidadFallo, rangoDiasAFallo, rangoDiasRedondeado, transicion } from "./fsm";
 import { UMBRAL_CRITICO } from "../constants";
 import type { Estado, Maquina } from "../types";
 
@@ -77,6 +77,35 @@ describe("días a fallo", () => {
 
   it("proyecta (umbral - actual) / ritmo", () => {
     expect(diasAFallo(base(4.5, 0.5))).toBeCloseTo((UMBRAL_CRITICO - 4.5) / 0.5, 5);
+  });
+});
+
+describe("rango de días a fallo (predicción honesta)", () => {
+  const base = (v: number, ritmoDia: number): Maquina =>
+    ({ hist: [{ t: 0, v, exp: 2 }], ritmoDia } as unknown as Maquina);
+
+  it("encierra la estimación central con el ritmo ±incertidumbre", () => {
+    const m = base(4.5, 0.5);
+    const centro = diasAFallo(m);
+    const r = rangoDiasAFallo(m);
+    expect(r.centro).toBeCloseTo(centro, 5);
+    expect(r.min).toBeCloseTo(centro / (1 + INCERTIDUMBRE_RITMO), 5);
+    expect(r.max).toBeCloseTo(centro / (1 - INCERTIDUMBRE_RITMO), 5);
+    expect(r.min).toBeLessThan(centro);
+    expect(r.max).toBeGreaterThan(centro);
+  });
+
+  it("propaga Infinity cuando no hay degradación", () => {
+    const r = rangoDiasAFallo(base(3, 0));
+    expect(r.min).toBe(Infinity);
+    expect(r.max).toBe(Infinity);
+  });
+
+  it("redondea a días enteros (mínimo 1) y marca si es rango", () => {
+    const r = rangoDiasRedondeado(base(4.5, 0.5));
+    expect(r.a).toBeGreaterThanOrEqual(1);
+    expect(r.b).toBeGreaterThanOrEqual(r.a);
+    expect(r.esRango).toBe(r.a !== r.b);
   });
 });
 

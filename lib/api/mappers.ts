@@ -37,11 +37,12 @@ export function aMaquina(d: MaquinaDTO): Maquina {
     cSube: 0,
     cBaja: 0,
     tick: d.hist.length,
+    calib: d.calib ?? 0,
   };
 }
 
 export function aAlerta(d: AlertaDTO): Alerta {
-  return { id: d.id, maquina: d.maquina, sensor: d.sensor, tipo: d.tipo, causa: d.causa, prob: d.prob, hora: horaDe(d.ts) };
+  return { id: d.id, maquina: d.maquina, sensor: d.sensor, tipo: d.tipo, causa: d.causa, prob: d.prob, hora: horaDe(d.ts), vib: d.vib, exp: d.exp, umbral: d.umbral };
 }
 
 export function aHistorial(d: AlertaDTO): EventoHistorial {
@@ -72,6 +73,7 @@ export interface SnapshotDominio {
   historial: EventoHistorial[];
   eventos: Evento[];
   savings: { ahorroMes: number; paradasEvitadas: number };
+  registro: { real: number; falsa: number; nc: number };
   roster: MaquinaSeed[];
 }
 
@@ -82,6 +84,7 @@ export function aSnapshot(d: SnapshotDTO): SnapshotDominio {
     historial: d.historial.map(aHistorial),
     eventos: d.eventos.map(aEvento),
     savings: d.savings,
+    registro: d.registro,
     roster: aRoster(d.maquinas),
   };
 }

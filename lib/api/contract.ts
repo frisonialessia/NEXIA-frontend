@@ -92,6 +92,8 @@ export interface MaquinaDTO {
   hist: LecturaDTO[];
   /** escenario (opcional; informativo) */
   esc?: Escenario;
+  /** ticks/periodo de calibración restante (0 = monitoreando) */
+  calib?: number;
 }
 
 export interface AlertaDTO {
@@ -103,6 +105,12 @@ export interface AlertaDTO {
   prob: number;
   /** epoch ms */
   ts: number;
+  /** vibración real que disparó la alerta */
+  vib: number;
+  /** vibración esperada en ese momento */
+  exp: number;
+  /** umbral crítico de la máquina */
+  umbral: number;
   /** "Pendiente" | "Resuelto" (solo en historial) */
   estado?: "Pendiente" | "Resuelto";
 }
@@ -121,6 +129,13 @@ export interface SavingsDTO {
   paradasEvitadas: number;
 }
 
+/** Track record del modelo (veredictos humanos acumulados). */
+export interface RegistroDTO {
+  real: number;
+  falsa: number;
+  nc: number;
+}
+
 /** GET /v1/fleet/snapshot */
 export interface SnapshotDTO {
   maquinas: MaquinaDTO[];
@@ -128,6 +143,7 @@ export interface SnapshotDTO {
   historial: AlertaDTO[];
   eventos: EventoDTO[];
   savings: SavingsDTO;
+  registro: RegistroDTO;
 }
 
 // ── Mensajes del WebSocket en vivo ──────────────────────────────────────────
@@ -146,6 +162,8 @@ export type MensajeVivo =
       nuevosEventos?: EventoDTO[];
       /** ahorro actualizado */
       savings?: SavingsDTO;
+      /** track record actualizado */
+      registro?: RegistroDTO;
     };
 
 // ── Comandos (acciones del usuario hacia el backend) ────────────────────────
