@@ -76,6 +76,13 @@ export interface Alerta {
   causa: string;
   prob: number;
   hora: string;
+  // Lectura que disparó la alerta (para explicar el porqué, no como caja negra).
+  /** vibración real en el momento de la detección (mm/s base) */
+  vib: number;
+  /** vibración esperada en ese momento (mm/s base) */
+  exp: number;
+  /** umbral crítico de la máquina (mm/s base) */
+  umbral: number;
 }
 
 /** Entrada del historial de fallos (una alerta + metadatos de seguimiento). */

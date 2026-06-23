@@ -9,6 +9,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ACCIONES, ARC, CAUSAS, ROL_NOMBRE, col, mix, soft } from "@/lib/constants";
+import { explicarAlerta, LECTURAS_CONFIRMACION } from "@/lib/domain/alertas";
+import { uni } from "@/lib/format";
 import { useModalA11y } from "@/lib/hooks/useModalA11y";
 import { etiquetarAlerta, useAlertas } from "@/lib/state/useFleet";
 import { useAdmin } from "@/lib/state/AdminProvider";
@@ -87,9 +89,12 @@ export function AuditQueue() {
 
 function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }) {
   const { dark } = useTheme();
-  const { rol } = useSession();
+  const { rol, sistema } = useSession();
   const { registrar } = useAdmin();
   const t = useT();
+  const exp = explicarAlerta(alerta);
+  const u = uni("vib", sistema);
+  const fmtVib = (n: number) => `${u.f(n).toFixed(2)} ${u.u}`;
   const [veredicto, setVeredicto] = useState<Veredicto | null>(null);
   const [causaSel, setCausaSel] = useState<string | null>(null);
   const [accionSel, setAccionSel] = useState<string | null>(null);
@@ -127,6 +132,37 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
           <div className="mt-3 rounded-xl bg-neutral-50 px-4 py-3 dark:bg-neutral-800">
             <span className="text-[11px] uppercase tracking-wider text-neutral-400">{t("audit.probableCause")}</span>
             <p className="mt-0.5 text-sm text-neutral-700 dark:text-neutral-200">{alerta.causa}</p>
+          </div>
+
+          {/* Por qué la marcamos (explicabilidad, no caja negra) */}
+          <div className="mt-3 rounded-xl border px-4 py-3" style={{ borderColor: ARC }}>
+            <span className="text-[11px] uppercase tracking-wider text-neutral-400">{t("audit.whyTitle")}</span>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="font-mono text-2xl" style={{ color: col("crit", dark) }}>
+                {exp.desviacionPct > 0 ? "+" : ""}{exp.desviacionPct}%
+              </span>
+              <span className="text-xs text-neutral-400">{t("audit.deviation")}</span>
+            </div>
+            <ul className="mt-2 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-300">
+              <li className="flex items-start gap-2">
+                <Icon name="chart" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
+                {t("audit.whyReading", { vib: fmtVib(exp.vib), exp: u.f(exp.exp).toFixed(2), u: u.u })}
+              </li>
+              <li className="flex items-start gap-2">
+                <Icon name="spark" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
+                {t("audit.whyBand", { n: exp.sigmas })}
+              </li>
+              <li className="flex items-start gap-2">
+                <Icon name="alert" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: exp.sobreUmbral ? col("crit", dark) : col("warn", dark) }} />
+                {exp.sobreUmbral
+                  ? t("audit.whyThreshold", { umbral: u.f(exp.umbral).toFixed(2), u: u.u })
+                  : t("audit.whyNearThreshold", { umbral: u.f(exp.umbral).toFixed(2), u: u.u })}
+              </li>
+              <li className="flex items-start gap-2">
+                <Icon name="check" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: col("ok", dark) }} />
+                {t("audit.whyConfirmed", { n: LECTURAS_CONFIRMACION })}
+              </li>
+            </ul>
           </div>
         </div>
 

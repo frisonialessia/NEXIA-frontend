@@ -42,7 +42,7 @@ export function aMaquina(d: MaquinaDTO): Maquina {
 }
 
 export function aAlerta(d: AlertaDTO): Alerta {
-  return { id: d.id, maquina: d.maquina, sensor: d.sensor, tipo: d.tipo, causa: d.causa, prob: d.prob, hora: horaDe(d.ts) };
+  return { id: d.id, maquina: d.maquina, sensor: d.sensor, tipo: d.tipo, causa: d.causa, prob: d.prob, hora: horaDe(d.ts), vib: d.vib, exp: d.exp, umbral: d.umbral };
 }
 
 export function aHistorial(d: AlertaDTO): EventoHistorial {

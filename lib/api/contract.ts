@@ -105,6 +105,12 @@ export interface AlertaDTO {
   prob: number;
   /** epoch ms */
   ts: number;
+  /** vibración real que disparó la alerta */
+  vib: number;
+  /** vibración esperada en ese momento */
+  exp: number;
+  /** umbral crítico de la máquina */
+  umbral: number;
   /** "Pendiente" | "Resuelto" (solo en historial) */
   estado?: "Pendiente" | "Resuelto";
 }

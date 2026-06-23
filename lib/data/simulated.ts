@@ -104,6 +104,9 @@ export function tickMaquina(m: Maquina): Alerta | null {
       causa: "Vibración fuera del rango esperado: posible " + causaPrincipal(m.tipo).toLowerCase(),
       prob: m.prob,
       hora: ahora.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }),
+      vib: v,
+      exp: m.expected,
+      umbral: m.umbral,
     };
   }
 
