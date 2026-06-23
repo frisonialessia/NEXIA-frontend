@@ -12,6 +12,7 @@ import { useOrg } from "@/lib/state/OrgProvider";
 import { useEventos, useMaquinas, useSavings } from "@/lib/state/useFleet";
 import { ConnectionStrip } from "./pro/ConnectionStrip";
 import { EventsFeed } from "./pro/EventsFeed";
+import { ExecutiveReportButton } from "./pro/ExecutiveReportButton";
 import { FleetHealthMap } from "./pro/FleetHealthMap";
 import { KpiStrip } from "./pro/KpiStrip";
 import { SortableFleet } from "./pro/SortableFleet";
@@ -31,7 +32,10 @@ export function CommandCenter() {
     <main className="fade-in px-6 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6">
-          <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t("cc.live", { plant: plantaActiva.nombre })}</span>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs uppercase tracking-[0.18em] text-neutral-400">{t("cc.live", { plant: plantaActiva.nombre })}</span>
+            {total > 0 && <ExecutiveReportButton />}
+          </div>
           <div className="mt-2 flex items-end justify-between">
             <h1 className="font-display text-3xl tracking-tight">{t("cc.title")}</h1>
             <p className="text-sm text-neutral-500">
