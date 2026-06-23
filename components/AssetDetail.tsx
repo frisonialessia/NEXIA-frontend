@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
-import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, sensoresDe } from "@/lib/data/asset";
+import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, saludEnlace, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
 import { diasAFallo } from "@/lib/engine/fsm";
@@ -31,6 +31,21 @@ import { Icon } from "./ui/Icon";
 import { Button } from "./ui/Primitives";
 import { Label, Stat } from "./ui/Typo";
 import { VibrationChart } from "./ui/VibrationChart";
+
+/** Métrica del enlace: valor grande y, opcionalmente, una barra de nivel. */
+function LinkMetric({ label, value, pct, color }: { label: string; value: string; pct?: number; color?: string }) {
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-wider text-neutral-400">{label}</div>
+      <div className="mt-0.5 font-mono text-lg" style={pct !== undefined ? { color } : undefined}>{value}</div>
+      {pct !== undefined && (
+        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+          <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function AssetDetail({ id }: { id: string }) {
   const maquinas = useMaquinas();
@@ -84,6 +99,7 @@ export function AssetDetail({ id }: { id: string }) {
   const last = m.hist[m.hist.length - 1];
 
   const sensores = sensoresDe(m.estado);
+  const enlace = saludEnlace(m);
 
   // Fondo y borde del recuadro de pronóstico según el estado.
   const predEstilo =
@@ -204,6 +220,34 @@ export function AssetDetail({ id }: { id: string }) {
           <GaugeCard titulo={t("detail.rpm")}>
             <Gauge valor={gauges.rpm.v} min={gauges.rpm.min} max={gauges.rpm.max} unidad={gauges.rpm.u} zonaPeligro={0.9} />
           </GaugeCard>
+        </div>
+
+        {/* Salud de la conexión (pipeline de datos) */}
+        <div className={`mb-5 ${SURFACE} px-7 py-5`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
+              {t("detail.linkTitle")}
+            </h3>
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                {enlace.online && (
+                  <span className="ping-soft absolute inline-flex h-full w-full rounded-full" style={{ background: col("ok", dark), opacity: 0.6 }} />
+                )}
+                <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: enlace.online ? col("ok", dark) : col("crit", dark) }} />
+              </span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-300">
+                {enlace.online ? t("detail.linkOnline") : t("detail.linkOffline")}
+                {" · "}
+                {enlace.ultimaLecturaSeg < 1 ? t("detail.lastReadingNow") : t("detail.lastReading", { n: enlace.ultimaLecturaSeg })}
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+            <LinkMetric label={t("detail.signal")} value={`${enlace.senalPct}%`} pct={enlace.senalPct} color={col("ok", dark)} />
+            <LinkMetric label={t("detail.battery")} value={`${enlace.bateriaPct}%`} pct={enlace.bateriaPct} color={enlace.bateriaPct < 25 ? col("warn", dark) : col("ok", dark)} />
+            <LinkMetric label={t("detail.sampling")} value={`${enlace.muestreoHz} Hz`} />
+            <LinkMetric label={t("detail.latency")} value={`${enlace.latenciaMs} ms`} />
+          </div>
         </div>
 
         {/* Sensores y actuadores */}
