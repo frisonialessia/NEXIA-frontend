@@ -9,7 +9,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ROLES } from "../constants";
-import { resolverCuenta, type Cuenta } from "../account";
+import type { Cuenta } from "../account";
+import { login as authLogin, logout as authLogout } from "../api/auth";
 import {
   esModoOperador,
   esSoloLectura,
@@ -32,8 +33,9 @@ interface SessionCtx {
   sesionActiva: boolean;
   /** ¿Ya se leyó el estado persistido? (evita parpadeos en el arranque). */
   hidratado: boolean;
-  /** Inicia sesión con un correo (modo demo: sin contraseña real). */
-  iniciarSesion: (email: string) => void;
+  /** Inicia sesión. Remoto: valida contra el backend. Demo: resuelve por correo.
+   *  Lanza Error si las credenciales fallan (la pantalla muestra el mensaje). */
+  iniciarSesion: (email: string, password?: string) => Promise<void>;
   /** Cierra la sesión activa. */
   cerrarSesion: () => void;
   /** Actualiza datos del perfil de la cuenta activa. */
@@ -88,8 +90,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem(CLAVE_ROL, r);
   }, []);
 
-  const iniciarSesion = useCallback((email: string) => {
-    const c = resolverCuenta(email);
+  const iniciarSesion = useCallback(async (email: string, password = "") => {
+    const c = await authLogin(email, password); // lanza si falla (remoto)
     setCuenta(c);
     localStorage.setItem(CLAVE_CUENTA, JSON.stringify(c));
     setRolState(c.rol);
@@ -97,6 +99,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const cerrarSesion = useCallback(() => {
+    authLogout();
     setCuenta(null);
     localStorage.removeItem(CLAVE_CUENTA);
   }, []);

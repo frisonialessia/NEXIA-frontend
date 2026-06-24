@@ -24,6 +24,18 @@ export function LoginScreen() {
   const t = useT();
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [cargando, setCargando] = useState(false);
+
+  async function acceder(correo: string, contrasena = "") {
+    setCargando(true);
+    try {
+      await iniciarSesion(correo, contrasena);
+    } catch (err) {
+      const motivo = err instanceof Error && err.message === "credenciales" ? t("login.badCredentials") : t("login.loginError");
+      toast.error(motivo);
+      setCargando(false);
+    }
+  }
 
   function entrar(e?: React.FormEvent) {
     e?.preventDefault();
@@ -31,7 +43,7 @@ export function LoginScreen() {
       toast.error(t("login.emailRequired"));
       return;
     }
-    iniciarSesion(email);
+    void acceder(email, pass);
   }
 
   const input =
@@ -82,8 +94,8 @@ export function LoginScreen() {
             />
           </label>
 
-          <Button type="submit" className="mt-6 w-full py-3">
-            {t("login.enter")}
+          <Button type="submit" disabled={cargando} className="mt-6 w-full py-3">
+            {cargando ? t("login.entering") : t("login.enter")}
           </Button>
 
           <p className="mt-3 text-center text-xs text-neutral-400">
@@ -101,7 +113,8 @@ export function LoginScreen() {
             {USUARIOS.map((u) => (
               <button
                 key={u.id}
-                onClick={() => iniciarSesion(u.e)}
+                disabled={cargando}
+                onClick={() => void acceder(u.e)}
                 className="flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800"
               >
                 <span
