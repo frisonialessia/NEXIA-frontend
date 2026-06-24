@@ -5,6 +5,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import type {
+  Criticidad,
   Estado,
   MaquinaSeed,
   Magnitud,
@@ -174,6 +175,13 @@ export const RANK_ESTADO: Record<Estado, number> = {
   RECOVERY_PROBATION: 1,
   WARNING_PROBATION: 2,
   STABLE: 3,
+};
+
+/** Rango de criticidad del activo (0 = más prioritaria). Sin definir = media. */
+export const RANK_CRITICIDAD: Record<Criticidad, number> = {
+  alta: 0,
+  media: 1,
+  baja: 2,
 };
 
 // ──────────────────────────────────────────────────────────────────────────
