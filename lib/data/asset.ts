@@ -5,7 +5,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { uni } from "../format";
-import type { Estado, Maquina, SistemaUnidades } from "../types";
+import type { Estado, Maquina, SistemaUnidades, Telemetria } from "../types";
 
 // ── Salud del enlace (gateway + sensor) ─────────────────────────────────────
 // Que el comprador vea que el dato es REAL y FRESCO: cuándo llegó la última
@@ -83,20 +83,30 @@ export interface GaugeSpec {
   u: string;
 }
 
-/** Lecturas de los velocímetros (temperatura, presión, RPM) en el sistema dado. */
+/** Telemetría de respaldo (base SI) si la máquina aún no tiene lecturas. */
+function telemetriaRespaldo(estado: Estado): Telemetria {
+  const f = factorEstado(estado);
+  return { temp: 58 * f, pres: 4.2 * f, rpm: 1450 / f, caudal: 42 / f, corriente: 54 * f };
+}
+
+/**
+ * Velocímetros del activo a partir de su telemetría multi-variable real,
+ * convertidos al sistema de unidades activo. Si la máquina no trae telemetría
+ * todavía, usa un respaldo derivado del estado.
+ */
 export function lecturasGauges(
-  estado: Estado,
+  m: Maquina,
   sistema: SistemaUnidades
-): { temp: GaugeSpec; pres: GaugeSpec; rpm: GaugeSpec } {
-  const factor = factorEstado(estado);
+): { temp: GaugeSpec; pres: GaugeSpec; rpm: GaugeSpec; caudal: GaugeSpec; corriente: GaugeSpec } {
+  const tel = m.telemetria ?? telemetriaRespaldo(m.estado);
   const t = uni("temp", sistema);
-  const tBase = 58 * factor + Math.random() * 4;
   const p = uni("pres", sistema);
-  const pBase = 4.2 * factor + Math.random() * 0.3;
-  const rpm = 1450 / factor + Math.random() * 50;
+  const c = uni("caudal", sistema);
   return {
-    temp: { v: t.f(tBase), min: t.f(20), max: t.f(120), u: t.u },
-    pres: { v: p.f(pBase), min: p.f(0), max: p.f(10), u: p.u },
-    rpm: { v: rpm, min: 0, max: 3000, u: "rpm" },
+    temp: { v: t.f(tel.temp), min: t.f(20), max: t.f(120), u: t.u },
+    pres: { v: p.f(tel.pres), min: p.f(0), max: p.f(10), u: p.u },
+    rpm: { v: tel.rpm, min: 0, max: 3000, u: "rpm" },
+    caudal: { v: c.f(tel.caudal), min: c.f(0), max: c.f(100), u: c.u },
+    corriente: { v: tel.corriente, min: 0, max: Math.max(120, tel.corriente * 1.4), u: "A" },
   };
 }

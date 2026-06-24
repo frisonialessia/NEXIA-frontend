@@ -42,6 +42,7 @@ export function aMaquina(d: MaquinaDTO): Maquina {
     potenciaKw: d.potenciaKw,
     criticidad: d.criticidad,
     costoParadaHora: d.costoParadaHora,
+    telemetria: d.telemetria,
   };
 }
 
