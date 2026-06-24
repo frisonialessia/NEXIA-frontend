@@ -6,9 +6,12 @@
 // cuando una máquina cambia de estado (poco frecuente, por la histéresis).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { CALIBRACION_TICKS, COSTO_HORA_PARADA, HORAS_PARADA_TIPICA, RANK_ESTADO } from "../constants";
+import { CALIBRACION_TICKS, COSTO_HORA_PARADA, HORAS_PARADA_TIPICA, RANK_CRITICIDAD, RANK_ESTADO } from "../constants";
 import { zonaDe, zonasISO, type ZonaISO } from "../engine/iso";
 import type { Maquina, MaquinaSeed } from "../types";
+
+/** Rango de criticidad de un activo (0 = más prioritaria). Sin definir = media. */
+export const rankCriticidad = (m: Maquina): number => RANK_CRITICIDAD[m.criticidad ?? "media"];
 
 /** Zona ISO 10816 actual de una máquina, o null si no declara potencia. */
 export function zonaISOActiva(m: Maquina): ZonaISO | null {
@@ -31,7 +34,10 @@ export const progresoCalibracion = (m: Maquina): number =>
 
 export function ordenarFlota(maquinas: Maquina[]): Maquina[] {
   return [...maquinas].sort(
-    (a, b) => RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] || a.id.localeCompare(b.id, "es")
+    (a, b) =>
+      RANK_ESTADO[a.estado] - RANK_ESTADO[b.estado] ||
+      rankCriticidad(a) - rankCriticidad(b) ||
+      a.id.localeCompare(b.id, "es")
   );
 }
 
@@ -48,7 +54,13 @@ export function ordenarConPreferencias(maquinas: Maquina[], orden: string[], pin
     return i === -1 ? Number.MAX_SAFE_INTEGER : i;
   };
   const grupo = (m: Maquina) => (m.estado === "CRITICAL_ALERT" ? 0 : pinSet.has(m.id) ? 1 : 2);
+  // Tras el grupo y el orden manual del usuario, la criticidad ordena lo que el
+  // usuario no arrastró (ambos idx = MAX); el arrastre explícito siempre manda.
   return [...maquinas].sort(
-    (a, b) => grupo(a) - grupo(b) || idx(a.id) - idx(b.id) || a.id.localeCompare(b.id, "es")
+    (a, b) =>
+      grupo(a) - grupo(b) ||
+      idx(a.id) - idx(b.id) ||
+      rankCriticidad(a) - rankCriticidad(b) ||
+      a.id.localeCompare(b.id, "es")
   );
 }

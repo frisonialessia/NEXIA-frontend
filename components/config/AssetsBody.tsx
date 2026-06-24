@@ -22,6 +22,9 @@ import { Label } from "../ui/Typo";
 
 const TIPOS: TipoMaquina[] = ["bomba", "compresor", "motor", "ventilador"];
 
+/** Color de la criticidad del activo (alta=rojo, media=ámbar, baja=gris). */
+const critCol = (c: Criticidad) => col(c === "alta" ? "crit" : c === "media" ? "warn" : "gray");
+
 export function AssetsBody() {
   const roster = useRoster();
   const { registrar } = useAdmin();
@@ -55,7 +58,18 @@ export function AssetsBody() {
               <Icon name="gauge" className="h-4 w-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">{s.id}</div>
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-medium">{s.id}</span>
+                {s.criticidad && (
+                  <span
+                    className="shrink-0 rounded px-1.5 py-px text-[10px] font-medium leading-none"
+                    style={{ color: critCol(s.criticidad), background: mix(critCol(s.criticidad)) }}
+                    title={t("assets.criticality")}
+                  >
+                    {t(`crit.${s.criticidad}`)}
+                  </span>
+                )}
+              </div>
               <div className="truncate text-xs text-neutral-400">
                 {s.sector} · {s.tipo ? t(`tipo.${s.tipo}`) : "—"} · {s.sensor}
               </div>
