@@ -175,12 +175,12 @@ export const RANK_ESTADO: Record<Estado, number> = {
 // ──────────────────────────────────────────────────────────────────────────
 
 export const FLOTA: MaquinaSeed[] = [
-  { id: "Bomba de llenado #1", sensor: "vib-eje-01", sector: "Embotelladora", base: 2.1, esc: "degradando" },
-  { id: "Compresor de aire #2", sensor: "vib-01", sector: "Procesadora de alimentos", base: 3.4, esc: "sano" },
-  { id: "Motor cinta transportadora", sensor: "vib-eje-02", sector: "Embotelladora", base: 1.8, esc: "sano" },
-  { id: "Bomba de agua cruda", sensor: "vib-01", sector: "Tratamiento de agua", base: 2.6, esc: "critico" },
-  { id: "Ventilador extractor", sensor: "vib-03", sector: "Taller mecánico", base: 1.5, esc: "sano" },
-  { id: "Bomba dosificadora", sensor: "vib-02", sector: "Tratamiento de agua", base: 2.0, esc: "sano" },
+  { id: "Bomba de llenado #1", sensor: "vib-eje-01", sector: "Embotelladora", base: 2.1, esc: "degradando", rpm: 1450, potenciaKw: 30, criticidad: "alta", costoParadaHora: 1800 },
+  { id: "Compresor de aire #2", sensor: "vib-01", sector: "Procesadora de alimentos", base: 3.4, esc: "sano", rpm: 2950, potenciaKw: 90, criticidad: "alta", costoParadaHora: 2500 },
+  { id: "Motor cinta transportadora", sensor: "vib-eje-02", sector: "Embotelladora", base: 1.8, esc: "sano", rpm: 1450, potenciaKw: 15, criticidad: "media", costoParadaHora: 900 },
+  { id: "Bomba de agua cruda", sensor: "vib-01", sector: "Tratamiento de agua", base: 2.6, esc: "critico", rpm: 1480, potenciaKw: 45, criticidad: "alta", costoParadaHora: 1500 },
+  { id: "Ventilador extractor", sensor: "vib-03", sector: "Taller mecánico", base: 1.5, esc: "sano", rpm: 960, potenciaKw: 11, criticidad: "baja", costoParadaHora: 600 },
+  { id: "Bomba dosificadora", sensor: "vib-02", sector: "Tratamiento de agua", base: 2.0, esc: "sano", rpm: 2900, potenciaKw: 5.5, criticidad: "media", costoParadaHora: 800 },
 ];
 
 // ── Causas raíz posibles por tipo de máquina ───────────────────────────────

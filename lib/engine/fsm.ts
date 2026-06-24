@@ -11,6 +11,16 @@
 
 import { CAUSAS, UMBRAL_CRITICO } from "../constants";
 import type { Estado, Maquina } from "../types";
+import { umbralISO } from "./iso";
+
+/**
+ * Umbral crítico EFECTIVO de una máquina: si tiene potencia declarada, se deriva
+ * de ISO 10816 (frontera C/D); si no, usa su umbral manual o el global.
+ */
+export function umbralEfectivo(m: Maquina): number {
+  if (m.potenciaKw && m.potenciaKw > 0) return umbralISO(m.potenciaKw);
+  return m.umbral ?? UMBRAL_CRITICO;
+}
 
 /** Umbral de probabilidad a partir del cual una lectura se considera "alta". */
 const PROB_ALTA = 0.6;
@@ -73,7 +83,7 @@ export function transicion(
 export function diasAFallo(m: Maquina): number {
   const last = m.hist[m.hist.length - 1];
   if (!last) return Infinity;
-  const umbral = m.umbral ?? UMBRAL_CRITICO;
+  const umbral = umbralEfectivo(m);
   if (last.v >= umbral) return 0;
   if (m.ritmoDia <= 0) return Infinity;
   return (umbral - last.v) / m.ritmoDia;

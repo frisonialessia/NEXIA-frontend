@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { causaPrincipal, diasAFallo, esAlta, INCERTIDUMBRE_RITMO, probabilidadFallo, rangoDiasAFallo, rangoDiasRedondeado, transicion } from "./fsm";
+import { causaPrincipal, diasAFallo, esAlta, INCERTIDUMBRE_RITMO, probabilidadFallo, rangoDiasAFallo, rangoDiasRedondeado, transicion, umbralEfectivo } from "./fsm";
 import { UMBRAL_CRITICO } from "../constants";
 import type { Estado, Maquina } from "../types";
 
@@ -106,6 +106,20 @@ describe("rango de días a fallo (predicción honesta)", () => {
     expect(r.a).toBeGreaterThanOrEqual(1);
     expect(r.b).toBeGreaterThanOrEqual(r.a);
     expect(r.esRango).toBe(r.a !== r.b);
+  });
+});
+
+describe("umbral efectivo", () => {
+  it("deriva de ISO cuando hay potencia (30 kW → 4.5 mm/s)", () => {
+    expect(umbralEfectivo({ potenciaKw: 30 } as unknown as Maquina)).toBe(4.5);
+  });
+
+  it("usa el umbral manual cuando no hay potencia", () => {
+    expect(umbralEfectivo({ umbral: 5.5 } as unknown as Maquina)).toBe(5.5);
+  });
+
+  it("cae al umbral global si no hay ni potencia ni umbral", () => {
+    expect(umbralEfectivo({} as unknown as Maquina)).toBe(UMBRAL_CRITICO);
   });
 });
 

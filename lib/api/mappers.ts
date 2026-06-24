@@ -38,6 +38,10 @@ export function aMaquina(d: MaquinaDTO): Maquina {
     cBaja: 0,
     tick: d.hist.length,
     calib: d.calib ?? 0,
+    rpm: d.rpm,
+    potenciaKw: d.potenciaKw,
+    criticidad: d.criticidad,
+    costoParadaHora: d.costoParadaHora,
   };
 }
 
