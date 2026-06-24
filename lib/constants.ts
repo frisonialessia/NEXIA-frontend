@@ -13,6 +13,7 @@ import type {
   TipoMaquina,
   Unidad,
 } from "./types";
+import type { ZonaISO } from "./engine/iso";
 
 // ── Dinero (configurable; defaults de la demo) ─────────────────────────────
 export const COSTO_HORA_PARADA = 1500;
@@ -143,6 +144,11 @@ export function tonoVerde(prob: number): string {
 export function colorSalud(estado: Estado, prob: number): string {
   if (estado === "CRITICAL_ALERT" || prob >= 0.6) return col("crit");
   return tonoVerde(prob);
+}
+
+/** Color de una zona ISO 10816: A/B sano, C advertencia, D daño. Tema-aware. */
+export function colorZonaISO(z: ZonaISO): string {
+  return z === "D" ? col("crit") : z === "C" ? col("warn") : col("ok");
 }
 
 /**

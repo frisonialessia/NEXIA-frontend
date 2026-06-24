@@ -12,12 +12,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
+import { ROL_NOMBRE, col, colorSalud, colorZonaISO, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, saludEnlace, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
 import { ahorroDe, estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
 import { diasAFallo, rangoDiasRedondeado } from "@/lib/engine/fsm";
-import { zonaDe, zonasISO, type ZonaISO } from "@/lib/engine/iso";
+import { zonaDe, zonasISO } from "@/lib/engine/iso";
 import { dinero } from "@/lib/format";
 import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
@@ -46,11 +46,6 @@ function LinkMetric({ label, value, pct, color }: { label: string; value: string
       )}
     </div>
   );
-}
-
-/** Color de la zona ISO: A/B sano, C advertencia, D daño. */
-function colorZonaISO(z: ZonaISO, dark: boolean): string {
-  return z === "D" ? col("crit", dark) : z === "C" ? col("warn", dark) : col("ok", dark);
 }
 
 /** Dato de ficha técnica (etiqueta + valor mono). */
@@ -333,7 +328,7 @@ export function AssetDetail({ id }: { id: string }) {
               {m.potenciaKw ? (() => {
                 const z = zonasISO(m.potenciaKw);
                 const zona = zonaDe(last ? last.v : m.expected, z);
-                const c = colorZonaISO(zona, dark);
+                const c = colorZonaISO(zona);
                 return (
                   <div>
                     <div className="text-[11px] uppercase tracking-wider text-neutral-400">{t("detail.isoZone")}</div>

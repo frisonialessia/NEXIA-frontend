@@ -7,7 +7,15 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { CALIBRACION_TICKS, COSTO_HORA_PARADA, HORAS_PARADA_TIPICA, RANK_ESTADO } from "../constants";
+import { zonaDe, zonasISO, type ZonaISO } from "../engine/iso";
 import type { Maquina, MaquinaSeed } from "../types";
+
+/** Zona ISO 10816 actual de una máquina, o null si no declara potencia. */
+export function zonaISOActiva(m: Maquina): ZonaISO | null {
+  if (!m.potenciaKw || m.potenciaKw <= 0) return null;
+  const last = m.hist[m.hist.length - 1];
+  return zonaDe(last ? last.v : m.expected, zonasISO(m.potenciaKw));
+}
 
 /** Ahorro de evitar una parada de ESTA máquina (costo/hora propio o global). */
 export function ahorroDe(m: Maquina | MaquinaSeed): number {

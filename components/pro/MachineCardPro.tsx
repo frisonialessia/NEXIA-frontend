@@ -7,8 +7,8 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import Link from "next/link";
-import { col, colorSalud } from "@/lib/constants";
-import { estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
+import { col, colorSalud, colorZonaISO } from "@/lib/constants";
+import { estaCalibrando, progresoCalibracion, zonaISOActiva } from "@/lib/domain/flota";
 import { diasAFallo, rangoDiasRedondeado } from "@/lib/engine/fsm";
 import { useT } from "@/lib/state/I18nProvider";
 import type { Maquina } from "@/lib/types";
@@ -25,6 +25,7 @@ export function MachineCardPro({ m }: { m: Maquina }) {
   const pulsa = !calibrando && (m.estado === "CRITICAL_ALERT" || m.estado === "RECOVERY_PROBATION");
   const mostrarPrediccion = !calibrando && m.estado !== "STABLE" && dias !== Infinity && dias < 30;
   const serie = m.hist.map((h) => h.v);
+  const zonaISO = calibrando ? null : zonaISOActiva(m);
 
   return (
     <Link href={`/activo/${encodeURIComponent(m.id)}`} className="group block">
@@ -45,7 +46,18 @@ export function MachineCardPro({ m }: { m: Maquina }) {
         </div>
 
         <h3 className="mt-3 font-display text-lg tracking-tight">{m.id}</h3>
-        <p className="text-xs text-neutral-400">{m.sector}</p>
+        <div className="mt-0.5 flex items-center gap-2">
+          <p className="text-xs text-neutral-400">{m.sector}</p>
+          {zonaISO && (
+            <span
+              className="rounded border px-1.5 py-px text-[10px] font-medium leading-none"
+              style={{ color: colorZonaISO(zonaISO), borderColor: colorZonaISO(zonaISO) }}
+              title={`ISO 10816 · zona ${zonaISO}`}
+            >
+              ISO {zonaISO}
+            </span>
+          )}
+        </div>
 
         <div className="mt-3 h-12 overflow-hidden rounded-lg opacity-90">
           {serie.length > 1 ? (
