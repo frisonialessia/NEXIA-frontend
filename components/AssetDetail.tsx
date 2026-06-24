@@ -17,6 +17,7 @@ import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, saludEnlace, sensoresDe
 import { serieReplay } from "@/lib/data/simulated";
 import { ahorroDe, estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
 import { diasAFallo, rangoDiasRedondeado } from "@/lib/engine/fsm";
+import { frecuenciasCaracteristicas } from "@/lib/engine/frecuencias";
 import { zonaDe, zonasISO } from "@/lib/engine/iso";
 import { dinero } from "@/lib/format";
 import { useT } from "@/lib/state/I18nProvider";
@@ -346,6 +347,35 @@ export function AssetDetail({ id }: { id: string }) {
             </div>
           </div>
         )}
+
+        {/* Diagnóstico por frecuencia (usa el RPM) */}
+        {m.rpm ? (
+          <div className={`mt-5 ${SURFACE} px-7 py-5`}>
+            <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("diag.title")}</h3>
+            <p className="mt-1 text-xs text-neutral-400">{t("diag.subtitle")}</p>
+            <div className="mt-4 overflow-hidden rounded-xl border border-neutral-100 dark:border-neutral-800">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-100 text-[11px] uppercase tracking-wider text-neutral-400 dark:border-neutral-800">
+                    <th className="px-4 py-2 text-left font-medium">{t("diag.order")}</th>
+                    <th className="px-4 py-2 text-right font-medium">{t("diag.freq")}</th>
+                    <th className="px-4 py-2 text-left font-medium">{t("diag.cause")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {frecuenciasCaracteristicas(m.rpm).map((f) => (
+                    <tr key={f.orden} className="border-b border-neutral-50 last:border-0 dark:border-neutral-800/50">
+                      <td className="px-4 py-2.5 font-mono">{f.orden}×</td>
+                      <td className="px-4 py-2.5 text-right font-mono">{f.hz.toFixed(1)} Hz</td>
+                      <td className="px-4 py-2.5 text-neutral-600 dark:text-neutral-300">{t(f.causaKey)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs text-neutral-400">{t("diag.bearingNote")}</p>
+          </div>
+        ) : null}
 
         {/* Indicadores de fiabilidad */}
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
