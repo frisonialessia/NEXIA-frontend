@@ -14,7 +14,7 @@ import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
 import { useSession } from "@/lib/state/SessionProvider";
 import { agregarMaquina, editarMaquina, quitarMaquina, useRoster } from "@/lib/state/useFleet";
-import type { MaquinaSeed, TipoMaquina } from "@/lib/types";
+import type { Criticidad, MaquinaSeed, TipoMaquina } from "@/lib/types";
 import { Card } from "../ui/Card";
 import { Icon } from "../ui/Icon";
 import { Button } from "../ui/Primitives";
@@ -101,6 +101,10 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
   const [sensor, setSensor] = useState(seed?.sensor ?? "vib-01");
   const [base, setBase] = useState(String(seed?.base ?? 2));
   const [umbral, setUmbral] = useState(String(seed?.umbral ?? 6.5));
+  const [rpm, setRpm] = useState(String(seed?.rpm ?? ""));
+  const [potencia, setPotencia] = useState(String(seed?.potenciaKw ?? ""));
+  const [criticidad, setCriticidad] = useState<Criticidad>(seed?.criticidad ?? "media");
+  const [costo, setCosto] = useState(String(seed?.costoParadaHora ?? ""));
 
   const input = "w-full rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm outline-none focus:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800";
 
@@ -109,12 +113,18 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
       toast.error(t("assets.nameRequired"));
       return;
     }
+    const ficha = {
+      rpm: Number(rpm) || undefined,
+      potenciaKw: Number(potencia) || undefined,
+      criticidad,
+      costoParadaHora: Number(costo) || undefined,
+    };
     if (esEdicion) {
-      editarMaquina(seed!.id, { sector, tipo, sensor, base: Number(base), umbral: Number(umbral) });
+      editarMaquina(seed!.id, { sector, tipo, sensor, base: Number(base), umbral: Number(umbral), ...ficha });
       registrar(actor, "Editó una máquina", seed!.id);
       toast(t("assets.updatedToast"));
     } else {
-      const nueva: MaquinaSeed = { id: nombre.trim(), sector: sector || "Sin sector", tipo, sensor, base: Number(base) || 2, umbral: Number(umbral) || 6.5, esc: "sano" };
+      const nueva: MaquinaSeed = { id: nombre.trim(), sector: sector || "Sin sector", tipo, sensor, base: Number(base) || 2, umbral: Number(umbral) || 6.5, esc: "sano", ...ficha };
       agregarMaquina(nueva);
       registrar(actor, "Agregó una máquina", nueva.id);
       toast(t("assets.addedToast"));
@@ -164,8 +174,32 @@ function AssetModal({ seed, onClose }: { seed: MaquinaSeed | null; onClose: () =
               <input type="number" step="0.1" value={base} onChange={(e) => setBase(e.target.value)} className={input} />
             </Campo>
             <Campo label={t("assets.critThreshold")}>
-              <input type="number" step="0.1" value={umbral} onChange={(e) => setUmbral(e.target.value)} className={input} />
+              <input type="number" step="0.1" value={umbral} onChange={(e) => setUmbral(e.target.value)} className={input} disabled={Number(potencia) > 0} />
             </Campo>
+          </div>
+
+          {/* Ficha técnica — habilita umbral ISO 10816 y costo por máquina */}
+          <div className="border-t border-neutral-100 pt-4 dark:border-neutral-800">
+            <Label>{t("assets.specs")}</Label>
+            <p className="mt-1 mb-3 text-xs text-neutral-400">{t("assets.specsHint")}</p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Campo label={t("assets.rpm")}>
+                <input type="number" step="10" value={rpm} onChange={(e) => setRpm(e.target.value)} placeholder="1450" className={input} />
+              </Campo>
+              <Campo label={t("assets.power")}>
+                <input type="number" step="1" value={potencia} onChange={(e) => setPotencia(e.target.value)} placeholder="30" className={input} />
+              </Campo>
+              <Campo label={t("assets.criticality")}>
+                <select value={criticidad} onChange={(e) => setCriticidad(e.target.value as Criticidad)} className={input}>
+                  {(["alta", "media", "baja"] as Criticidad[]).map((c) => (
+                    <option key={c} value={c}>{t(`crit.${c}`)}</option>
+                  ))}
+                </select>
+              </Campo>
+              <Campo label={t("assets.stopCost")}>
+                <input type="number" step="100" value={costo} onChange={(e) => setCosto(e.target.value)} placeholder="1500" className={input} />
+              </Campo>
+            </div>
           </div>
         </div>
 

@@ -94,6 +94,11 @@ export interface MaquinaDTO {
   esc?: Escenario;
   /** ticks/periodo de calibración restante (0 = monitoreando) */
   calib?: number;
+  // ── Ficha técnica (opcional) ────────────────────────────────────────────
+  rpm?: number;
+  potenciaKw?: number;
+  criticidad?: "alta" | "media" | "baja";
+  costoParadaHora?: number;
 }
 
 export interface AlertaDTO {

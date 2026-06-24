@@ -37,9 +37,21 @@ export interface MaquinaSeed {
   esc: Escenario;
   /** tipo de máquina (si se omite, se deduce del nombre) */
   tipo?: TipoMaquina;
-  /** umbral crítico de vibración (si se omite, usa el global) */
+  /** umbral crítico de vibración (si se omite, usa el global o el ISO) */
   umbral?: number;
+  // ── Ficha técnica (opcional) — habilita cálculos de ingeniería ──────────
+  /** velocidad nominal en RPM (para diagnóstico por frecuencia, futuro) */
+  rpm?: number;
+  /** potencia nominal en kW (habilita el umbral ISO 10816 automático) */
+  potenciaKw?: number;
+  /** criticidad del activo para el negocio */
+  criticidad?: Criticidad;
+  /** costo de una hora de parada de ESTA máquina (si se omite, usa el global) */
+  costoParadaHora?: number;
 }
+
+/** Criticidad de un activo para el negocio (priorización). */
+export type Criticidad = "alta" | "media" | "baja";
 
 /** Estado completo y vivo de una máquina (semilla + estado dinámico del motor). */
 export interface Maquina extends MaquinaSeed {

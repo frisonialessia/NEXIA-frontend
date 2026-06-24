@@ -6,8 +6,13 @@
 // cuando una máquina cambia de estado (poco frecuente, por la histéresis).
 // ──────────────────────────────────────────────────────────────────────────
 
-import { CALIBRACION_TICKS, RANK_ESTADO } from "../constants";
-import type { Maquina } from "../types";
+import { CALIBRACION_TICKS, COSTO_HORA_PARADA, HORAS_PARADA_TIPICA, RANK_ESTADO } from "../constants";
+import type { Maquina, MaquinaSeed } from "../types";
+
+/** Ahorro de evitar una parada de ESTA máquina (costo/hora propio o global). */
+export function ahorroDe(m: Maquina | MaquinaSeed): number {
+  return (m.costoParadaHora ?? COSTO_HORA_PARADA) * HORAS_PARADA_TIPICA;
+}
 
 /** ¿La máquina aún está aprendiendo su baseline (no juzga todavía)? */
 export const estaCalibrando = (m: Maquina): boolean => m.calib > 0;

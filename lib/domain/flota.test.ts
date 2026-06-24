@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ordenarConPreferencias, ordenarFlota } from "./flota";
+import { ahorroDe, ordenarConPreferencias, ordenarFlota } from "./flota";
+import { COSTO_HORA_PARADA, HORAS_PARADA_TIPICA } from "../constants";
 import type { Maquina } from "../types";
 
 const m = (id: string, estado: Maquina["estado"], prob: number): Maquina =>
@@ -15,6 +16,16 @@ describe("orden estable de la flota", () => {
     const antes = ordenarFlota([m("A", "STABLE", 0.2), m("B", "STABLE", 0.3)]).map((x) => x.id);
     const despues = ordenarFlota([m("A", "STABLE", 0.95), m("B", "STABLE", 0.1)]).map((x) => x.id);
     expect(antes).toEqual(despues);
+  });
+});
+
+describe("ahorro por máquina", () => {
+  it("usa el costo de parada propio de la máquina", () => {
+    expect(ahorroDe({ costoParadaHora: 2000 } as unknown as Maquina)).toBe(2000 * HORAS_PARADA_TIPICA);
+  });
+
+  it("cae al costo global si la máquina no lo define", () => {
+    expect(ahorroDe({} as unknown as Maquina)).toBe(COSTO_HORA_PARADA * HORAS_PARADA_TIPICA);
   });
 });
 

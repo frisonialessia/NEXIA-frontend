@@ -16,6 +16,7 @@ import { apiConfigurada } from "../api/contract";
 import { comandos, conectarRemoto, type OrigenRemoto, type ParcheRemoto } from "../api/remoteSource";
 import { AHORRO_POR_PARADA, CALIBRACION_TICKS, FLOTA } from "../constants";
 import { aEventoHistorial, crearFlota, crearMaquina, tickMaquina } from "../data/simulated";
+import { ahorroDe } from "../domain/flota";
 import { causaPrincipal } from "../engine/fsm";
 import type { Alerta, Evento, EventoHistorial, Maquina, MaquinaSeed, Veredicto } from "../types";
 
@@ -298,6 +299,10 @@ export function editarMaquina(id: string, parcial: Partial<MaquinaSeed>) {
       m.esc = parcial.esc;
       m.ritmoDia = parcial.esc === "degradando" ? 0.7 : 0;
     }
+    if (parcial.rpm !== undefined) m.rpm = parcial.rpm;
+    if (parcial.potenciaKw !== undefined) m.potenciaKw = parcial.potenciaKw;
+    if (parcial.criticidad !== undefined) m.criticidad = parcial.criticidad;
+    if (parcial.costoParadaHora !== undefined) m.costoParadaHora = parcial.costoParadaHora;
   }
   persistirRoster();
   set({ maquinas: [...flota], roster: [...rosterSeeds] });
@@ -324,7 +329,9 @@ export function etiquetarAlerta(id: string, veredicto: Veredicto) {
   const historial = snapshot.historial.map((h) => (h.id === id ? { ...h, estado: "Resuelto" as const } : h));
   let savings = snapshot.savings;
   if (alerta && veredicto === "real") {
-    savings = { ahorroMes: savings.ahorroMes + AHORRO_POR_PARADA, paradasEvitadas: savings.paradasEvitadas + 1 };
+    const m = flota.find((x) => x.id === alerta.maquina);
+    const ahorro = m ? ahorroDe(m) : AHORRO_POR_PARADA;
+    savings = { ahorroMes: savings.ahorroMes + ahorro, paradasEvitadas: savings.paradasEvitadas + 1 };
   }
   // Suma el veredicto al track record del modelo (precisión auditable).
   const r = snapshot.registro;

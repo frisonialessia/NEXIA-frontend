@@ -12,11 +12,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { AHORRO_POR_PARADA, ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
+import { ROL_NOMBRE, col, colorSalud, surf } from "@/lib/constants";
 import { MTBF, MTTR, PROX_MANTENIMIENTO, lecturasGauges, saludEnlace, sensoresDe } from "@/lib/data/asset";
 import { serieReplay } from "@/lib/data/simulated";
-import { estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
+import { ahorroDe, estaCalibrando, progresoCalibracion } from "@/lib/domain/flota";
 import { diasAFallo, rangoDiasRedondeado } from "@/lib/engine/fsm";
+import { zonaDe, zonasISO, type ZonaISO } from "@/lib/engine/iso";
 import { dinero } from "@/lib/format";
 import { useT } from "@/lib/state/I18nProvider";
 import { useAdmin } from "@/lib/state/AdminProvider";
@@ -43,6 +44,21 @@ function LinkMetric({ label, value, pct, color }: { label: string; value: string
           <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
         </div>
       )}
+    </div>
+  );
+}
+
+/** Color de la zona ISO: A/B sano, C advertencia, D daño. */
+function colorZonaISO(z: ZonaISO, dark: boolean): string {
+  return z === "D" ? col("crit", dark) : z === "C" ? col("warn", dark) : col("ok", dark);
+}
+
+/** Dato de ficha técnica (etiqueta + valor mono). */
+function Spec({ label, valor }: { label: string; valor: string }) {
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-wider text-neutral-400">{label}</div>
+      <div className="mt-1 font-mono text-lg">{valor}</div>
     </div>
   );
 }
@@ -198,7 +214,7 @@ export function AssetDetail({ id }: { id: string }) {
               <p className="mt-1 text-xs text-neutral-400">{t("detail.estimateHint")}</p>
               <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
                 {t("detail.avoidPrefix")}
-                <span className="font-semibold">{dinero(AHORRO_POR_PARADA)}</span>
+                <span className="font-semibold">{dinero(ahorroDe(m))}</span>
                 {t("detail.avoidSuffix")}
               </p>
             </div>
@@ -308,6 +324,33 @@ export function AssetDetail({ id }: { id: string }) {
             </button>
           </div>
         </div>
+
+        {/* Ficha técnica + severidad ISO 10816 */}
+        {(m.potenciaKw || m.rpm || m.criticidad) && (
+          <div className={`mt-5 ${SURFACE} px-7 py-5`}>
+            <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("detail.specsTitle")}</h3>
+            <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+              {m.potenciaKw ? (() => {
+                const z = zonasISO(m.potenciaKw);
+                const zona = zonaDe(last ? last.v : m.expected, z);
+                const c = colorZonaISO(zona, dark);
+                return (
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wider text-neutral-400">{t("detail.isoZone")}</div>
+                    <div className="mt-1 flex items-baseline gap-2">
+                      <span className="font-mono text-2xl font-semibold" style={{ color: c }}>{zona}</span>
+                      <span className="text-xs text-neutral-400">{t(`iso.${zona}`)}</span>
+                    </div>
+                    <div className="mt-0.5 font-mono text-[11px] text-neutral-400">{t("detail.isoThreshold", { v: z.cd })}</div>
+                  </div>
+                );
+              })() : null}
+              {m.rpm ? <Spec label={t("detail.specRpm")} valor={`${m.rpm.toLocaleString()} rpm`} /> : null}
+              {m.potenciaKw ? <Spec label={t("detail.specPower")} valor={`${m.potenciaKw} kW`} /> : null}
+              {m.criticidad ? <Spec label={t("detail.specCriticality")} valor={t(`crit.${m.criticidad}`)} /> : null}
+            </div>
+          </div>
+        )}
 
         {/* Indicadores de fiabilidad */}
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
