@@ -12,10 +12,30 @@
 
 import { FLOTA, UMBRAL_CRITICO, tipoDe } from "../constants";
 import { causaPrincipal, esAlta, probabilidadFallo, transicion } from "../engine/fsm";
-import type { Alerta, EventoHistorial, Maquina, MaquinaSeed } from "../types";
+import type { Alerta, EventoHistorial, Maquina, MaquinaSeed, Telemetria } from "../types";
 
 /** Tamaño máximo de la ventana móvil de lecturas que guarda cada máquina. */
 const VENTANA_HIST = 40;
+
+/**
+ * Genera la telemetría multi-variable (valores base SI), escalada por la
+ * severidad del estado: bajo fallo sube temperatura/presión/corriente y cae la
+ * velocidad/caudal. Estable por tick (se llama una vez por paso, no por render).
+ * Con backend real, estos valores llegan del PLC y esta función desaparece.
+ */
+function generarTelemetria(m: Maquina): Telemetria {
+  const f = m.estado === "CRITICAL_ALERT" ? 1.4 : m.estado === "WARNING_PROBATION" ? 1.15 : 1;
+  const ruido = (amp: number) => (Math.random() - 0.5) * amp;
+  const rpmNominal = m.rpm ?? 1450;
+  const corrNominal = (m.potenciaKw ?? 30) * 1.8; // ≈ A por kW (motor trifásico típico)
+  return {
+    temp: +(55 * f + ruido(3)).toFixed(1),
+    pres: +(4.2 * f + ruido(0.2)).toFixed(2),
+    rpm: Math.round(rpmNominal / f + ruido(40)),
+    caudal: +(42 / f + ruido(4)).toFixed(1),
+    corriente: +(corrNominal * f + ruido(2)).toFixed(1),
+  };
+}
 
 /** Construye una máquina viva a partir de su semilla. */
 export function crearMaquina(d: MaquinaSeed): Maquina {
@@ -81,6 +101,7 @@ export function tickMaquina(m: Maquina): Alerta | null {
     m.cBaja = 0;
     m.hist.push({ t: Date.now(), v, exp: m.expected });
     if (m.hist.length > VENTANA_HIST) m.hist.shift();
+    m.telemetria = generarTelemetria(m);
     return null;
   }
 
@@ -114,6 +135,7 @@ export function tickMaquina(m: Maquina): Alerta | null {
   m.hist.push({ t: Date.now(), v, exp: m.expected });
   if (m.hist.length > VENTANA_HIST) m.hist.shift();
 
+  m.telemetria = generarTelemetria(m);
   return alerta;
 }
 

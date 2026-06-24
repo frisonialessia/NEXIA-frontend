@@ -77,6 +77,26 @@ export interface Maquina extends MaquinaSeed {
   umbral: number;
   /** ticks de calibración restantes (0 = monitoreando; >0 = aprendiendo baseline) */
   calib: number;
+  /** telemetría multi-variable actual (temp, presión, RPM real, caudal, corriente) */
+  telemetria?: Telemetria;
+}
+
+/**
+ * Telemetría multi-variable de una máquina (valores en unidades base SI). La
+ * vibración es la magnitud que dispara la FSM; estas son contexto adicional que
+ * un PLC entrega de sobra. Hoy simuladas; con backend real llegan del PLC.
+ */
+export interface Telemetria {
+  /** temperatura (°C) */
+  temp: number;
+  /** presión (bar) */
+  pres: number;
+  /** velocidad real medida (RPM) */
+  rpm: number;
+  /** caudal (m³/h) */
+  caudal: number;
+  /** corriente del motor (A) */
+  corriente: number;
 }
 
 /** Una alerta generada cuando una máquina entra en estado crítico. */

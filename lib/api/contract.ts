@@ -99,6 +99,17 @@ export interface MaquinaDTO {
   potenciaKw?: number;
   criticidad?: "alta" | "media" | "baja";
   costoParadaHora?: number;
+  // ── Telemetría multi-variable (opcional; del PLC) ─────────────────────────
+  telemetria?: TelemetriaDTO;
+}
+
+/** Telemetría multi-variable en unidades base SI (la envía el PLC/gateway). */
+export interface TelemetriaDTO {
+  temp: number;
+  pres: number;
+  rpm: number;
+  caudal: number;
+  corriente: number;
 }
 
 export interface AlertaDTO {

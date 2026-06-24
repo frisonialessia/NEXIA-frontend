@@ -26,7 +26,7 @@ import { useMantenimiento } from "@/lib/state/MaintenanceProvider";
 import { useMaquinas } from "@/lib/state/useFleet";
 import { useSession } from "@/lib/state/SessionProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
-import type { Lectura } from "@/lib/types";
+import type { Lectura, Maquina } from "@/lib/types";
 import { Card, SURFACE } from "./ui/Card";
 import { Gauge } from "./ui/Gauge";
 import { Icon } from "./ui/Icon";
@@ -83,9 +83,9 @@ export function AssetDetail({ id }: { id: string }) {
   // Lecturas de los velocímetros (de la capa de datos): se recalculan a cada
   // tick de la máquina, no en cada render, para que no parpadeen en el replay.
   const gauges = useMemo(
-    () => lecturasGauges(m?.estado ?? "STABLE", sistema),
+    () => lecturasGauges(m ?? ({ estado: "STABLE" } as Maquina), sistema),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [m?.tick, m?.estado, sistema]
+    [m?.tick, m?.estado, m?.telemetria, sistema]
   );
 
   if (!m) {
@@ -236,6 +236,16 @@ export function AssetDetail({ id }: { id: string }) {
           <GaugeCard titulo={t("detail.rpm")}>
             <Gauge valor={gauges.rpm.v} min={gauges.rpm.min} max={gauges.rpm.max} unidad={gauges.rpm.u} zonaPeligro={0.9} />
           </GaugeCard>
+        </div>
+
+        {/* Telemetría adicional (multi-variable) */}
+        <div className={`mb-5 ${SURFACE} px-7 py-4`}>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+            <Spec label={t("detail.caudal")} valor={`${gauges.caudal.v.toFixed(1)} ${gauges.caudal.u}`} />
+            <Spec label={t("detail.corriente")} valor={`${gauges.corriente.v.toFixed(1)} A`} />
+            <Spec label={t("detail.temp")} valor={`${gauges.temp.v.toFixed(1)} ${gauges.temp.u}`} />
+            <Spec label={t("detail.pres")} valor={`${gauges.pres.v.toFixed(2)} ${gauges.pres.u}`} />
+          </div>
         </div>
 
         {/* Salud de la conexión (pipeline de datos) */}
