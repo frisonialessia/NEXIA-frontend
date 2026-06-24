@@ -10,7 +10,7 @@
 
 import { toast } from "sonner";
 import { resumirRegistro } from "@/lib/domain/alertas";
-import { ordenarFlota } from "@/lib/domain/flota";
+import { ordenarFlota, zonaISOActiva } from "@/lib/domain/flota";
 import { rangoDiasRedondeado } from "@/lib/engine/fsm";
 import { dinero } from "@/lib/format";
 import { imprimirReporte } from "@/lib/reports/exporter";
@@ -40,14 +40,21 @@ export function ExecutiveReportButton() {
     const riesgo = enAtencion.length === 0 ? t("exec.riskNone") : t("exec.riskSome", { n: enAtencion.length });
     const precisionTxt = r.precision === null ? "—" : `${Math.round(r.precision * 100)}%`;
 
+    // Hex por zona (el reporte se imprime fuera de la app, sin variables CSS).
+    const isoHex: Record<string, string> = { A: "#10b981", B: "#10b981", C: "#eab308", D: "#ef4444" };
+    const celdaIso = (m: (typeof enAtencion)[number]) => {
+      const z = zonaISOActiva(m);
+      return z ? `<span style="color:${isoHex[z]};font-weight:600">${z}</span>` : "—";
+    };
+
     const filasAtencion = enAtencion.length
       ? enAtencion
           .map(
             (m) =>
-              `<tr><td>${m.id}</td><td>${t(`estados.${m.estado}`)}</td><td class="num">${Math.round(m.prob * 100)}%</td><td>${pred(m)}</td></tr>`
+              `<tr><td>${m.id}</td><td>${t(`estados.${m.estado}`)}</td><td>${celdaIso(m)}</td><td class="num">${Math.round(m.prob * 100)}%</td><td>${pred(m)}</td></tr>`
           )
           .join("")
-      : `<tr><td colspan="4">${t("exec.allNormal")}</td></tr>`;
+      : `<tr><td colspan="5">${t("exec.allNormal")}</td></tr>`;
 
     const html = `
       <h1>${t("exec.title")}</h1>
@@ -63,7 +70,7 @@ export function ExecutiveReportButton() {
       </div>
       <h2>${t("exec.needAttention")}</h2>
       <table><thead><tr>
-        <th>${t("exec.colMachine")}</th><th>${t("exec.colState")}</th>
+        <th>${t("exec.colMachine")}</th><th>${t("exec.colState")}</th><th>${t("exec.colIso")}</th>
         <th class="num">${t("exec.colProb")}</th><th>${t("exec.colForecast")}</th>
       </tr></thead><tbody>${filasAtencion}</tbody></table>
       <h2>${t("exec.reliability")}</h2>
