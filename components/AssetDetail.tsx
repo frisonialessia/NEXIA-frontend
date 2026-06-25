@@ -248,6 +248,26 @@ export function AssetDetail({ id }: { id: string }) {
           </div>
         </div>
 
+        {/* Indicadores derivados (KPIs) */}
+        {m.kpis && (m.kpis.energiaKw !== undefined || m.kpis.eficiencia !== undefined || m.kpis.oee !== undefined) && (
+          <div className={`mb-5 ${SURFACE} px-7 py-5`}>
+            <h3 className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("kpis.title")}</h3>
+            <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+              {m.kpis.energiaKw !== undefined && <Spec label={t("kpis.energy")} valor={`${m.kpis.energiaKw.toFixed(2)} kW`} />}
+              {m.kpis.eficiencia !== undefined && <Spec label={t("kpis.efficiency")} valor={`${m.kpis.eficiencia.toFixed(1)}%`} />}
+              {m.kpis.oee !== undefined && (
+                <div>
+                  <div className="text-[11px] uppercase tracking-wider text-neutral-400">{t("kpis.oee")}</div>
+                  <div className="mt-1 font-mono text-lg">
+                    {m.kpis.oee.toFixed(1)}% <span className="text-[11px] font-sans text-neutral-400">· {t("kpis.preliminary")}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <p className="mt-3 text-xs text-neutral-400">{t("kpis.oeeNote")}</p>
+          </div>
+        )}
+
         {/* Salud de la conexión (pipeline de datos) */}
         <div className={`mb-5 ${SURFACE} px-7 py-5`}>
           <div className="flex flex-wrap items-center justify-between gap-2">

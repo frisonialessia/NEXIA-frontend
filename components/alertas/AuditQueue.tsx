@@ -95,6 +95,10 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
   const exp = explicarAlerta(alerta);
   const u = uni("vib", sistema);
   const fmtVib = (n: number) => `${u.f(n).toFixed(2)} ${u.u}`;
+  // Multi-variable: si la alerta la disparó otra magnitud, se explica con su
+  // unidad (la causa textual del backend ya viene en "causa probable").
+  const esVib = !alerta.campo || alerta.campo === "vibracion";
+  const um = uni(alerta.campo === "presion" ? "pres" : "temp", sistema);
   const [veredicto, setVeredicto] = useState<Veredicto | null>(null);
   const [causaSel, setCausaSel] = useState<string | null>(null);
   const [accionSel, setAccionSel] = useState<string | null>(null);
@@ -137,32 +141,55 @@ function AuditModal({ alerta, onClose }: { alerta: Alerta; onClose: () => void }
           {/* Por qué la marcamos (explicabilidad, no caja negra) */}
           <div className="mt-3 rounded-xl border px-4 py-3" style={{ borderColor: ARC }}>
             <span className="text-[11px] uppercase tracking-wider text-neutral-400">{t("audit.whyTitle")}</span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-mono text-2xl" style={{ color: col("crit", dark) }}>
-                {exp.desviacionPct > 0 ? "+" : ""}{exp.desviacionPct}%
-              </span>
-              <span className="text-xs text-neutral-400">{t("audit.deviation")}</span>
-            </div>
-            <ul className="mt-2 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-300">
-              <li className="flex items-start gap-2">
-                <Icon name="chart" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
-                {t("audit.whyReading", { vib: fmtVib(exp.vib), exp: u.f(exp.exp).toFixed(2), u: u.u })}
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="spark" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
-                {t("audit.whyBand", { n: exp.sigmas })}
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="alert" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: exp.sobreUmbral ? col("crit", dark) : col("warn", dark) }} />
-                {exp.sobreUmbral
-                  ? t("audit.whyThreshold", { umbral: u.f(exp.umbral).toFixed(2), u: u.u })
-                  : t("audit.whyNearThreshold", { umbral: u.f(exp.umbral).toFixed(2), u: u.u })}
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="check" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: col("ok", dark) }} />
-                {t("audit.whyConfirmed", { n: LECTURAS_CONFIRMACION })}
-              </li>
-            </ul>
+            {esVib ? (
+              <>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="font-mono text-2xl" style={{ color: col("crit", dark) }}>
+                    {exp.desviacionPct > 0 ? "+" : ""}{exp.desviacionPct}%
+                  </span>
+                  <span className="text-xs text-neutral-400">{t("audit.deviation")}</span>
+                </div>
+                <ul className="mt-2 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-300">
+                  <li className="flex items-start gap-2">
+                    <Icon name="chart" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
+                    {t("audit.whyReading", { vib: fmtVib(exp.vib), exp: u.f(exp.exp).toFixed(2), u: u.u })}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="spark" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neutral-400" />
+                    {t("audit.whyBand", { n: exp.sigmas })}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="alert" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: exp.sobreUmbral ? col("crit", dark) : col("warn", dark) }} />
+                    {exp.sobreUmbral
+                      ? t("audit.whyThreshold", { umbral: u.f(exp.umbral).toFixed(2), u: u.u })
+                      : t("audit.whyNearThreshold", { umbral: u.f(exp.umbral).toFixed(2), u: u.u })}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="check" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: col("ok", dark) }} />
+                    {t("audit.whyConfirmed", { n: LECTURAS_CONFIRMACION })}
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="font-mono text-2xl" style={{ color: col("crit", dark) }}>
+                    {alerta.valor !== undefined ? `${um.f(alerta.valor).toFixed(1)} ${um.u}` : "—"}
+                  </span>
+                  <span className="text-xs text-neutral-400">{t(`audit.field.${alerta.campo}`)}</span>
+                </div>
+                <ul className="mt-2 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-300">
+                  <li className="flex items-start gap-2">
+                    <Icon name="alert" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: col("crit", dark) }} />
+                    {alerta.limite !== undefined ? t("audit.whyLimit", { limite: um.f(alerta.limite).toFixed(1), u: um.u }) : alerta.causa}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="check" className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: col("ok", dark) }} />
+                    {t("audit.whyEdge")}
+                  </li>
+                </ul>
+              </>
+            )}
           </div>
         </div>
 
