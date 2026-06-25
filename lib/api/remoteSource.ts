@@ -70,7 +70,12 @@ export function conectarRemoto(cb: CallbacksRemoto): OrigenRemoto {
   function abrir() {
     if (cerrado) return;
     try {
-      ws = new WebSocket(wsUrl());
+      // El navegador no puede enviar headers en el WS → el token va por query
+      // param. El backend lee ?token=... y filtra por organización.
+      const base = wsUrl();
+      const tok = authToken();
+      const url = tok ? base + (base.includes("?") ? "&" : "?") + "token=" + encodeURIComponent(tok) : base;
+      ws = new WebSocket(url);
     } catch {
       programarReconexion();
       return;
