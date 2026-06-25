@@ -79,6 +79,22 @@ export interface Maquina extends MaquinaSeed {
   calib: number;
   /** telemetría multi-variable actual (temp, presión, RPM real, caudal, corriente) */
   telemetria?: Telemetria;
+  /** indicadores derivados de la telemetría (energía, eficiencia, OEE) */
+  kpis?: Kpis;
+}
+
+/**
+ * Indicadores de planta derivados de la telemetría (capa aparte de la FSM).
+ * Cada clave aparece solo si hay dato para calcularla.
+ */
+export interface Kpis {
+  /** kW activos estimados (√3·V·I·fp/1000) */
+  energiaKw?: number;
+  /** eficiencia % (0–100) */
+  eficiencia?: number;
+  /** OEE % (0–100). Hoy solo el rendimiento es medido; disponibilidad y calidad
+   *  son placeholders hasta la FASE 2 → mostrar como preliminar. */
+  oee?: number;
 }
 
 /**
@@ -115,7 +131,17 @@ export interface Alerta {
   exp: number;
   /** umbral crítico de la máquina (mm/s base) */
   umbral: number;
+  // Magnitud que disparó la alerta (multi-variable). Si ausente → vibración.
+  /** qué magnitud cruzó el límite */
+  campo?: MagnitudAlerta;
+  /** valor medido que disparó (unidad SI según `campo`) */
+  valor?: number;
+  /** límite cruzado (misma unidad que `valor`) */
+  limite?: number;
 }
+
+/** Magnitud que puede disparar una alerta. */
+export type MagnitudAlerta = "vibracion" | "temperatura" | "presion";
 
 /** Entrada del historial de fallos (una alerta + metadatos de seguimiento). */
 export interface EventoHistorial extends Alerta {

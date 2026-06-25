@@ -101,6 +101,8 @@ export interface MaquinaDTO {
   costoParadaHora?: number;
   // ── Telemetría multi-variable (opcional; del PLC) ─────────────────────────
   telemetria?: TelemetriaDTO;
+  /** indicadores derivados (ausente si no hay datos para ninguno) */
+  kpis?: KpisDTO;
 }
 
 /** Telemetría multi-variable en unidades base SI (la envía el PLC/gateway). */
@@ -110,6 +112,16 @@ export interface TelemetriaDTO {
   rpm: number;
   caudal: number;
   corriente: number;
+}
+
+/** KPIs derivados de la telemetría. Cada clave aparece solo si hay dato. */
+export interface KpisDTO {
+  /** kW activos · 3 dec */
+  energiaKw?: number;
+  /** eficiencia % (0–100) · 1 dec */
+  eficiencia?: number;
+  /** OEE % (0–100) · 1 dec · preliminar (disp/calidad son placeholders) */
+  oee?: number;
 }
 
 export interface AlertaDTO {
@@ -127,6 +139,12 @@ export interface AlertaDTO {
   exp: number;
   /** umbral crítico de la máquina */
   umbral: number;
+  // Multi-variable: qué magnitud cruzó el límite (ausente → vibración).
+  campo?: "vibracion" | "temperatura" | "presion";
+  /** valor medido (unidad SI según campo) */
+  valor?: number;
+  /** límite cruzado (misma unidad que valor) */
+  limite?: number;
   /** "Pendiente" | "Resuelto" (solo en historial) */
   estado?: "Pendiente" | "Resuelto";
 }

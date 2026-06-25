@@ -12,7 +12,7 @@
 
 import { FLOTA, UMBRAL_CRITICO, tipoDe } from "../constants";
 import { causaPrincipal, esAlta, probabilidadFallo, transicion } from "../engine/fsm";
-import type { Alerta, EventoHistorial, Maquina, MaquinaSeed, Telemetria } from "../types";
+import type { Alerta, EventoHistorial, Kpis, Maquina, MaquinaSeed, Telemetria } from "../types";
 
 /** Tamaño máximo de la ventana móvil de lecturas que guarda cada máquina. */
 const VENTANA_HIST = 40;
@@ -34,6 +34,19 @@ function generarTelemetria(m: Maquina): Telemetria {
     rpm: Math.round(rpmNominal / f + ruido(40)),
     caudal: +(42 / f + ruido(4)).toFixed(1),
     corriente: +(corrNominal * f + ruido(2)).toFixed(1),
+  };
+}
+
+/**
+ * KPIs derivados de la telemetría (mismas fórmulas que el backend). OEE es
+ * preliminar: solo el rendimiento (caudal) es medido; disponibilidad y calidad
+ * son placeholders hasta la FASE 2.
+ */
+function generarKpis(tel: Telemetria): Kpis {
+  return {
+    energiaKw: +((Math.sqrt(3) * 400 * tel.corriente * 0.85) / 1000).toFixed(3),
+    eficiencia: +Math.min(100, tel.caudal).toFixed(1),
+    oee: +(0.95 * (tel.caudal / 100) * 0.99 * 100).toFixed(1),
   };
 }
 
@@ -102,6 +115,7 @@ export function tickMaquina(m: Maquina): Alerta | null {
     m.hist.push({ t: Date.now(), v, exp: m.expected });
     if (m.hist.length > VENTANA_HIST) m.hist.shift();
     m.telemetria = generarTelemetria(m);
+    m.kpis = generarKpis(m.telemetria);
     return null;
   }
 
@@ -128,6 +142,9 @@ export function tickMaquina(m: Maquina): Alerta | null {
       vib: v,
       exp: m.expected,
       umbral: m.umbral,
+      campo: "vibracion",
+      valor: v,
+      limite: m.umbral,
     };
   }
 
@@ -136,6 +153,7 @@ export function tickMaquina(m: Maquina): Alerta | null {
   if (m.hist.length > VENTANA_HIST) m.hist.shift();
 
   m.telemetria = generarTelemetria(m);
+  m.kpis = generarKpis(m.telemetria);
   return alerta;
 }
 
