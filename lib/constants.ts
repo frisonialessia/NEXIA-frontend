@@ -205,6 +205,24 @@ export const CAUSAS: Record<TipoMaquina, string[]> = {
   ventilador: ["Desbalance de aspas", "Acumulación de suciedad", "Rodamiento dañado"],
 };
 
+/**
+ * Perfiles de telemetría TÍPICOS por tipo de equipo (valores base SI, máquina
+ * sana). Reflejan el comportamiento real de una planta para que las cifras sean
+ * creíbles para un ingeniero de mantenimiento:
+ *   - compresor: caliente (~80 °C) y a alta presión (~8.5 bar)
+ *   - bomba: intermedia (~54 °C, ~5 bar, buen caudal)
+ *   - motor: presión/caudal del sistema de lubricación, corriente alta
+ *   - ventilador: frío (~47 °C) y a baja presión estática, mucho caudal de aire
+ * temp en °C · pres en bar · caudal en m³/h. (corriente y rpm se derivan de la
+ * potencia y la velocidad nominal de cada máquina.)
+ */
+export const PERFIL_TELEMETRIA: Record<TipoMaquina, { temp: number; pres: number; caudal: number }> = {
+  bomba: { temp: 54, pres: 5.2, caudal: 62 },
+  compresor: { temp: 82, pres: 8.5, caudal: 38 },
+  motor: { temp: 63, pres: 1.8, caudal: 12 },
+  ventilador: { temp: 47, pres: 0.6, caudal: 88 },
+};
+
 /** Acciones que el técnico puede registrar al cerrar una alerta. */
 export const ACCIONES = [
   "Se reemplazó la pieza",

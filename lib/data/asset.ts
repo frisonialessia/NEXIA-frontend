@@ -4,6 +4,7 @@
 // Hoy se derivan del estado (simulado); el día del backend, llegan del sensor.
 // ──────────────────────────────────────────────────────────────────────────
 
+import { PERFIL_TELEMETRIA } from "../constants";
 import { uni } from "../format";
 import type { Estado, Maquina, SistemaUnidades, Telemetria } from "../types";
 
@@ -83,10 +84,18 @@ export interface GaugeSpec {
   u: string;
 }
 
-/** Telemetría de respaldo (base SI) si la máquina aún no tiene lecturas. */
-function telemetriaRespaldo(estado: Estado): Telemetria {
-  const f = factorEstado(estado);
-  return { temp: 58 * f, pres: 4.2 * f, rpm: 1450 / f, caudal: 42 / f, corriente: 54 * f };
+/** Telemetría de respaldo (base SI, perfil real por tipo) si la máquina aún no
+ *  tiene lecturas. */
+function telemetriaRespaldo(m: Maquina): Telemetria {
+  const f = factorEstado(m.estado);
+  const p = PERFIL_TELEMETRIA[m.tipo];
+  return {
+    temp: p.temp * f,
+    pres: p.pres,
+    rpm: (m.rpm ?? 1450) / f,
+    caudal: p.caudal / f,
+    corriente: (m.potenciaKw ?? 30) * 1.8 * f,
+  };
 }
 
 /**
@@ -98,7 +107,7 @@ export function lecturasGauges(
   m: Maquina,
   sistema: SistemaUnidades
 ): { temp: GaugeSpec; pres: GaugeSpec; rpm: GaugeSpec; caudal: GaugeSpec; corriente: GaugeSpec } {
-  const tel = m.telemetria ?? telemetriaRespaldo(m.estado);
+  const tel = m.telemetria ?? telemetriaRespaldo(m);
   const t = uni("temp", sistema);
   const p = uni("pres", sistema);
   const c = uni("caudal", sistema);

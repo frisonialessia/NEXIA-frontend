@@ -10,7 +10,7 @@
 //    de red. Las vistas NO importan nada de aquí: hablan con useFleet().
 // ──────────────────────────────────────────────────────────────────────────
 
-import { FLOTA, UMBRAL_CRITICO, tipoDe } from "../constants";
+import { FLOTA, PERFIL_TELEMETRIA, UMBRAL_CRITICO, tipoDe } from "../constants";
 import { causaPrincipal, esAlta, probabilidadFallo, transicion } from "../engine/fsm";
 import type { Alerta, EventoHistorial, Kpis, Maquina, MaquinaSeed, Telemetria } from "../types";
 
@@ -26,13 +26,15 @@ const VENTANA_HIST = 40;
 function generarTelemetria(m: Maquina): Telemetria {
   const f = m.estado === "CRITICAL_ALERT" ? 1.4 : m.estado === "WARNING_PROBATION" ? 1.15 : 1;
   const ruido = (amp: number) => (Math.random() - 0.5) * amp;
+  const p = PERFIL_TELEMETRIA[m.tipo]; // perfil real por tipo de equipo
   const rpmNominal = m.rpm ?? 1450;
   const corrNominal = (m.potenciaKw ?? 30) * 1.8; // ≈ A por kW (motor trifásico típico)
   return {
-    temp: +(55 * f + ruido(3)).toFixed(1),
-    pres: +(4.2 * f + ruido(0.2)).toFixed(2),
+    // Bajo fallo: sube temperatura y corriente; cae velocidad y caudal.
+    temp: +(p.temp * f + ruido(3)).toFixed(1),
+    pres: +Math.max(0, p.pres + ruido(Math.max(0.1, p.pres * 0.04))).toFixed(2),
     rpm: Math.round(rpmNominal / f + ruido(40)),
-    caudal: +(42 / f + ruido(4)).toFixed(1),
+    caudal: +Math.max(0, p.caudal / f + ruido(Math.max(1, p.caudal * 0.05))).toFixed(1),
     corriente: +(corrNominal * f + ruido(2)).toFixed(1),
   };
 }
