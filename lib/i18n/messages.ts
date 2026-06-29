@@ -150,6 +150,7 @@ const en: Dict = {
   "kpi.stableAssets": "stable assets",
   "kpi.needAttention": "Need attention",
   "kpi.allOk": "all in order",
+  "kpi.example": "example",
   "kpi.oneAtRisk": "machine at risk",
   "kpi.manyAtRisk": "machines at risk",
 
@@ -772,6 +773,7 @@ const es: Dict = {
   "kpi.stableAssets": "activos estables",
   "kpi.needAttention": "Requieren atención",
   "kpi.allOk": "todo en orden",
+  "kpi.example": "ejemplo",
   "kpi.oneAtRisk": "máquina en riesgo",
   "kpi.manyAtRisk": "máquinas en riesgo",
 

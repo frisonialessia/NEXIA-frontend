@@ -8,6 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { col } from "@/lib/constants";
+import { esDemo } from "@/lib/demo";
 import { resumirRegistro } from "@/lib/domain/alertas";
 import { useT } from "@/lib/state/I18nProvider";
 import { useRegistro } from "@/lib/state/useFleet";
@@ -31,7 +32,14 @@ export function TrackRecord() {
 
   return (
     <div className={`${SURFACE} px-7 py-5`}>
-      <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">{t("track.title")}</span>
+      <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-400">
+        {t("track.title")}
+        {esDemo() && (
+          <span className="ml-2 rounded px-1.5 py-px text-[9px] tracking-wider text-neutral-400 ring-1 ring-neutral-200 dark:ring-neutral-700">
+            {t("kpi.example")}
+          </span>
+        )}
+      </span>
       <div className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-4">
         <div>
           <div className="flex items-baseline gap-1.5">

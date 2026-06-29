@@ -9,6 +9,7 @@
 import type { ReactNode } from "react";
 import { AHORRO_POR_PARADA, type ColorKey, col, colorPorValor, colorSalud, soft } from "@/lib/constants";
 import { ordenarFlota } from "@/lib/domain/flota";
+import { esDemo } from "@/lib/demo";
 import { AHORRO_SEMANAL, SALUD_SEMANAL } from "@/lib/data/trend";
 import { dinero } from "@/lib/format";
 import type { Maquina } from "@/lib/types";
@@ -38,6 +39,7 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
 
   const dots = ordenarFlota(maquinas).map((m) => colorSalud(m.estado, m.prob));
   const saludKey = colorPorValor(salud, 75);
+  const demo = esDemo();
 
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
@@ -49,6 +51,7 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
         sub={t("kpi.inStops")}
         spark={{ data: AHORRO_SEMANAL, colorKey: "ok" }}
         delta={{ texto: `+${ahorroPct}%`, bueno: true }}
+        ejemplo={demo}
       />
       <KpiTile
         titulo={t("kpi.stopsAvoided")}
@@ -57,6 +60,7 @@ export function KpiStrip({ maquinas, savings }: { maquinas: Maquina[]; savings: 
         valor={String(savings.paradasEvitadas)}
         sub={t("kpi.thisMonth")}
         spark={{ data: paradasSemanal, colorKey: "ok" }}
+        ejemplo={demo}
       />
       <KpiTile
         titulo={t("kpi.plantHealth")}
@@ -94,6 +98,7 @@ function KpiTile({
   spark,
   delta,
   extra,
+  ejemplo,
 }: {
   titulo: string;
   icono: IconName;
@@ -103,7 +108,9 @@ function KpiTile({
   spark?: { data: number[]; colorKey: ColorKey };
   delta?: Delta;
   extra?: ReactNode;
+  ejemplo?: boolean;
 }) {
+  const t = useT();
   return (
     <div className={`${SURFACE} px-4 py-3.5`}>
       <div className="flex items-center justify-between">
@@ -112,6 +119,11 @@ function KpiTile({
             <Icon name={icono} className="h-4 w-4" />
           </span>
           <Label>{titulo}</Label>
+          {ejemplo && (
+            <span className="rounded px-1.5 py-px text-[9px] font-medium uppercase tracking-wider text-neutral-400 ring-1 ring-neutral-200 dark:ring-neutral-700">
+              {t("kpi.example")}
+            </span>
+          )}
         </div>
         {delta && (
           <span
