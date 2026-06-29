@@ -6,6 +6,7 @@
 // contra la semilla del equipo. Cuentas de demostración para entrar en un clic.
 // ──────────────────────────────────────────────────────────────────────────
 
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { col } from "@/lib/constants";
@@ -101,6 +102,9 @@ export function LoginScreen() {
           <p className="mt-3 text-center text-xs text-neutral-400">
             {t("login.noPassword")}
           </p>
+          <Link href="/calculadora" className="mt-3 block text-center text-xs font-medium" style={{ color: col("brand", dark) }}>
+            {t("login.calcLink")}
+          </Link>
         </form>
 
         <div className="mt-7">

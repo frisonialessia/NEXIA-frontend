@@ -8,6 +8,7 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { useSession } from "@/lib/state/SessionProvider";
+import { usePathname } from "next/navigation";
 import { LoginScreen } from "./account/LoginScreen";
 import { DemoBanner } from "./DemoBanner";
 import { LiveAnnouncer } from "./LiveAnnouncer";
@@ -17,12 +18,19 @@ import { PwaRegister } from "./PwaRegister";
 import { BrandMark } from "./account/BrandMark";
 import { WelcomeTour } from "./onboarding/WelcomeTour";
 
+/** Rutas accesibles sin iniciar sesión (p. ej. la calculadora de ahorro). */
+const RUTAS_PUBLICAS = ["/calculadora"];
+
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { sesionActiva, hidratado } = useSession();
+  const pathname = usePathname();
+  const esPublica = RUTAS_PUBLICAS.some((r) => pathname === r || pathname.startsWith(r + "/"));
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100">
-      {!hidratado ? (
+      {esPublica ? (
+        children
+      ) : !hidratado ? (
         <div className="flex min-h-screen flex-col items-center justify-center gap-4">
           <BrandMark size={48} className="animate-pulse" />
           <span className="font-display text-lg tracking-tight text-neutral-400">NEXIA</span>
