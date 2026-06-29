@@ -71,6 +71,22 @@ export function LoginScreen() {
           onSubmit={entrar}
           className="rounded-2xl bg-white p-7 ring-1 ring-neutral-200/70 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_28px_-14px_rgba(16,24,40,0.14)] dark:bg-neutral-900 dark:ring-neutral-800 dark:shadow-none"
         >
+          {/* Entrada al demo de un clic (cero fricción para el prospecto) */}
+          <button
+            type="button"
+            disabled={cargando}
+            onClick={() => void acceder("alessia@planta.com")}
+            className="w-full rounded-xl py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            style={{ background: col("brand", dark) }}
+          >
+            {t("login.demoEnter")}
+          </button>
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+            <span className="text-[11px] uppercase tracking-[0.14em] text-neutral-400">{t("login.or")}</span>
+            <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+          </div>
+
           <label className="block">
             <span className="mb-1.5 block text-xs font-medium uppercase tracking-[0.14em] text-neutral-400">{t("login.email")}</span>
             <input
@@ -95,7 +111,7 @@ export function LoginScreen() {
             />
           </label>
 
-          <Button type="submit" disabled={cargando} className="mt-6 w-full py-3">
+          <Button type="submit" variant="secondary" disabled={cargando} className="mt-6 w-full py-3">
             {cargando ? t("login.entering") : t("login.enter")}
           </Button>
 

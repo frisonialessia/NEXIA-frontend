@@ -9,7 +9,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { col } from "@/lib/constants";
-import { ROI_DEFAULT, calcularROI, type EntradaROI } from "@/lib/data/roi";
+import { PRESETS_ROI, ROI_DEFAULT, calcularROI, type EntradaROI } from "@/lib/data/roi";
 import { dinero } from "@/lib/format";
 import { useT } from "@/lib/state/I18nProvider";
 import { useTheme } from "@/lib/state/ThemeProvider";
@@ -48,6 +48,17 @@ export function Calculadora() {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {/* Entradas */}
           <div className="rounded-2xl bg-white p-7 ring-1 ring-neutral-200/70 dark:bg-neutral-900 dark:ring-neutral-800">
+            <div className="mb-5 flex flex-wrap gap-2">
+              {PRESETS_ROI.map((p) => (
+                <button
+                  key={p.nombreKey}
+                  onClick={() => setE(p.datos)}
+                  className="rounded-full border border-neutral-200 px-3 py-1 text-xs text-neutral-600 transition-colors hover:border-neutral-400 dark:border-neutral-700 dark:text-neutral-300"
+                >
+                  {t(p.nombreKey)}
+                </button>
+              ))}
+            </div>
             <Campo label={t("calc.costoHora")}>
               <input type="number" min={0} step={100} value={e.costoHora} onChange={set("costoHora")} className={input} />
             </Campo>
